@@ -1,7 +1,7 @@
 // File: dbin.js
 // Đã chuyển đổi Qty và s sang kiểu Số (Number) để tính toán trực tiếp
 
-export const dbinSales = [
+const dbinSales = [
   {hq: "2.North",ar: "1. Ha Noi",Pv: "Hà Nội" ,sku: "Miến tươi Song Long 1kg",mo: "May",Qty: 1562,s:412211800 },
 {hq: "2.North",ar: "1. Ha Noi",Pv: "Hà Nội" ,sku: "Miến tươi Song Long 3kg",mo: "May",Qty: 360,s:191646000 },
 {hq: "1.South",ar: "1. HCMC",Pv: "TP.Hồ Chí Minh" ,sku: "Miến đậu xanh Song Long 200g",mo: "May",Qty: 43,s:50086400 },
