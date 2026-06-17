@@ -136,16 +136,15 @@
 
         th { background-color: #f8f9fa; color: #495057; font-weight: 600; }
 
-        /* Màu Gantt Chart */
         .col-task { font-weight: 600; color: #0B486B; word-break: break-word; } /* Mã 1 */
         .timeline-cell { position: relative; padding: 0 !important; height: 55px; background-color: #ffffff; }
         .pic-label { position: absolute; top: 4px; font-size: 11px; font-weight: 600; color: #222; white-space: nowrap; z-index: 10; text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff; pointer-events: none; }
         .task-arrow-wrapper { position: absolute; top: 24px; height: 22px; background-color: #eaeaea; border-radius: 4px; z-index: 5; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
         .task-arrow-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: width 0.3s ease; }
         .progress-text { color: #ffffff; font-size: 10px; font-weight: bold; }
-        .status-ongoing { background-color: #0B486B; } /* Mã 1 */
-        .status-done { background-color: #79BD9A; color: #111111; } /* Mã 3 */
-        .status-delay { background-color: #3B8686; color: #ffffff; } /* Mã 2 */
+        .status-ongoing { background-color: #0B486B; } 
+        .status-done { background-color: #79BD9A; color: #111111; } 
+        .status-delay { background-color: #3B8686; color: #ffffff; } 
         .status-done .progress-text { color: #111111; } 
 
         /* ==========================================================================
@@ -158,7 +157,6 @@
         .swot-column, .sale-left-column { flex: 0 0 calc(60% - 10px); display: flex; flex-direction: column; }
         .tree-column, .sale-right-column { flex: 0 0 calc(40% - 10px); display: flex; flex-direction: column; }
 
-        /* Khung 50/50 cho Primary Sale */
         .sale-half-column { flex: 1 1 calc(50% - 10px); display: flex; flex-direction: column; min-width: 0; }
 
         /* SWOT Styles */
@@ -166,13 +164,13 @@
         .swot-box { padding: 20px; border-radius: 8px; min-height: 180px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .swot-box h3, .swot-support h3 { margin-bottom: 12px; font-size: 18px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; }
         .swot-box ul, .swot-support ul { padding-left: 15px; font-size: 14px; line-height: 1.6; }
-        .swot-s { background-color: #0B486B; color: #ffffff; } /* Mã 1 */
-        .swot-w { background-color: #3B8686; color: #ffffff; } /* Mã 2 */
-        .swot-o { background-color: #79BD9A; color: #111111; } /* Mã 3 */
+        .swot-s { background-color: #0B486B; color: #ffffff; } 
+        .swot-w { background-color: #3B8686; color: #ffffff; } 
+        .swot-o { background-color: #79BD9A; color: #111111; } 
         .swot-o h3 { border-bottom: 1px solid rgba(0,0,0,0.15); color: #0B486B; }
-        .swot-t { background-color: #A8DBA8; color: #111111; } /* Mã 4 */
+        .swot-t { background-color: #A8DBA8; color: #111111; } 
         .swot-t h3 { border-bottom: 1px solid rgba(0,0,0,0.15); color: #0B486B; }
-        .swot-support { background-color: #CFF09E; color: #111111; margin-top: 20px; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); } /* Mã 5 */
+        .swot-support { background-color: #CFF09E; color: #111111; margin-top: 20px; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .swot-support h3 { border-bottom: 1px solid rgba(0,0,0,0.15); color: #0B486B; }
         .province-title { display: block; margin-top: 8px; font-weight: bold; font-size: 14px; text-transform: uppercase; color: inherit; }
         .swot-content-text { display: block; margin-bottom: 8px; padding-left: 10px; opacity: 0.95; }
@@ -194,10 +192,8 @@
         .tree-line { width: 2px; height: 30px; background-color: #ccc; z-index: 1; }
         .tree-row { display: flex; gap: 30px; justify-content: center; width: 100%; position: relative; }
 
-        /* Biểu đồ Primary Sale container */
+        /* Biểu đồ Primary Sale */
         .chart-container { position: relative; width: 100%; height: 300px; margin-bottom: 20px; }
-
-        /* Căn chỉnh số tiền trong bảng */
         .text-right { text-align: right !important; }
 
         @media (max-width: 992px) {
@@ -281,20 +277,16 @@
             
             <div class="sale-half-column">
                 <div class="card" style="margin-bottom: 0; height: 100%;">
-                    <h2>Biểu đồ Giá trị Primary Sale</h2>
-                    <div class="chart-container">
+                    <h2>PRIMARY SALES</h2> <div class="chart-container">
                         <canvas id="barChart"></canvas>
                     </div>
                     <div class="table-responsive">
                         <table id="value-table">
                             <thead>
-                                <tr id="value-table-head">
-                                    </tr>
+                                <tr id="value-table-head"></tr>
                             </thead>
-                            <tbody id="value-table-body">
-                                </tbody>
-                            <tfoot id="value-table-foot" style="font-weight: bold; background-color: #f8f9fa;">
-                                </tfoot>
+                            <tbody id="value-table-body"></tbody>
+                            <tfoot id="value-table-foot" style="background-color: #f8f9fa;"></tfoot>
                         </table>
                     </div>
                 </div>
@@ -302,20 +294,17 @@
 
             <div class="sale-half-column">
                 <div class="card" style="margin-bottom: 0; height: 100%;">
-                    <h2>Tỷ trọng Ngành Hàng (Theo Giá trị)</h2>
-                    <div class="chart-container">
+                    <h2>PRIMARY SALES BY SKU</h2> <div class="chart-container">
                         <canvas id="donutChart"></canvas>
                     </div>
                     <h2 style="margin-top: 15px; font-size: 16px;">Chi tiết Primary Sale by SKU (Số lượng thùng)</h2>
                     <div class="table-responsive">
                         <table id="sku-table">
                             <thead>
-                                <tr id="sku-table-head">
-                                    </tr>
+                                <tr id="sku-table-head"></tr>
                             </thead>
-                            <tbody id="sku-table-body">
-                                </tbody>
-                        </table>
+                            <tbody id="sku-table-body"></tbody>
+                            <tfoot id="sku-table-foot" style="background-color: #f8f9fa;"></tfoot> </table>
                     </div>
                 </div>
             </div>
@@ -398,12 +387,7 @@
         function filterData(dataArray, dataIsDbin = false) {
             const selectedArea = document.getElementById('filter-area').value;
             return dataArray.filter(item => {
-                let areaVal = '';
-                if (dataIsDbin) {
-                    areaVal = item.ar || ''; 
-                } else {
-                    areaVal = item['ar'] || item['AR'] || item['Area'] || item['Khu vực'] || '';
-                }
+                let areaVal = dataIsDbin ? (item.ar || '') : (item['ar'] || item['AR'] || item['Area'] || item['Khu vực'] || '');
                 return (selectedArea === 'All') || (areaVal.trim().toLowerCase() === selectedArea.trim().toLowerCase());
             });
         }
@@ -415,7 +399,7 @@
             renderPrimarySale();
         }
 
-        // --- CÁC HÀM GANTT, SWOT, TREE CŨ --- (Đã thu gọn để nhường chỗ code mới, nhưng chức năng giữ nguyên)
+        // --- CÁC HÀM GANTT, SWOT, TREE CŨ --- 
         function parseDateString(dateStr) {
             if (!dateStr) return null;
             const parts = dateStr.toString().split(/[/-]/); 
@@ -436,10 +420,7 @@
             if (firstHeader) firstHeader.innerText = (selectedArea === 'All') ? 'Area' : 'STT';
 
             let filteredGantt = filterData(globalData.gantt);
-            if (filteredGantt.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Không có dữ liệu tiến độ</td></tr>';
-                return;
-            }
+            if (filteredGantt.length === 0) return;
 
             let minDate = null, maxDate = null;
             filteredGantt.forEach(task => {
@@ -463,11 +444,7 @@
                 let d = new Date(minDate); d.setDate(d.getDate() + i);
                 let monthLabel = `Tháng ${d.getMonth() + 1}/${d.getFullYear()}`;
                 if (i === 0) currentMonthLabel = monthLabel;
-                if (monthLabel !== currentMonthLabel) {
-                    months.push({ label: currentMonthLabel, count: currentMonthDays });
-                    currentMonthLabel = monthLabel; currentMonthDays = 1;
-                } else currentMonthDays++;
-
+                if (monthLabel !== currentMonthLabel) { months.push({ label: currentMonthLabel, count: currentMonthDays }); currentMonthLabel = monthLabel; currentMonthDays = 1; } else currentMonthDays++;
                 let isW = (d.getDay() === 0 || d.getDay() === 6);
                 daysHtml += `<div style="flex: 1; text-align: center; font-size: 11px; border-right: 1px solid #e0e0e0; padding: 4px 0; background-color: ${isW ? '#ffeaea' : '#ffffff'}; color: ${isW ? '#d32f2f' : '#555'}"><strong>${d.getDate()}</strong></div>`;
             }
@@ -491,7 +468,6 @@
                 let statusClass = 'status-ongoing';
                 if (sts.includes('done') || prog === '100%') statusClass = 'status-done';
                 if (sts.includes('delay')) statusClass = 'status-delay';
-
                 let fCol = (selectedArea === 'All') ? (task['Area'] || task['Khu vực'] || '') : (idx + 1);
 
                 tbody.innerHTML += `
@@ -502,9 +478,7 @@
                         <td class="timeline-cell" style="${bgGrid}">
                             <div class="pic-label" style="left: calc(${left}% + 4px);">${task['PIC'] || ''}</div>
                             <div class="task-arrow-wrapper" style="left: ${left}%; width: ${width}%;">
-                                <div class="task-arrow-fill ${statusClass}" style="width: ${prog}">
-                                    <span class="progress-text">${prog}</span>
-                                </div>
+                                <div class="task-arrow-fill ${statusClass}" style="width: ${prog}"><span class="progress-text">${prog}</span></div>
                             </div>
                         </td>
                     </tr>`;
@@ -525,9 +499,7 @@
             });
         }
 
-        function sumRole(data, role) {
-            return data.reduce((s, i) => s + (parseInt(i[role] || i[role.toLowerCase()] || 0)), 0);
-        }
+        function sumRole(data, role) { return data.reduce((s, i) => s + (parseInt(i[role] || i[role.toLowerCase()] || 0)), 0); }
 
         function renderTreeDiagram() {
             const plan = filterData(globalData.hcPlan);
@@ -554,79 +526,79 @@
         }
 
         /* ==========================================================================
-           LOGIC PRIMARY SALE MỚI (TỪ DBIN.JS)
+           LOGIC PRIMARY SALE - ĐÃ BỔ SUNG SUBTOTAL VÀ VISUAL BOOST CHO DONUT
            ========================================================================== */
         function renderPrimarySale() {
-            // Lọc dữ liệu dbinsale theo Khu vực
             const filteredDbin = filterData(dbinSales, true);
             
-            // Tìm các tháng có phát sinh giao dịch để tạo cột động
             const monthsSet = new Set();
             filteredDbin.forEach(r => monthsSet.add(r.mo));
             const availableMonths = Array.from(monthsSet).sort();
 
-            // Nếu không có data
-            if(filteredDbin.length === 0) {
-                document.getElementById('value-table-body').innerHTML = '<tr><td colspan="10" style="text-align:center;">Không có dữ liệu</td></tr>';
-                document.getElementById('sku-table-body').innerHTML = '<tr><td colspan="10" style="text-align:center;">Không có dữ liệu</td></tr>';
-                if(barChartInstance) barChartInstance.destroy();
-                if(donutChartInstance) donutChartInstance.destroy();
-                return;
-            }
+            if(filteredDbin.length === 0) return;
 
             // ----------------------------------------------------
-            // 1. DATA CỦA BẢNG VÀ BIỂU ĐỒ BAR CHẠY THEO VALUE (s)
+            // 1. DATA BẢNG VALUE & BIỂU ĐỒ BAR (NHÓM SUBTOTAL THEO AREA)
             // ----------------------------------------------------
-            const valMap = {}; // Lưu table theo Tỉnh (Pv)
-            const provinceLabels = []; // Trục X của Bar Chart
-            const provinceValues = []; // Trục Y của Bar Chart
+            const areaValueGroups = {}; 
+            const provinceLabels = [];
+            const provinceValues = [];
+            const chartDataObj = {};
+            let grandTotalValues = { total: 0, months: {} };
 
             filteredDbin.forEach(r => {
-                const key = `${r.hq}_${r.ar}_${r.Pv}`;
-                if (!valMap[key]) {
-                    valMap[key] = { hq: r.hq, ar: r.ar, Pv: r.Pv, months: {}, total: 0 };
-                    provinceLabels.push(r.Pv);
+                // Gom dữ liệu cho Bảng Value Grouped by Area
+                if (!areaValueGroups[r.ar]) areaValueGroups[r.ar] = { rows: {}, subTotal: 0, subMonths: {} };
+                const pKey = `${r.hq}_${r.Pv}`;
+                if (!areaValueGroups[r.ar].rows[pKey]) {
+                    areaValueGroups[r.ar].rows[pKey] = { hq: r.hq, Pv: r.Pv, months: {}, total: 0 };
                 }
-                valMap[key].months[r.mo] = (valMap[key].months[r.mo] || 0) + r.s;
-                valMap[key].total += r.s;
+                
+                areaValueGroups[r.ar].rows[pKey].months[r.mo] = (areaValueGroups[r.ar].rows[pKey].months[r.mo] || 0) + r.s;
+                areaValueGroups[r.ar].rows[pKey].total += r.s;
+                
+                areaValueGroups[r.ar].subMonths[r.mo] = (areaValueGroups[r.ar].subMonths[r.mo] || 0) + r.s;
+                areaValueGroups[r.ar].subTotal += r.s;
+
+                grandTotalValues.months[r.mo] = (grandTotalValues.months[r.mo] || 0) + r.s;
+                grandTotalValues.total += r.s;
+
+                // Gom dữ liệu cho Biểu đồ
+                chartDataObj[r.Pv] = (chartDataObj[r.Pv] || 0) + r.s;
             });
 
-            // Gộp dữ liệu cho trục Y biểu đồ Bar theo Tỉnh (cộng tổng các Tỉnh trùng lặp nếu có)
-            const chartDataObj = {};
-            filteredDbin.forEach(r => chartDataObj[r.Pv] = (chartDataObj[r.Pv] || 0) + r.s);
-            const uniqProvinces = Object.keys(chartDataObj);
-            const valsForChart = uniqProvinces.map(p => chartDataObj[p]);
-
-            // Render Table Value Header
+            // Gắn Header
             let valHead = `<th>HQ</th><th>Area</th><th>Province (PR)</th>`;
             availableMonths.forEach(m => valHead += `<th class="text-right">Tháng ${m}</th>`);
             valHead += `<th class="text-right">Total Value</th>`;
             document.getElementById('value-table-head').innerHTML = valHead;
 
-            // Render Table Value Body & Footer
+            // In Body với dòng Tổng Area
             let valBody = '';
-            let grandTotals = { total: 0, months: {} };
-            
-            Object.values(valMap).forEach(row => {
-                valBody += `<tr><td>${row.hq}</td><td>${row.ar}</td><td>${row.Pv}</td>`;
-                availableMonths.forEach(m => {
-                    const mVal = row.months[m] || 0;
-                    grandTotals.months[m] = (grandTotals.months[m] || 0) + mVal;
-                    valBody += `<td class="text-right">${formatCurrency(mVal)}</td>`;
+            Object.keys(areaValueGroups).sort().forEach(ar => {
+                let grp = areaValueGroups[ar];
+                // In từng dòng Tỉnh
+                Object.values(grp.rows).forEach(row => {
+                    valBody += `<tr><td>${row.hq}</td><td>${ar}</td><td>${row.Pv}</td>`;
+                    availableMonths.forEach(m => valBody += `<td class="text-right">${formatCurrency(row.months[m] || 0)}</td>`);
+                    valBody += `<td class="text-right" style="color:#0B486B; font-weight:500;">${formatCurrency(row.total)}</td></tr>`;
                 });
-                grandTotals.total += row.total;
-                valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(row.total)}</td></tr>`;
+                // Dòng Tổng Khu vực
+                valBody += `<tr style="background-color: #e3f2fd;"><td colspan="3" class="text-right" style="font-weight:bold; color:#0B486B;">TỔNG ${ar.toUpperCase()}</td>`;
+                availableMonths.forEach(m => valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.subMonths[m] || 0)}</td>`);
+                valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.subTotal)}</td></tr>`;
             });
             document.getElementById('value-table-body').innerHTML = valBody;
 
+            // Dòng Grand Total
             let valFoot = `<tr><td colspan="3" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
-            availableMonths.forEach(m => {
-                valFoot += `<td class="text-right" style="color:#e53935;">${formatCurrency(grandTotals.months[m])}</td>`;
-            });
-            valFoot += `<td class="text-right" style="color:#e53935; font-size:14px;">${formatCurrency(grandTotals.total)}</td></tr>`;
+            availableMonths.forEach(m => valFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${formatCurrency(grandTotalValues.months[m] || 0)}</td>`);
+            valFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${formatCurrency(grandTotalValues.total)}</td></tr>`;
             document.getElementById('value-table-foot').innerHTML = valFoot;
 
-            // VẼ BIỂU ĐỒ BAR (MÃ 1: #0B486B)
+            // Vẽ Bar Chart
+            const uniqProvinces = Object.keys(chartDataObj);
+            const valsForChart = uniqProvinces.map(p => chartDataObj[p]);
             const ctxBar = document.getElementById('barChart').getContext('2d');
             if(barChartInstance) barChartInstance.destroy();
             barChartInstance = new Chart(ctxBar, {
@@ -634,104 +606,119 @@
                 data: {
                     labels: uniqProvinces,
                     datasets: [{
-                        label: 'Giá trị Sales (VND)',
-                        data: valsForChart,
-                        backgroundColor: '#0B486B', // Mã 1
-                        borderRadius: 4
+                        label: 'Giá trị Sales (VND)', data: valsForChart, backgroundColor: '#0B486B', borderRadius: 4
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom' },
-                        title: { display: true, text: 'Tổng doanh thu theo Tỉnh/Thành phố' }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { callback: (val) => new Intl.NumberFormat('vi-VN', {notation: 'compact'}).format(val) } }
-                    }
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Tổng doanh thu theo Tỉnh/Thành phố' } },
+                    scales: { y: { beginAtZero: true, ticks: { callback: val => new Intl.NumberFormat('vi-VN', {notation: 'compact'}).format(val) } } }
                 }
             });
 
             // ----------------------------------------------------
-            // 2. DATA CỦA BẢNG SKU & BIỂU ĐỒ DONUT
+            // 2. DATA BẢNG SKU & BIỂU ĐỒ DONUT (CÓ TOTAL & BOOST)
             // ----------------------------------------------------
-            const qtyMap = {};
+            const areaQtyGroups = {};
             let valSongLan = 0, valMienTuoi = 0, valMienDauXanh = 0;
+            let grandTotalQty = { total: 0, months: {} };
 
             filteredDbin.forEach(r => {
-                // Table Data (Theo số lượng Thùng - Qty)
-                const qKey = `${r.hq}_${r.ar}_${r.Pv}_${r.sku}`;
-                if (!qtyMap[qKey]) {
-                    qtyMap[qKey] = { hq: r.hq, ar: r.ar, Pv: r.Pv, sku: r.sku, months: {}, total: 0 };
+                // Table Data (Group by Area)
+                if (!areaQtyGroups[r.ar]) areaQtyGroups[r.ar] = { rows: {}, subTotal: 0, subMonths: {} };
+                const skuKey = `${r.hq}_${r.Pv}_${r.sku}`;
+                if (!areaQtyGroups[r.ar].rows[skuKey]) {
+                    areaQtyGroups[r.ar].rows[skuKey] = { hq: r.hq, Pv: r.Pv, sku: r.sku, months: {}, total: 0 };
                 }
-                qtyMap[qKey].months[r.mo] = (qtyMap[qKey].months[r.mo] || 0) + r.Qty;
-                qtyMap[qKey].total += r.Qty;
 
-                // Donut Data (Theo Giá trị Value s, gom nhóm)
+                areaQtyGroups[r.ar].rows[skuKey].months[r.mo] = (areaQtyGroups[r.ar].rows[skuKey].months[r.mo] || 0) + r.Qty;
+                areaQtyGroups[r.ar].rows[skuKey].total += r.Qty;
+                
+                areaQtyGroups[r.ar].subMonths[r.mo] = (areaQtyGroups[r.ar].subMonths[r.mo] || 0) + r.Qty;
+                areaQtyGroups[r.ar].subTotal += r.Qty;
+
+                grandTotalQty.months[r.mo] = (grandTotalQty.months[r.mo] || 0) + r.Qty;
+                grandTotalQty.total += r.Qty;
+
+                // Donut Data
                 if(r.sku.includes("Song Lân")) valSongLan += r.s;
                 else if(r.sku.includes("Miến đậu xanh")) valMienDauXanh += r.s;
                 else if(r.sku.includes("Miến tươi")) valMienTuoi += r.s;
             });
 
-            // Render Table SKU Header
             let qtyHead = `<th>HQ</th><th>Area</th><th>Province (PR)</th><th>SKU</th>`;
             availableMonths.forEach(m => qtyHead += `<th class="text-right">Tháng ${m}</th>`);
             qtyHead += `<th class="text-right">Tổng (Thùng)</th>`;
             document.getElementById('sku-table-head').innerHTML = qtyHead;
 
-            // Render Table SKU Body
+            // In Body Bảng SKU kèm Subtotal Area
             let qtyBody = '';
-            Object.values(qtyMap).forEach(row => {
-                qtyBody += `<tr><td>${row.hq}</td><td>${row.ar}</td><td>${row.Pv}</td><td style="font-weight:500;">${row.sku}</td>`;
-                availableMonths.forEach(m => {
-                    const mQty = row.months[m] || 0;
-                    qtyBody += `<td class="text-right">${mQty > 0 ? mQty.toFixed(2) : '-'}</td>`;
+            Object.keys(areaQtyGroups).sort().forEach(ar => {
+                let grp = areaQtyGroups[ar];
+                Object.values(grp.rows).forEach(row => {
+                    qtyBody += `<tr><td>${row.hq}</td><td>${ar}</td><td>${row.Pv}</td><td style="font-weight:500;">${row.sku}</td>`;
+                    availableMonths.forEach(m => qtyBody += `<td class="text-right">${(row.months[m] || 0) > 0 ? (row.months[m]).toFixed(2) : '-'}</td>`);
+                    qtyBody += `<td class="text-right" style="font-weight:500; color:#3B8686;">${row.total.toFixed(2)}</td></tr>`;
                 });
-                qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${row.total.toFixed(2)}</td></tr>`;
+                
+                qtyBody += `<tr style="background-color: #e0f2f1;"><td colspan="4" class="text-right" style="font-weight:bold; color:#3B8686;">TỔNG ${ar.toUpperCase()}</td>`;
+                availableMonths.forEach(m => qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${(grp.subMonths[m] || 0).toFixed(2)}</td>`);
+                qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${grp.subTotal.toFixed(2)}</td></tr>`;
             });
             document.getElementById('sku-table-body').innerHTML = qtyBody;
 
-            // VẼ BIỂU ĐỒ DONUT VỚI CHỨC NĂNG DỊCH CHUYỂN TỶ TRỌNG NHỎ (OFFSET)
+            // Grand Total Bảng SKU
+            let skuFoot = `<tr><td colspan="4" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
+            availableMonths.forEach(m => skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${(grandTotalQty.months[m] || 0).toFixed(2)}</td>`);
+            skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${grandTotalQty.total.toFixed(2)}</td></tr>`;
+            document.getElementById('sku-table-foot').innerHTML = skuFoot;
+
+            // VẼ BIỂU ĐỒ DONUT (THỦ THUẬT VISUAL BOOST ĐỂ MIẾNG NHỎ DỄ CLICK)
             const ctxDonut = document.getElementById('donutChart').getContext('2d');
             if(donutChartInstance) donutChartInstance.destroy();
 
-            const donutDataArr = [valSongLan, valMienTuoi, valMienDauXanh];
-            // Xác định phần tử có giá trị nhưng quá nhỏ (dưới 10% tổng) để đẩy nó ra ngoài
-            const totalDonutVal = donutDataArr.reduce((a, b) => a + b, 0);
-            const offsetArr = donutDataArr.map(val => (val > 0 && (val / totalDonutVal) < 0.15) ? 40 : 0);
+            const realDonutData = [valSongLan, valMienTuoi, valMienDauXanh];
+            const totalDonutVal = realDonutData.reduce((a, b) => a + b, 0);
+
+            // Bơm ảo dữ liệu (chỉ dùng để VẼ HÌNH) để nó hiện ít nhất 5% diện tích bánh
+            const visualDonutData = realDonutData.map(val => {
+                if (val === 0) return 0;
+                let pct = val / totalDonutVal;
+                return pct < 0.05 ? totalDonutVal * 0.05 : val; 
+            });
+
+            // Kéo dịch những miếng có tỷ trọng ảo < 15% ra ngoài
+            const offsetArr = visualDonutData.map((v, i) => (realDonutData[i] > 0 && (realDonutData[i] / totalDonutVal) < 0.15) ? 30 : 0);
 
             donutChartInstance = new Chart(ctxDonut, {
                 type: 'doughnut',
                 data: {
                     labels: ['Song Lân', 'Miến Tươi', 'Miến Đậu Xanh'],
                     datasets: [{
-                        data: donutDataArr,
+                        data: visualDonutData, // Dùng dữ liệu ảo để vẽ
                         backgroundColor: [
-                            '#0B486B', // Mã 1 - Song Lân
-                            '#79BD9A', // Mã 3 - Miến Tươi
-                            '#A8DBA8'  // Mã 4 - Miến Đậu Xanh
+                            '#0B486B', // Mã 1
+                            '#79BD9A', // Mã 3
+                            '#3B8686'  // Mã 2 (CẬP NHẬT THEO YÊU CẦU)
                         ],
                         borderWidth: 2,
-                        hoverOffset: 10,
-                        offset: offsetArr // Hiệu ứng kéo dịch ra ngoài cho SKU nhỏ
+                        hoverOffset: 15,
+                        offset: offsetArr 
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    layout: { padding: 20 },
-                    cutout: '55%',
+                    responsive: true, maintainAspectRatio: false, layout: { padding: 30 }, cutout: '55%',
                     plugins: {
                         legend: { position: 'bottom' },
                         title: { display: true, text: 'Phân Bổ Giá Trị Các Dòng Sản Phẩm' },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    let label = context.label || '';
-                                    let value = context.raw || 0;
-                                    let percentage = ((value / totalDonutVal) * 100).toFixed(1) + "%";
-                                    return `${label}: ${formatCurrency(value)} VND (${percentage})`;
+                                    // GỌI LẠI DỮ LIỆU THẬT ĐỂ HIỂN THỊ TRONG TOOLTIP
+                                    let idx = context.dataIndex;
+                                    let realValue = realDonutData[idx];
+                                    let percentage = ((realValue / totalDonutVal) * 100).toFixed(2) + "%";
+                                    return `${context.chart.data.labels[idx]}: ${formatCurrency(realValue)} VND (${percentage})`;
                                 }
                             }
                         }
@@ -740,7 +727,6 @@
             });
         }
 
-        // Khởi động khi Load trang
         window.addEventListener('DOMContentLoaded', initDashboard);
     </script>
 </body>
