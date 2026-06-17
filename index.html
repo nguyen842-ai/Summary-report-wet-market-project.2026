@@ -156,14 +156,12 @@
             word-break: break-word;
         }
 
-        /* Ô chứa dòng Timeline và Mũi tên trôi nổi */
         .timeline-cell {
             position: relative;
             padding: 0 !important;
             height: 55px; 
         }
 
-        /* Nhãn tên PIC nằm lơ lửng phía trên mũi tên */
         .pic-label {
             position: absolute;
             top: 4px;
@@ -176,7 +174,6 @@
             pointer-events: none;
         }
 
-        /* Khung bao bọc thanh tiến độ */
         .task-arrow-wrapper {
             position: absolute;
             top: 24px; 
@@ -187,7 +184,6 @@
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        /* Thanh màu hiển thị phần trăm hoàn thành bên trong mũi tên */
         .task-arrow-fill {
             height: 100%;
             border-radius: 4px;
@@ -203,14 +199,34 @@
             font-weight: bold;
         }
 
-        /* Trạng thái công việc */
         .status-ongoing { background: linear-gradient(90deg, #2196F3, #1E88E5); }
         .status-done { background: linear-gradient(90deg, #4CAF50, #43A047); }
         .status-delay { background: linear-gradient(90deg, #F44336, #E53935); }
 
         /* ==========================================================================
-           5. MÔ HÌNH PHÂN TÍCH SWOT (CẬP NHẬT MÃ MÀU YÊU CẦU)
+           5. BỐ CỤC SWOT VÀ TREE DIAGRAM (60% - 40%)
            ========================================================================== */
+        .bottom-layout-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+            align-items: stretch;
+        }
+
+        .swot-column {
+            flex: 0 0 calc(60% - 10px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tree-column {
+            flex: 0 0 calc(40% - 10px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* SWOT Styles */
         .swot-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -239,15 +255,13 @@
             line-height: 1.6;
         }
 
-        /* Áp dụng 5 mã màu theo đúng số thứ tự */
-        .swot-s { background-color: #0B486B; color: #ffffff; } /* Mã 1 - Xanh đậm */
-        .swot-w { background-color: #3B8686; color: #ffffff; } /* Mã 2 - Xanh ngọc sẫm */
-        .swot-o { background-color: #79BD9A; color: #111111; } /* Mã 3 - Xanh mint lá nhạt (Chữ tối rõ ràng) */
-        .swot-t { background-color: #A8DBA8; color: #111111; } /* Mã 4 - Xanh lá nhạt pastel (Chữ tối rõ ràng) */
+        .swot-s { background-color: #0B486B; color: #ffffff; }
+        .swot-w { background-color: #3B8686; color: #ffffff; }
+        .swot-o { background-color: #79BD9A; color: #111111; }
+        .swot-t { background-color: #A8DBA8; color: #111111; }
         
-        /* Hàng Support nằm trải dài hết trang phía dưới */
         .swot-support { 
-            background-color: #CFF09E; /* Mã 5 - Xanh chuối nhạt pastel */
+            background-color: #CFF09E;
             color: #111111; 
             margin-top: 20px; 
             padding: 20px; 
@@ -255,7 +269,6 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        /* Đường kẻ phân cách tiêu đề tương thích độ sáng nền */
         .swot-s h3, .swot-w h3 { border-bottom: 1px solid rgba(255,255,255,0.3); }
         .swot-o h3, .swot-t h3, .swot-support h3 { border-bottom: 1px solid rgba(0,0,0,0.15); color: #0B486B; }
 
@@ -274,11 +287,80 @@
             padding-left: 10px;
             opacity: 0.95;
         }
+
+        /* ==========================================================================
+           6. TREE DIAGRAM STYLES (SƠ ĐỒ NHÂN SỰ)
+           ========================================================================== */
+        .org-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 10px 0;
+            flex-grow: 1;
+            justify-content: center;
+        }
+
+        .tree-node {
+            background: #ffffff;
+            border: 2px solid #1a237e;
+            border-radius: 8px;
+            padding: 15px 20px;
+            text-align: center;
+            width: 85%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            position: relative;
+            z-index: 2;
+        }
+
+        .tree-node-title {
+            font-weight: bold;
+            color: #1a237e;
+            font-size: 16px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .tree-node-data {
+            display: flex;
+            justify-content: space-around;
+            font-size: 14px;
+        }
+
+        .data-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .data-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .data-plan { color: #0056b3; font-weight: bold; font-size: 16px;}
+        .data-actual { color: #28a745; font-weight: bold; font-size: 16px;}
+
+        .tree-line {
+            width: 3px;
+            height: 35px;
+            background-color: #1a237e;
+            z-index: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .swot-column, .tree-column {
+                flex: 0 0 100%;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- MÀN HÌNH CHỜ (LOADING SCREEN) -->
     <div id="loading-screen">
         <div class="loader-box">
             <h2 style="margin-bottom: 5px; font-size: 18px;">HỆ THỐNG ĐANG KHỞI TẠO</h2>
@@ -289,12 +371,10 @@
         </div>
     </div>
 
-    <!-- TOÀN BỘ NỘI DUNG DASHBOARD -->
     <div class="container" id="dashboard-content" style="display: none;">
         
         <h1>Báo Cáo Tổng Hợp Dự Án</h1>
 
-        <!-- BỘ LỌC DỮ LIỆU (FILTERS) -->
         <div class="filter-panel">
             <div class="filter-group">
                 <label for="filter-area">Khu Vực</label>
@@ -322,7 +402,6 @@
             </div>
         </div>
 
-        <!-- BIỂU ĐỒ TIẾN ĐỘ GANTT CHART -->
         <div class="card">
             <h2>Biểu đồ tiến độ dự án (Gantt Chart từng ngày)</h2>
             <div class="table-responsive">
@@ -336,53 +415,64 @@
                         </tr>
                     </thead>
                     <tbody id="gantt-tbody">
-                        <!-- Code JS sẽ tự động bơm dữ liệu vào đây -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- MÔ HÌNH PHÂN TÍCH SWOT -->
-        <div class="card">
-            <h2>Phân Tích Chiến Lược Dự Án (SWOT)</h2>
-            <div class="swot-grid">
-                <div class="swot-box swot-s">
-                    <h3>Strengths (Điểm mạnh)</h3>
-                    <ul id="swot-s" style="list-style: none; padding-left: 0;"></ul>
-                </div>
-                <div class="swot-box swot-w">
-                    <h3>Weaknesses (Điểm yếu)</h3>
-                    <ul id="swot-w" style="list-style: none; padding-left: 0;"></ul>
-                </div>
-                <div class="swot-box swot-o">
-                    <h3>Opportunities (Cơ hội)</h3>
-                    <ul id="swot-o" style="list-style: none; padding-left: 0;"></ul>
-                </div>
-                <div class="swot-box swot-t">
-                    <h3>Threats (Thách thức)</h3>
-                    <ul id="swot-t" style="list-style: none; padding-left: 0;"></ul>
-                </div>
-            </div>
+        <div class="bottom-layout-wrapper">
             
-            <!-- DÒNG SUPPORT ĐÃ THÊM NẰM DÀI TRẢI HẾT TRANG PHÍA DƯỚI -->
-            <div class="swot-support">
-                <h3>Support (Hỗ trợ)</h3>
-                <ul id="swot-support" style="list-style: none; padding-left: 0;"></ul>
+            <div class="swot-column">
+                <div class="card" style="margin-bottom: 0; height: 100%;">
+                    <h2>Phân Tích Chiến Lược Dự Án (SWOT)</h2>
+                    <div class="swot-grid">
+                        <div class="swot-box swot-s">
+                            <h3>Strengths (Điểm mạnh)</h3>
+                            <ul id="swot-s" style="list-style: none; padding-left: 0;"></ul>
+                        </div>
+                        <div class="swot-box swot-w">
+                            <h3>Weaknesses (Điểm yếu)</h3>
+                            <ul id="swot-w" style="list-style: none; padding-left: 0;"></ul>
+                        </div>
+                        <div class="swot-box swot-o">
+                            <h3>Opportunities (Cơ hội)</h3>
+                            <ul id="swot-o" style="list-style: none; padding-left: 0;"></ul>
+                        </div>
+                        <div class="swot-box swot-t">
+                            <h3>Threats (Thách thức)</h3>
+                            <ul id="swot-t" style="list-style: none; padding-left: 0;"></ul>
+                        </div>
+                    </div>
+                    
+                    <div class="swot-support">
+                        <h3>Support (Hỗ trợ)</h3>
+                        <ul id="swot-support" style="list-style: none; padding-left: 0;"></ul>
+                    </div>
+                </div>
             </div>
+
+            <div class="tree-column">
+                <div class="card" style="margin-bottom: 0; height: 100%; display: flex; flex-direction: column;">
+                    <h2>Sơ Đồ Nhân Sự (Headcount)</h2>
+                    <div id="tree-container" style="flex-grow: 1; display: flex; align-items: center; justify-content: center; overflow-y: auto;">
+                        </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
 
-    <!-- ==========================================================================
-       6. TOÀN BỘ LOGIC XỬ LÝ (JAVASCRIPT BẢN CẬP NHẬT GỘP TẤT CẢ)
-       ========================================================================== -->
     <script>
         const SPREADSHEET_ID = '1Xtwk_Y7UGKNw2YC9c4kblae71mHahzr7GqV-sfiie6E';
+        // Đã cập nhật API Key theo yêu cầu của bạn
         const API_KEY = 'AIzaSyC8oIfsPGtSedj73Qky4aasg98xqkrWT5s'; 
 
         let globalData = {
             gantt: [],
-            swot: []
+            swot: [],
+            hcPlan: [],
+            hcActual: []
         };
 
         function convertRawToObjects(rawValues) {
@@ -413,14 +503,24 @@
 
             try {
                 if (statusText) statusText.innerText = "Đang đọc dữ liệu Tiến độ (Gantt)...";
-                if (progressBar) progressBar.style.width = '40%';
+                if (progressBar) progressBar.style.width = '25%';
                 const rawGantt = await fetchSheetTab('Gantt'); 
                 globalData.gantt = convertRawToObjects(rawGantt);
 
                 if (statusText) statusText.innerText = "Đang đọc dữ liệu Phân tích (SWOT)...";
-                if (progressBar) progressBar.style.width = '80%';
+                if (progressBar) progressBar.style.width = '50%';
                 const rawSwot = await fetchSheetTab('Swot'); 
                 globalData.swot = convertRawToObjects(rawSwot);
+
+                if (statusText) statusText.innerText = "Đang đọc dữ liệu Headcount Plan...";
+                if (progressBar) progressBar.style.width = '75%';
+                const rawHcPlan = await fetchSheetTab('Headcount plan'); 
+                globalData.hcPlan = convertRawToObjects(rawHcPlan);
+
+                if (statusText) statusText.innerText = "Đang đọc dữ liệu Headcount Actual...";
+                if (progressBar) progressBar.style.width = '95%';
+                const rawHcActual = await fetchSheetTab('Headcount actual'); 
+                globalData.hcActual = convertRawToObjects(rawHcActual);
 
                 if (progressBar) progressBar.style.width = '100%';
                 if (statusText) statusText.innerText = "Hoàn tất! Đang đồng bộ giao diện...";
@@ -460,7 +560,8 @@
             monthFilter.addEventListener('change', renderDashboard);
         }
 
-        function filterData(dataArray, isSwot = false) {
+        // Bổ sung tham số để bỏ qua lọc theo Tháng đối với SWOT và Headcount
+        function filterData(dataArray, ignoreMonth = false) {
             if (!dataArray || !Array.isArray(dataArray)) return [];
             
             const areaFilterEl = document.getElementById('filter-area');
@@ -474,7 +575,7 @@
                 const matchArea = (selectedArea === 'All') || (areaVal.toString().trim().toLowerCase() === selectedArea.toString().trim().toLowerCase());
                 
                 let matchMonth = true;
-                if (!isSwot && selectedMonth !== 'All') {
+                if (!ignoreMonth && selectedMonth !== 'All') {
                     const endDate = item['End'] || item['End date'] || item['Deadline'] || item['end'] || item['deadline'] || '';
                     matchMonth = endDate.includes(`/${selectedMonth}/`) || endDate.includes(`-${selectedMonth}-`);
                 }
@@ -498,6 +599,7 @@
         function renderDashboard() {
             renderGanttChart();
             renderSWOT();
+            renderTreeDiagram();
         }
 
         function renderGanttChart() {
@@ -548,7 +650,7 @@
 
             if (totalDays > 730) {
                 console.error("Khoảng ngày bất thường:", totalDays, "ngày.");
-                alert("⚠️ CẢNH BÁO: Có ô ngày tháng trên Google Sheets bị nhập sai năm (kéo dài " + totalDays + " ngày). Hệ thống tạm thời chỉ hiển thị 30 ngày.");
+                alert("⚠️ CẢNH BÁO: Có ô ngày tháng trên Google Sheets bị nhập sai năm. Hệ thống tạm thời chỉ hiển thị 30 ngày.");
                 totalDays = 30; 
                 maxProjectDate = new Date(minProjectDate);
                 maxProjectDate.setDate(maxProjectDate.getDate() + 30);
@@ -669,11 +771,9 @@
             });
         }
 
-        // KẾT XUẤT CÁC Ô THÔNG TIN SWOT THEO CẤU TRÚC PROVINCE -> XUỐNG DÒNG -> NỘI DUNG
         function renderSWOT() {
             const filteredSwot = filterData(globalData.swot, true);
             
-            // Clear dữ liệu cũ
             ['swot-s', 'swot-w', 'swot-o', 'swot-t', 'swot-support'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.innerHTML = '';
@@ -687,7 +787,6 @@
                 return;
             }
 
-            // Đọc dữ liệu linh động theo cấu trúc cột chữ hoa/thường: hq, ar, pr, s, w, o, t, support
             filteredSwot.forEach(item => {
                 const province = item['pr'] || item['PR'] || item['province'] || item['Province'] || '';
                 const pHeader = province ? `<span class="province-title">${province}</span>` : '';
@@ -714,6 +813,65 @@
                     document.getElementById('swot-support').innerHTML += `<li>${pHeader}<span class="swot-content-text">${supportVal}</span></li>`;
                 }
             });
+        }
+
+        // Hàm tính tổng số người theo Role
+        function sumRole(dataArray, roleName) {
+            return dataArray.reduce((sum, item) => {
+                let val = 0;
+                for (let key in item) {
+                    // Tìm chính xác tên cột (không phân biệt hoa/thường)
+                    if (key.trim().toLowerCase() === roleName.toLowerCase()) {
+                        val = parseInt(item[key]) || 0;
+                        break;
+                    }
+                }
+                return sum + val;
+            }, 0);
+        }
+
+        // KẾT XUẤT SƠ ĐỒ NHÂN SỰ (TREE DIAGRAM)
+        function renderTreeDiagram() {
+            const container = document.getElementById('tree-container');
+            if (!container) return;
+
+            // Lọc dữ liệu Headcount dựa vào Khu vực (bỏ qua lọc Tháng)
+            const filteredPlan = filterData(globalData.hcPlan, true);
+            const filteredActual = filterData(globalData.hcActual, true);
+
+            // Cấu trúc phân cấp
+            const rolesHierarchy = ['CDM', 'KAM', 'KAE', 'DSR'];
+            
+            let treeHtml = '<div class="org-tree">';
+
+            rolesHierarchy.forEach((role, index) => {
+                const planCount = sumRole(filteredPlan, role);
+                const actualCount = sumRole(filteredActual, role);
+
+                treeHtml += `
+                    <div class="tree-node">
+                        <div class="tree-node-title">${role}</div>
+                        <div class="tree-node-data">
+                            <div class="data-block">
+                                <span class="data-label">Kế hoạch</span>
+                                <span class="data-plan">${planCount}</span>
+                            </div>
+                            <div class="data-block">
+                                <span class="data-label">Thực tế</span>
+                                <span class="data-actual">${actualCount}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Nối đường kẻ nếu chưa phải là phần tử cuối cùng
+                if (index < rolesHierarchy.length - 1) {
+                    treeHtml += `<div class="tree-line"></div>`;
+                }
+            });
+
+            treeHtml += '</div>';
+            container.innerHTML = treeHtml;
         }
 
         window.addEventListener('DOMContentLoaded', initDashboard);
