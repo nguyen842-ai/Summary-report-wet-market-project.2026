@@ -1,0 +1,178 @@
+/* --- PHONG CÁCH TỔNG THỂ --- */
+:root {
+    /* Bảng màu mới của bạn */
+    --color-dark-bg: #0B486B;      /* Màu nền chính (Xanh đậm) */
+    --color-card-bg: #3B8686;      /* Màu nền thẻ/bảng (Xanh ngọc) */
+    --color-text-main: #CFF09E;    /* Màu chữ chính (Xanh lá mạ nhạt) */
+    --color-accent: #79BD9A;       /* Màu nhấn (Xanh lá trung bình) */
+    
+    /* Màu cho thanh tiến độ - Sử dụng dải màu gradient */
+    --bar-gradient-start: #79BD9A; /* Bắt đầu thanh loading */
+    --bar-gradient-end: #A8DBA8;   /* Kết thúc thanh loading */
+    
+    /* Màu trạng thái (giữ nguyên để dễ phân biệt hoặc điều chỉnh sau) */
+    --color-done: #CFF09E;         /* Hoàn thành - dùng màu chữ chính */
+    --color-delay: #FF3366;        /* Trễ tiến độ - giữ màu đỏ */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--color-dark-bg);
+    color: var(--color-text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* --- MÀN HÌNH LOADING TRANG CHỦ --- */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-dark-bg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.5s ease;
+}
+
+.loading-container {
+    width: 300px;
+    text-align: center;
+}
+
+#loading-status {
+    font-size: 14px;
+    color: var(--color-accent);
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.progress-bar-bg {
+    width: 100%;
+    height: 12px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#main-progress-bar {
+    height: 100%;
+    width: 0%;
+    /* Hiệu ứng chuyển màu dải (Gradient) cho thanh loading */
+    background: linear-gradient(90deg, var(--bar-gradient-start) 0%, var(--bar-gradient-end) 100%);
+    border-radius: 6px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(168, 219, 168, 0.5); /* Tạo hiệu ứng phát sáng nhẹ */
+}
+
+/* --- GIAO DIỆN CHÍNH DASHBOARD --- */
+#dashboard-content {
+    display: none; /* Ẩn mặc định, sẽ hiện khi load xong */
+    width: 95%;
+    max-width: 1200px;
+    height: 90vh;
+    padding: 20px;
+    background-color: var(--color-card-bg);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    overflow-y: auto; /* Cho phép cuộn nếu nội dung quá dài */
+}
+
+/* --- CẤU TRÚC BẢNG (TABLE) CHUNG --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: rgba(255, 255, 255, 0.05); /* Nền nhẹ cho bảng */
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+th {
+    background-color: rgba(0, 0, 0, 0.2); /* Nền đậm hơn cho tiêu đề */
+    color: var(--color-accent);
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+/* --- PHONG CÁCH GANTT CHART ĐẶC BIỆT --- */
+#gantt-table {
+    font-size: 14px;
+}
+
+#gantt-tbody td {
+    color: var(--color-text-main);
+}
+
+/* Cột Task Name căn trái */
+#gantt-tbody td:nth-child(2) {
+    text-align: left;
+    color: var(--color-text-main);
+    font-weight: 500;
+}
+
+/* Container chứa thanh loading */
+.gantt-bar-wrapper {
+    width: 100%;
+    height: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Thanh loading chính bên trong */
+.gantt-loading-bar {
+    height: 100%;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: width 0.4s ease;
+    /* Gradient dải màu cho phần trăm hoàn thành */
+    background: linear-gradient(90deg, var(--color-accent) 0%, var(--bar-gradient-end) 100%);
+}
+
+/* Chữ hiển thị phần trăm bên trong thanh */
+.bar-text-percent {
+    font-size: 11px;
+    color: var(--color-dark-bg); /* Chữ màu đậm trên nền sáng */
+    font-weight: bold;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+}
+
+/* Các lớp trạng thái (ghi đè màu nếu cần) */
+.bar-done {
+    background: var(--color-done) !important;
+}
+
+.bar-delay {
+    background: var(--color-delay) !important;
+}
+
+.bar-ongoing {
+    /* Sử dụng gradient mặc định đã khai báo ở trên */
+}
