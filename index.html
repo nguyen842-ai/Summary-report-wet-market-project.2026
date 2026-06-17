@@ -3,515 +3,376 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý Tiến Độ & Phân Tích SWOT</title>
-    
+    <title>Sales Performance Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/modern/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <script src="./dbin.js"></script>
-    
-    <script src="./dataM5.js"></script> 
-    <script src="./dataM6.js"></script>
     <style>
-        /* ==========================================================================
-           1. CẤU HÌNH GIAO DIỆN CHUNG (CSS RESET & BASE)
-           ========================================================================== */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
         body {
-            background-color: #f4f6f9;
+            background-color: #f4f7f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #333;
-            padding: 20px;
         }
-
-        .container { max-width: 100%; padding: 0 15px; margin: 0 auto; }
-
-        /* ==========================================================================
-           2. BỐ CỤC TIÊU ĐỀ VÀ BỘ LỌC (50-50)
-           ========================================================================== */
-        .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 20px; }
-        .header-left { flex: 1; }
-        .header-left h1 { margin-bottom: 0; color: #1a237e; }
-        .header-right { flex: 1; display: flex; justify-content: flex-end; }
-
-        .filter-group {
-            display: flex; flex-direction: row; align-items: center; gap: 10px;
-            background: #ffffff; padding: 10px 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 1px;
         }
-        .filter-group label { font-size: 13px; font-weight: 600; color: #666; text-transform: uppercase; }
-        .filter-group select { padding: 8px 12px; border: 1px solid #cccccc; border-radius: 4px; min-width: 200px; font-size: 14px; outline: none; background-color: #fff; color: #333; }
-
-        /* ==========================================================================
-           3. MÀN HÌNH CHỜ TẢI DỮ LIỆU (LOADING SCREEN)
-           ========================================================================== */
-        #loading-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #ffffff; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease;
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            background: #fff;
         }
-        .loader-box { text-align: center; width: 300px; }
-        .progress-bar-container { width: 100%; background-color: #e0e0e0; border-radius: 10px; overflow: hidden; height: 8px; margin-top: 15px; }
-        #main-progress-bar { width: 0%; height: 100%; background-color: #1a237e; transition: width 0.4s ease; }
-        #loading-status { font-size: 14px; color: #666; margin-top: 10px; }
-
-        /* ==========================================================================
-           4. BẢNG BIỂU CHUNG (TABLE STYLES)
-           ========================================================================== */
-        .card { background: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); padding: 20px; margin-bottom: 30px; overflow: hidden; display: flex; flex-direction: column; }
-        h2 { margin-bottom: 20px; color: #1a237e; }
-        .table-responsive { overflow-x: auto; width: 100%; }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th, td { padding: 10px; border: 1px solid #e0e0e0; font-size: 13px; vertical-align: middle; }
-        th { background-color: #f8f9fa; color: #495057; font-weight: 600; }
-
-        /* Màu Gantt Chart */
-        .col-task { font-weight: 600; color: #0B486B; word-break: break-word; }
-        .timeline-cell { position: relative; padding: 0 !important; height: 55px; background-color: #ffffff; }
-        .pic-label { position: absolute; top: 4px; font-size: 11px; font-weight: 600; color: #222; white-space: nowrap; z-index: 10; text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff; pointer-events: none; }
-        .task-arrow-wrapper { position: absolute; top: 24px; height: 22px; background-color: #eaeaea; border-radius: 4px; z-index: 5; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
-        .task-arrow-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: width 0.3s ease; }
-        .progress-text { color: #ffffff; font-size: 10px; font-weight: bold; }
-        .status-ongoing { background-color: #0B486B; } 
-        .status-done { background-color: #79BD9A; color: #111111; } 
-        .status-delay { background-color: #3B8686; color: #ffffff; } 
-        .status-done .progress-text { color: #111111; } 
-
-        /* ==========================================================================
-           5. BỐ CỤC BÊN DƯỚI (SWOT, TREE, SALES)
-           ========================================================================== */
-        .bottom-layout-wrapper { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 30px; align-items: stretch; }
-        .swot-column { flex: 0 0 calc(60% - 10px); display: flex; flex-direction: column; }
-        .tree-column { flex: 0 0 calc(40% - 10px); display: flex; flex-direction: column; }
-        .sale-half-column { flex: 1 1 calc(50% - 10px); display: flex; flex-direction: column; min-width: 0; }
-
-        /* SWOT Styles */
-        .swot-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 15px; }
-        .swot-box { padding: 20px; border-radius: 8px; min-height: 180px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .swot-box h3, .swot-support h3 { margin-bottom: 12px; font-size: 18px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; }
-        .swot-box ul, .swot-support ul { padding-left: 15px; font-size: 14px; line-height: 1.6; }
-        .swot-s { background-color: #0B486B; color: #ffffff; } 
-        .swot-w { background-color: #3B8686; color: #ffffff; } 
-        .swot-o { background-color: #79BD9A; color: #111111; } 
-        .swot-o h3 { border-bottom: 1px solid rgba(0,0,0,0.15); color: #0B486B; }
-        .swot-t { background-color: #A8DBA8; color: #111111; } 
-        .swot-t h3 { border-bottom: 1px solid rgba(0,0,0,0.15); color: #0B486B; }
-        .swot-support { background-color: #CFF09E; color: #111111; margin-top: 20px; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .swot-support h3 { border-bottom: 1px solid rgba(0,0,0,0.15); color: #0B486B; }
-        .province-title { display: block; margin-top: 8px; font-weight: bold; font-size: 14px; text-transform: uppercase; color: inherit; }
-        .swot-content-text { display: block; margin-bottom: 8px; padding-left: 10px; opacity: 0.95; }
-
-        /* Tree Diagram Styles */
-        .org-tree { display: flex; flex-direction: column; align-items: center; width: 100%; padding: 20px 0; flex-grow: 1; }
-        .tree-node { border-radius: 12px; padding: 18px 20px; text-align: center; width: 220px; box-shadow: 0 6px 12px rgba(0,0,0,0.12); position: relative; z-index: 2; border: 1px solid rgba(0,0,0,0.1); }
-        .node-cdm { background-color: #0B486B; color: #ffffff; } 
-        .node-kam { background-color: #3B8686; color: #ffffff; } 
-        .node-kae { background-color: #79BD9A; color: #111111; } 
-        .node-dsr { background-color: #A8DBA8; color: #111111; } 
-        .tree-node-title { font-weight: 800; font-size: 20px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .node-kae .tree-node-title, .node-dsr .tree-node-title { border-bottom: 1px solid rgba(0,0,0,0.1); }
-        .tree-node-data { display: flex; justify-content: space-around; font-size: 15px; }
-        .data-block { display: flex; flex-direction: column; align-items: center; }
-        .data-label { font-size: 12px; opacity: 0.8; margin-bottom: 4px; }
-        .data-plan, .data-actual { font-weight: bold; font-size: 22px; }
-        .tree-node-icons { margin-top: 12px; font-size: 16px; display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; line-height: 1; }
-        .tree-line { width: 2px; height: 30px; background-color: #ccc; z-index: 1; }
-        .tree-row { display: flex; gap: 30px; justify-content: center; width: 100%; position: relative; }
-
-        /* Biểu đồ Sales */
-        .chart-container { position: relative; width: 100%; height: 300px; margin-bottom: 20px; }
-        .text-right { text-align: right !important; }
-
-        @media (max-width: 992px) {
-            .swot-column, .tree-column, .sale-half-column { flex: 0 0 100%; }
-            .header-section { flex-direction: column; align-items: flex-start; }
-            .header-right { justify-content: flex-start; width: 100%; }
-            .tree-row { flex-direction: column; align-items: center; gap: 0; }
-            .tree-row .tree-line { display: block; height: 20px; }
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid #efeef2;
+            font-weight: 600;
+            color: #0B486B;
+            padding: 1rem 1.25rem;
+            font-size: 1.1rem;
+        }
+        .nav-tabs .nav-link {
+            border: none;
+            color: #555;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0;
+        }
+        .nav-tabs .nav-link.active {
+            color: #0B486B;
+            border-bottom: 3px solid #0B486B;
+            background: transparent;
+            font-weight: bold;
+        }
+        .table-responsive {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        table {
+            font-size: 0.9rem;
+        }
+        th {
+            background-color: #f8f9fa !important;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            color: #555;
+            font-weight: 600;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .filter-panel {
+            background: #fff;
+            border-radius: 10px;
+            padding: 1.25rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+        .chart-container {
+            position: relative;
+            height: 320px;
+            width: 100%;
         }
     </style>
 </head>
 <body>
 
-    <div id="loading-screen">
-        <div class="loader-box">
-            <h2 style="margin-bottom: 5px; font-size: 18px;">HỆ THỐNG ĐANG KHỞI TẠO</h2>
-            <div id="loading-status">Đang tải và đồng bộ dữ liệu...</div>
-            <div class="progress-bar-container">
-                <div id="main-progress-bar"></div>
+    <nav class="navbar navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">📊 PERFORMANCE DASHBOARD</span>
+        </div>
+    </nav>
+
+    <div class="container-fluid my-4">
+        <div class="row">
+            
+            <div class="col-md-3">
+                <div class="filter-panel">
+                    <h5 class="mb-3" style="color: #0B486B; font-weight: bold;">Bộ Lọc Dữ Liệu</h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold">HQ (Vùng)</label>
+                        <select id="filter-hq" class="form-select">
+                            <option value="">-- Tất cả HQ --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Area (Khu vực)</label>
+                        <select id="filter-area" class="form-select">
+                            <option value="">-- Tất cả Area --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tháng (Month)</label>
+                        <select id="filter-month" class="form-select">
+                            <option value="">-- Tất cả Tháng --</option>
+                        </select>
+                    </div>
+
+                    <button id="btn-reset-filter" class="btn btn-outline-secondary w-100 mt-2">Xóa Bộ Lọc</button>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                
+                <ul class="nav nav-tabs mb-3" id="dashboardTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="primary-tab" data-bs-toggle="tab" data-bs-target="#primary-pane" type="button" role="tab">PRIMARY SALES</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="secondary-tab" data-bs-toggle="tab" data-bs-target="#secondary-pane" type="button" role="tab">SECONDARY SALES</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="dashboardTabsContent">
+                    
+                    <div class="tab-pane fade show active" id="primary-pane" role="tabpanel">
+                        
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div class="card">
+                                    <div class="card-header">Doanh Thu Theo Tỉnh Thành (Province)</div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="barChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="card">
+                                    <div class="card-header">Phần Trăm Cơ Cấu SKU</div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="donutChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">Báo Cáo Doanh Thu (Value - VND)</div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover mb-0">
+                                        <thead id="value-table-head"></thead>
+                                        <tbody id="value-table-body"></tbody>
+                                        <tfoot id="value-table-foot" class="table-light"></tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">Báo Cáo Sản Lượng Theo SKU (Quantity - Thùng)</div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover mb-0">
+                                        <thead id="sku-table-head"></thead>
+                                        <tbody id="sku-table-body"></tbody>
+                                        <tfoot id="sku-table-foot" class="table-light"></tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="secondary-pane" role="tabpanel">
+                        
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div class="card">
+                                    <div class="card-header">Doanh Thu Secondary Theo Khu Vực (Area)</div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="sec-barChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="card">
+                                    <div class="card-header">Cơ Cấu Dòng Sản Phẩm Secondary</div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="sec-donutChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">Báo Cáo Doanh Thu Secondary (Value - VND)</div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover mb-0">
+                                        <thead id="sec-value-table-head"></thead>
+                                        <tbody id="sec-value-table-body"></tbody>
+                                        <tfoot id="sec-value-table-foot" class="table-light"></tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">Báo Cáo Sản Lượng Secondary Theo SKU (Quantity - Thùng)</div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover mb-0">
+                                        <thead id="sec-sku-table-head"></thead>
+                                        <tbody id="sec-sku-table-body"></tbody>
+                                        <tfoot id="sec-sku-table-foot" class="table-light"></tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 
-    <div class="container" id="dashboard-content" style="display: none;">
-        
-        <div class="header-section">
-            <div class="header-left">
-                <h1>Báo Cáo Tổng Hợp Dự Án</h1>
-            </div>
-            <div class="header-right">
-                <div class="filter-group">
-                    <label for="filter-area">Khu Vực Báo Cáo:</label>
-                    <select id="filter-area">
-                        <option value="All">Đang tải...</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>Biểu đồ tiến độ dự án (Gantt Chart)</h2>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th id="gantt-header-first" style="width: 1%; white-space: nowrap; text-align: center;">STT</th>
-                            <th style="width: 15%; min-width: 140px;">Main task</th>
-                            <th style="width: 1%; white-space: nowrap; text-align: center;">Deadline</th>
-                            <th id="gantt-header-days" style="width: auto; padding: 0; min-width: 500px; background-color: #ffffff;"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="gantt-tbody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="bottom-layout-wrapper">
-            <div class="swot-column">
-                <div class="card" style="margin-bottom: 0; height: 100%;">
-                    <h2>Phân Tích Chiến Lược Dự Án (SWOT)</h2>
-                    <div class="swot-grid">
-                        <div class="swot-box swot-s"><h3>Strengths</h3><ul id="swot-s"></ul></div>
-                        <div class="swot-box swot-w"><h3>Weaknesses</h3><ul id="swot-w"></ul></div>
-                        <div class="swot-box swot-o"><h3>Opportunities</h3><ul id="swot-o"></ul></div>
-                        <div class="swot-box swot-t"><h3>Threats</h3><ul id="swot-t"></ul></div>
-                    </div>
-                    <div class="swot-support"><h3>Support</h3><ul id="swot-support"></ul></div>
-                </div>
-            </div>
-
-            <div class="tree-column">
-                <div class="card" style="margin-bottom: 0; height: 100%; display: flex; flex-direction: column;">
-                    <h2>Sơ Đồ Nhân Sự (Headcount)</h2>
-                    <div id="tree-container" style="flex-grow: 1; display: flex; align-items: flex-start; justify-content: center; overflow-y: auto;"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="bottom-layout-wrapper" id="primary-sale-section">
-            <div class="sale-half-column">
-                <div class="card" style="margin-bottom: 0; height: 100%;">
-                    <h2>PRIMARY SALES</h2>
-                    <div class="chart-container"><canvas id="barChart"></canvas></div>
-                    <div class="table-responsive">
-                        <table id="value-table">
-                            <thead><tr id="value-table-head"></tr></thead>
-                            <tbody id="value-table-body"></tbody>
-                            <tfoot id="value-table-foot" style="background-color: #f8f9fa;"></tfoot>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="sale-half-column">
-                <div class="card" style="margin-bottom: 0; height: 100%;">
-                    <h2>PRIMARY SALES BY SKU</h2>
-                    <div class="chart-container"><canvas id="donutChart"></canvas></div>
-                    <h2 style="margin-top: 15px; font-size: 16px;">Chi tiết Primary Sale by SKU (Thùng)</h2>
-                    <div class="table-responsive">
-                        <table id="sku-table">
-                            <thead><tr id="sku-table-head"></tr></thead>
-                            <tbody id="sku-table-body"></tbody>
-                            <tfoot id="sku-table-foot" style="background-color: #f8f9fa;"></tfoot>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="bottom-layout-wrapper" id="secondary-sale-section">
-            <div class="sale-half-column">
-                <div class="card" style="margin-bottom: 0; height: 100%;">
-                    <h2>SECONDARY SALES</h2>
-                    <div class="chart-container"><canvas id="sec-barChart"></canvas></div>
-                    <div class="table-responsive">
-                        <table id="sec-value-table">
-                            <thead><tr id="sec-value-table-head"></tr></thead>
-                            <tbody id="sec-value-table-body"></tbody>
-                            <tfoot id="sec-value-table-foot" style="background-color: #f8f9fa;"></tfoot>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="sale-half-column">
-                <div class="card" style="margin-bottom: 0; height: 100%;">
-                    <h2>SECONDARY SALES BY SKU</h2>
-                    <div class="chart-container"><canvas id="sec-donutChart"></canvas></div>
-                    <h2 style="margin-top: 15px; font-size: 16px;">Chi tiết Secondary Sale by SKU (Thùng)</h2>
-                    <div class="table-responsive">
-                        <table id="sec-sku-table">
-                            <thead><tr id="sec-sku-table-head"></tr></thead>
-                            <tbody id="sec-sku-table-body"></tbody>
-                            <tfoot id="sec-sku-table-foot" style="background-color: #f8f9fa;"></tfoot>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
+    <script type="module">
+        import { dbinSales } from './dbin.js';
+        window.dbinSales = dbinSales; 
+    </script>
+    <script src="./dataM6.js"></script>
 
     <script>
-        const SPREADSHEET_ID = '1Xtwk_Y7UGKNw2YC9c4kblae71mHahzr7GqV-sfiie6E';
-        const API_KEY = 'AIzaSyC8oIfsPGtSedj73Qky4aasg98xqkrWT5s'; 
-
-        let globalData = { gantt: [], swot: [], hcPlan: [], hcActual: [] };
-        
+        // Khai báo biến toàn cục quản lý các thực thể biểu đồ ChartJS để tránh trùng lặp
         let barChartInstance = null;
         let donutChartInstance = null;
         let secBarChartInstance = null;
         let secDonutChartInstance = null;
 
-        function formatCurrency(num) { return new Intl.NumberFormat('vi-VN').format(num || 0); }
-
-        function convertRawToObjects(rawValues) {
-            if (!rawValues || rawValues.length === 0) return [];
-            const headers = rawValues[0];
-            return rawValues.slice(1).map(row => {
-                let obj = {}; headers.forEach((header, index) => { obj[header] = row[index] || ''; }); return obj;
-            });
+        // Hàm tiện ích định dạng tiền tệ Việt Nam Đồng
+        function formatCurrency(val) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
         }
 
-        async function fetchSheetTab(tabName) {
-            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(tabName)}?key=${API_KEY}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            return data.values;
-        }
-
-        async function initDashboard() {
-            const progressBar = document.getElementById('main-progress-bar');
-            const loadScreen = document.getElementById('loading-screen');
-            const mainContent = document.getElementById('dashboard-content');
-            
-            try {
-                progressBar.style.width = '30%';
-                globalData.gantt = convertRawToObjects(await fetchSheetTab('Gantt'));
-                progressBar.style.width = '50%';
-                globalData.swot = convertRawToObjects(await fetchSheetTab('Swot'));
-                progressBar.style.width = '80%';
-                globalData.hcPlan = convertRawToObjects(await fetchSheetTab('Headcount plan'));
-                globalData.hcActual = convertRawToObjects(await fetchSheetTab('Headcount actual'));
-                progressBar.style.width = '100%';
-                
-                setupFilters();
-                renderDashboard();
-
-                setTimeout(() => {
-                    loadScreen.style.opacity = '0';
-                    setTimeout(() => { loadScreen.style.display = 'none'; mainContent.style.display = 'block'; }, 500);
-                }, 600);
-            } catch (error) {
-                document.getElementById('loading-status').innerText = 'LỖI: ' + error.message;
-            }
-        }
-
-        function setupFilters() {
-            const areaFilter = document.getElementById('filter-area');
-            const areas = [...new Set(globalData.gantt.map(item => item['ar'] || item['AR'] || item['Area'] || item['Khu vực']).filter(x => x))];
-            areaFilter.innerHTML = '<option value="All">Tất cả khu vực</option>';
-            areas.forEach(area => { areaFilter.innerHTML += `<option value="${area}">${area}</option>`; });
-            areaFilter.addEventListener('change', renderDashboard);
-        }
-
-        function filterData(dataArray, isDbObj = false) {
-            if (!dataArray || !Array.isArray(dataArray)) return [];
-            const selectedArea = document.getElementById('filter-area').value;
-            return dataArray.filter(item => {
-                let areaVal = isDbObj ? (item.ar || '') : (item['ar'] || item['AR'] || item['Area'] || item['Khu vực'] || '');
-                return (selectedArea === 'All') || (areaVal.trim().toLowerCase() === selectedArea.trim().toLowerCase());
-            });
-        }
-
-        /* ----------------------------------------------------
-           HÀM MỚI: TỰ ĐỘNG GOM DATA SECONDARY TỪ MỌI FILE M5, M6, M7...
-           ---------------------------------------------------- */
-       /* ----------------------------------------------------
-           HÀM MỚI: GOM DATA SECONDARY (BỌC THÉP CHO M1 -> M12)
-           ---------------------------------------------------- */
-        function getAggregatedSecondarySales() {
-            let combinedData = [];
-            // Kiểm tra điểm danh từ Tháng 1 đến Tháng 12 xem biến nào đã được load
-            if (typeof dbSalesM1 !== 'undefined') combinedData = combinedData.concat(dbSalesM1);
-            if (typeof dbSalesM2 !== 'undefined') combinedData = combinedData.concat(dbSalesM2);
-            if (typeof dbSalesM3 !== 'undefined') combinedData = combinedData.concat(dbSalesM3);
-            if (typeof dbSalesM4 !== 'undefined') combinedData = combinedData.concat(dbSalesM4);
-            if (typeof dbSalesM5 !== 'undefined') combinedData = combinedData.concat(dbSalesM5);
-            if (typeof dbSalesM6 !== 'undefined') combinedData = combinedData.concat(dbSalesM6);
-            if (typeof dbSalesM7 !== 'undefined') combinedData = combinedData.concat(dbSalesM7);
-            if (typeof dbSalesM8 !== 'undefined') combinedData = combinedData.concat(dbSalesM8);
-            if (typeof dbSalesM9 !== 'undefined') combinedData = combinedData.concat(dbSalesM9);
-            if (typeof dbSalesM10 !== 'undefined') combinedData = combinedData.concat(dbSalesM10);
-            if (typeof dbSalesM11 !== 'undefined') combinedData = combinedData.concat(dbSalesM11);
-            if (typeof dbSalesM12 !== 'undefined') combinedData = combinedData.concat(dbSalesM12);
-            
-            return combinedData;
-        }
-
-        function renderDashboard() {
-            renderGanttChart();
-            renderSWOT();
-            renderTreeDiagram();
-            
-            // Xử lý Primary Sales (nếu có file dbin.js)
-            if (typeof dbinSales !== 'undefined') renderPrimarySale();
-            
-            // Xử lý Secondary Sales (tự động gom dữ liệu từ tất cả các file có sẵn)
-            renderSecondarySale(); 
-        }
-
-        /* ----------------------------------------------------
-           GANTT, SWOT, TREE DIAGRAM
-           ---------------------------------------------------- */
-        function parseDateString(dateStr) {
-            if (!dateStr) return null;
-            const parts = dateStr.toString().split(/[/-]/); 
-            if (parts.length === 3) { let year = parseInt(parts[2]); if (year < 100) year += 2000; return new Date(year, parseInt(parts[1]) - 1, parseInt(parts[0])); }
-            return null;
-        }
-
-        function renderGanttChart() {
-            const tbody = document.getElementById('gantt-tbody');
-            const headerDays = document.getElementById('gantt-header-days');
-            const firstHeader = document.getElementById('gantt-header-first'); 
-            tbody.innerHTML = '';
-            
-            const selectedArea = document.getElementById('filter-area').value;
-            if (firstHeader) firstHeader.innerText = (selectedArea === 'All') ? 'Area' : 'STT';
-
-            let filteredGantt = filterData(globalData.gantt);
-            if (filteredGantt.length === 0) return;
-
-            let minDate = null, maxDate = null;
-            filteredGantt.forEach(task => {
-                let s = parseDateString(task['Start'] || task['start']);
-                let e = parseDateString(task['End'] || task['End date'] || task['Deadline']);
-                if (s && (!minDate || s < minDate)) minDate = s;
-                if (e && (!maxDate || e > maxDate)) maxDate = e;
-            });
-
-            if (!minDate) minDate = new Date();
-            if (!maxDate) { maxDate = new Date(minDate); maxDate.setDate(maxDate.getDate() + 30); }
-            minDate.setDate(minDate.getDate() - 2); maxDate.setDate(maxDate.getDate() + 2);
-
-            const totalMs = maxDate.getTime() - minDate.getTime();
-            const totalDays = Math.round(totalMs / (1000 * 60 * 60 * 24)) + 1;
-
-            let months = [], currentMonthLabel = '', currentMonthDays = 0;
-            let daysHtml = '<div style="display: flex; width: 100%; background-color: #ffffff;">';
-
-            for (let i = 0; i < totalDays; i++) {
-                let d = new Date(minDate); d.setDate(d.getDate() + i);
-                let monthLabel = `${d.getMonth() + 1}/${d.getFullYear()}`;
-                if (i === 0) currentMonthLabel = monthLabel;
-                if (monthLabel !== currentMonthLabel) { months.push({ label: currentMonthLabel, count: currentMonthDays }); currentMonthLabel = monthLabel; currentMonthDays = 1; } else currentMonthDays++;
-                let isW = (d.getDay() === 0 || d.getDay() === 6);
-                daysHtml += `<div style="flex: 1; text-align: center; font-size: 11px; border-right: 1px solid #e0e0e0; padding: 4px 0; background-color: ${isW ? '#ffeaea' : '#ffffff'}; color: ${isW ? '#d32f2f' : '#555'}"><strong>${d.getDate()}</strong></div>`;
-            }
-            months.push({ label: currentMonthLabel, count: currentMonthDays });
-            daysHtml += '</div>';
-
-            let monthHtml = '<div style="display: flex; width: 100%; border-bottom: 1px solid #e0e0e0; background-color: #f8f9fa;">';
-            months.forEach(m => monthHtml += `<div style="flex: ${m.count}; text-align: center; font-size: 11px; font-weight: bold; color: #1a237e; padding: 5px 0; border-right: 1px solid #e0e0e0;">${m.label}</div>`);
-            headerDays.innerHTML = monthHtml + '</div>' + daysHtml;
-
-            let dayW = (1 / totalDays) * 100;
-            let bgGrid = `background-color: #ffffff; background-image: repeating-linear-gradient(to right, transparent, transparent calc(100% - 1px), #e8e8e8 calc(100% - 1px), #e8e8e8 100%); background-size: ${dayW}% 100%;`;
-
-            filteredGantt.forEach((task, idx) => {
-                let sObj = parseDateString(task['Start'] || task['start']);
-                let eObj = parseDateString(task['End'] || task['Deadline']);
-                let left = sObj ? ((sObj.getTime() - minDate.getTime()) / totalMs) * 100 : 0;
-                let width = (sObj && eObj) ? ((eObj.getTime() - sObj.getTime()) / totalMs) * 100 : dayW;
-                let prog = task['Progress'] || '0%';
-                let sts = (task['Status'] || task['Remark'] || '').toString().toLowerCase();
-                let statusClass = 'status-ongoing';
-                if (sts.includes('done') || prog === '100%') statusClass = 'status-done';
-                if (sts.includes('delay')) statusClass = 'status-delay';
-                let fCol = (selectedArea === 'All') ? (task['ar'] || task['AR'] || task['Area'] || task['Khu vực'] || '') : (idx + 1);
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td style="text-align: center; font-weight: bold;">${fCol}</td>
-                        <td class="col-task">${task['Task'] || task['Tên công việc'] || ''}</td>
-                        <td style="text-align: center; font-weight: 500;">${task['End'] || task['Deadline'] || ''}</td>
-                        <td class="timeline-cell" style="${bgGrid}">
-                            <div class="pic-label" style="left: calc(${left}% + 4px);">${task['PIC'] || ''}</div>
-                            <div class="task-arrow-wrapper" style="left: ${left}%; width: ${width}%;">
-                                <div class="task-arrow-fill ${statusClass}" style="width: ${prog}"><span class="progress-text">${prog}</span></div>
-                            </div>
-                        </td>
-                    </tr>`;
-            });
-        }
-
-        function renderSWOT() {
-            const fSwot = filterData(globalData.swot);
-            ['swot-s', 'swot-w', 'swot-o', 'swot-t', 'swot-support'].forEach(id => document.getElementById(id).innerHTML = '');
-            fSwot.forEach(item => {
-                const p = item['pr'] || item['PR'] || item['Province'] || item['province'] || '';
-                const h = p ? `<span class="province-title">${p}</span>` : '';
-                
-                const sVal = item['S'] || item['s'] || '';
-                const wVal = item['W'] || item['w'] || '';
-                const oVal = item['O'] || item['o'] || '';
-                const tVal = item['T'] || item['t'] || '';
-                const supVal = item['Support'] || item['support'] || item['SUPPORT'] || '';
-                
-                if (sVal) document.getElementById('swot-s').innerHTML += `<li>${h}<span class="swot-content-text">${sVal}</span></li>`;
-                if (wVal) document.getElementById('swot-w').innerHTML += `<li>${h}<span class="swot-content-text">${wVal}</span></li>`;
-                if (oVal) document.getElementById('swot-o').innerHTML += `<li>${h}<span class="swot-content-text">${oVal}</span></li>`;
-                if (tVal) document.getElementById('swot-t').innerHTML += `<li>${h}<span class="swot-content-text">${tVal}</span></li>`;
-                if (supVal) document.getElementById('swot-support').innerHTML += `<li>${h}<span class="swot-content-text">${supVal}</span></li>`;
-            });
-        }
-
-        function sumRole(data, role) { return data.reduce((s, i) => s + (parseInt(i[role] || i[role.toLowerCase()] || 0)), 0); }
-
-        function renderTreeDiagram() {
-            const plan = filterData(globalData.hcPlan);
-            const act = filterData(globalData.hcActual);
-            const createNode = (role, className) => {
-                const pC = sumRole(plan, role); const aC = sumRole(act, role);
-                return `<div class="tree-node ${className}">
-                    <div class="tree-node-title">${role}</div>
-                    <div class="tree-node-data">
-                        <div class="data-block"><span class="data-label">Plan</span><span class="data-plan">${pC}</span></div>
-                        <div class="data-block"><span class="data-label">Actual</span><span class="data-actual">${aC}</span></div>
-                    </div>
-                    <div class="tree-node-icons">${'👤'.repeat(aC || 0)}</div>
-                </div>`;
+        // Hàm dịch tên tháng tiếng Anh sang dạng số tiếng Việt gọn gàng
+        function getVietnameseMonth(monthStr) {
+            const months = {
+                "Jan": "1", "Feb": "2", "Mar": "3", "Apr": "4",
+                "May": "5", "Jun": "6", "Jul": "7", "Aug": "8",
+                "Sep": "9", "Oct": "10", "Nov": "11", "Dec": "12"
             };
-            document.getElementById('tree-container').innerHTML = `
-                <div class="org-tree">
-                    ${createNode('CDM', 'node-cdm')}<div class="tree-line"></div>
-                    ${createNode('KAM', 'node-kam')}<div class="tree-line"></div>
-                    <div class="tree-row">${createNode('KAE', 'node-kae')}${createNode('DSR', 'node-dsr')}</div>
-                </div>`;
+            return months[monthStr] || monthStr;
         }
 
-       /* ----------------------------------------------------
-           PRIMARY SALES (ĐÃ SỬA LỖI CLEAR DATA)
+        // Đợi dữ liệu dbinSales từ file module import thành công vào window
+        window.addEventListener('DOMContentLoaded', () => {
+            const checkDataInterval = setInterval(() => {
+                if (window.dbinSales) {
+                    clearInterval(checkDataInterval);
+                    initDashboard();
+                }
+            }, 100);
+        });
+
+        // HÀM KHỞI TẠO DASHBOARD CHÍNH
+        function initDashboard() {
+            populateFilterOptions();
+            setupEventListeners();
+            renderAll();
+        }
+
+        // GOM DỮ LIỆU SECONDARY TỪ ĐIỂM BÁN (dataM6.js) LÊN TỔNG HỢP THEO SKU KHU VỰC THÁNG
+        function getAggregatedSecondarySales() {
+            if (typeof dbSalesM6 === 'undefined') return [];
+            return dbSalesM6; 
+        }
+
+        // TỰ ĐỘNG QUÉT DỮ LIỆU ĐỂ THÊM VÀO CÁC OPTION CỦA BỘ LỌC
+        function populateFilterOptions() {
+            const hqs = new Set();
+            const areas = new Set();
+            const months = new Set();
+
+            window.dbinSales.forEach(r => { if(r.hq) hqs.add(r.hq); if(r.ar) areas.add(r.ar); if(r.mo) months.add(r.mo); });
+            const allSec = getAggregatedSecondarySales();
+            allSec.forEach(r => { if(r.hq) hqs.add(r.hq); if(r.ar) areas.add(r.ar); if(r.mo) months.add(r.mo); });
+
+            const selHq = document.getElementById('filter-hq');
+            Array.from(hqs).sort().forEach(h => selHq.add(new Option(h, h)));
+
+            const selArea = document.getElementById('filter-area');
+            Array.from(areas).sort().forEach(a => selArea.add(new Option(a, a)));
+
+            const selMonth = document.getElementById('filter-month');
+            Array.from(months).sort().forEach(m => selMonth.add(new Option(`Tháng ${getVietnameseMonth(m)}`, m)));
+        }
+
+        // CÀI ĐẶT CÁC LẮNG NGHE SỰ KIỆN KHI NGƯỜI DÙNG THAY ĐỔI BỘ LỌC
+        function setupEventListeners() {
+            document.getElementById('filter-hq').addEventListener('change', () => { updateAreaFilterOptions(); renderAll(); });
+            document.getElementById('filter-area').addEventListener('change', renderAll);
+            document.getElementById('filter-month').addEventListener('change', renderAll);
+            document.getElementById('btn-reset-filter').addEventListener('click', () => {
+                document.getElementById('filter-hq').value = "";
+                document.getElementById('filter-area').value = "";
+                document.getElementById('filter-month').value = "";
+                updateAreaFilterOptions();
+                renderAll();
+            });
+        }
+
+        // TỰ ĐỘNG ĐỔI OPTION KHU VỰC THEO VÙNG (HQ) ĐƯỢC CHỌN
+        function updateAreaFilterOptions() {
+            const selectedHq = document.getElementById('filter-hq').value;
+            const selArea = document.getElementById('filter-area');
+            const currentSelectedArea = selArea.value;
+
+            selArea.innerHTML = '<option value="">-- Tất cả Area --</option>';
+            const areas = new Set();
+
+            window.dbinSales.forEach(r => { if(!selectedHq || r.hq === selectedHq) { if(r.ar) areas.add(r.ar); } });
+            const allSec = getAggregatedSecondarySales();
+            allSec.forEach(r => { if(!selectedHq || r.hq === selectedHq) { if(r.ar) areas.add(r.ar); } });
+
+            Array.from(areas).sort().forEach(a => selArea.add(new Option(a, a)));
+            if (areas.has(currentSelectedArea)) {
+                selArea.value = currentSelectedArea;
+            }
+        }
+
+        // HÀM LỌC CHUNG CHO CẢ HAI NGUỒN DỮ LIỆU
+        function filterData(sourceArray, isSecondary = false) {
+            const fHq = document.getElementById('filter-hq').value;
+            const fAr = document.getElementById('filter-area').value;
+            const fMo = document.getElementById('filter-month').value;
+
+            return sourceArray.filter(r => {
+                if(fHq && r.hq !== fHq) return false;
+                if(fAr && r.ar !== fAr) return false;
+                if(fMo && r.mo !== fMo) return false;
+                return true;
+            });
+        }
+
+        // CHẠY RENDER CẢ HAI TAB
+        function renderAll() {
+            renderPrimarySale();
+            renderSecondarySale();
+        }
+
+        /* ----------------------------------------------------
+           PRIMARY SALES (XỬ LÝ DỌN DỮ LIỆU RỖNG + ĐỔI TÊN THÁNG)
            ---------------------------------------------------- */
         function renderPrimarySale() {
-            const filteredDbin = filterData(dbinSales, true);
+            const filteredDbin = filterData(window.dbinSales, false);
             const monthsSet = new Set();
             filteredDbin.forEach(r => monthsSet.add(r.mo));
             const availableMonths = Array.from(monthsSet).sort();
 
-            // SỬA LỖI TẠI ĐÂY: Xóa sạch dữ liệu cũ nếu mảng rỗng
+            // SỬA LỖI: Nếu mảng trống thì dọn sạch sẽ dữ liệu cũ ngay
             if(filteredDbin.length === 0) {
                 document.getElementById('value-table-head').innerHTML = '';
                 document.getElementById('value-table-body').innerHTML = '<tr><td colspan="10" style="text-align:center; color:#999; padding:20px;">Không có dữ liệu</td></tr>';
@@ -544,7 +405,7 @@
             });
 
             let valHead = `<th>HQ</th><th>Area</th><th>Province (PR)</th>`;
-            availableMonths.forEach(m => valHead += `<th class="text-right">${m}</th>`);
+            availableMonths.forEach(m => valHead += `<th class="text-right">Tháng ${getVietnameseMonth(m)}</th>`);
             valHead += `<th class="text-right">Total Value</th>`;
             document.getElementById('value-table-head').innerHTML = valHead;
 
@@ -590,7 +451,7 @@
             });
 
             let qtyHead = `<th>HQ</th><th>Area</th><th>Province (PR)</th><th>SKU</th>`;
-            availableMonths.forEach(m => qtyHead += `<th class="text-right">${m}</th>`);
+            availableMonths.forEach(m => qtyHead += `<th class="text-right">Tháng ${getVietnameseMonth(m)}</th>`);
             qtyHead += `<th class="text-right">Tổng (Thùng)</th>`;
             document.getElementById('sku-table-head').innerHTML = qtyHead;
 
@@ -627,7 +488,7 @@
         }
 
         /* ----------------------------------------------------
-           SECONDARY SALES (ĐÃ SỬA LỖI CLEAR DATA)
+           SECONDARY SALES (ĐÃ BỎ CHỢ - CHỈ GỒM TỔNG KHU VỰC)
            ---------------------------------------------------- */
         function renderSecondarySale() {
             const allSecSales = getAggregatedSecondarySales();
@@ -637,7 +498,7 @@
             filteredSec.forEach(r => monthsSet.add(r.mo));
             const availableMonths = Array.from(monthsSet).sort();
 
-            // SỬA LỖI TẠI ĐÂY: Xóa sạch dữ liệu cũ nếu mảng rỗng
+            // SỬA LỖI: Dọn sạch sẽ dữ liệu cũ nếu kết quả mảng rỗng
             if(filteredSec.length === 0) {
                 document.getElementById('sec-value-table-head').innerHTML = '';
                 document.getElementById('sec-value-table-body').innerHTML = '<tr><td colspan="10" style="text-align:center; color:#999; padding:20px;">Không có dữ liệu</td></tr>';
@@ -673,7 +534,7 @@
             });
 
             let valHead = `<th>HQ</th><th>Area</th>`;
-            availableMonths.forEach(m => valHead += `<th class="text-right">${m}</th>`);
+            availableMonths.forEach(m => valHead += `<th class="text-right">Tháng ${getVietnameseMonth(m)}</th>`);
             valHead += `<th class="text-right">Total Value</th>`;
             document.getElementById('sec-value-table-head').innerHTML = valHead;
 
@@ -730,7 +591,7 @@
             });
 
             let qtyHead = `<th>HQ</th><th>Area</th><th>SKU</th>`;
-            availableMonths.forEach(m => qtyHead += `<th class="text-right">${m}</th>`);
+            availableMonths.forEach(m => qtyHead += `<th class="text-right">Tháng ${getVietnameseMonth(m)}</th>`);
             qtyHead += `<th class="text-right">Tổng (Thùng)</th>`;
             document.getElementById('sec-sku-table-head').innerHTML = qtyHead;
 
@@ -768,143 +629,6 @@
                 options: { responsive: true, maintainAspectRatio: false, layout: { padding: 30 }, cutout: '55%', plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Phân Bổ Giá Trị Các Dòng Sản Phẩm' }, tooltip: { callbacks: { label: function(c) { let idx = c.dataIndex; let realValue = realDonutData[idx]; let percentage = ((realValue / totalDonutVal) * 100).toFixed(2) + "%"; return `${c.chart.data.labels[idx]}: ${formatCurrency(realValue)} VND (${percentage})`; } } } } }
             });
         }
-
-            // ==========================================
-            // 1. DATA BẢNG VALUE & BIỂU ĐỒ BAR (CHỈ CÒN AREA)
-            // ==========================================
-            const areaValueGroups = {}; 
-            const chartDataObj = {};
-            let grandTotalValues = { total: 0, months: {} };
-
-            filteredSec.forEach(r => {
-                let sVal = parseFloat(r.s) || 0;
-                
-                // Gom thẳng vào Area (không còn Market)
-                if (!areaValueGroups[r.ar]) {
-                    areaValueGroups[r.ar] = { hq: r.hq, months: {}, total: 0 };
-                }
-                
-                areaValueGroups[r.ar].months[r.mo] = (areaValueGroups[r.ar].months[r.mo] || 0) + sVal;
-                areaValueGroups[r.ar].total += sVal;
-
-                grandTotalValues.months[r.mo] = (grandTotalValues.months[r.mo] || 0) + sVal;
-                grandTotalValues.total += sVal;
-
-                chartDataObj[r.ar] = (chartDataObj[r.ar] || 0) + sVal; 
-            });
-
-            // Table Head (Đã xóa th Market)
-            let valHead = `<th>HQ</th><th>Area</th>`;
-            availableMonths.forEach(m => valHead += `<th class="text-right">${m}</th>`);
-            valHead += `<th class="text-right">Total Value</th>`;
-            document.getElementById('sec-value-table-head').innerHTML = valHead;
-
-            // Table Body (Mỗi Area là 1 dòng Tổng luôn)
-            let valBody = '';
-            Object.keys(areaValueGroups).sort().forEach(ar => {
-                let grp = areaValueGroups[ar];
-                valBody += `<tr style="background-color: #e3f2fd;">
-                    <td style="font-weight:bold; color:#0B486B;">${grp.hq}</td>
-                    <td style="font-weight:bold; color:#0B486B;">TỔNG ${ar.toUpperCase()}</td>`;
-                availableMonths.forEach(m => valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.months[m] || 0)}</td>`);
-                valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.total)}</td></tr>`;
-            });
-            document.getElementById('sec-value-table-body').innerHTML = valBody;
-
-            // Table Footer (Grand Total)
-            let valFoot = `<tr><td colspan="2" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
-            availableMonths.forEach(m => valFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${formatCurrency(grandTotalValues.months[m] || 0)}</td>`);
-            valFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${formatCurrency(grandTotalValues.total)}</td></tr>`;
-            document.getElementById('sec-value-table-foot').innerHTML = valFoot;
-
-            // Bar Chart
-            const uniqAreas = Object.keys(chartDataObj);
-            const ctxSecBar = document.getElementById('sec-barChart').getContext('2d');
-            if(secBarChartInstance) secBarChartInstance.destroy();
-            secBarChartInstance = new Chart(ctxSecBar, {
-                type: 'bar',
-                data: { labels: uniqAreas, datasets: [{ label: 'Giá trị Sales (VND)', data: uniqAreas.map(a => chartDataObj[a]), backgroundColor: '#0B486B', borderRadius: 4 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Tổng doanh thu theo Khu Vực (Area)' } }, scales: { y: { beginAtZero: true, ticks: { callback: val => new Intl.NumberFormat('vi-VN', {notation: 'compact'}).format(val) } } } }
-            });
-
-            // ==========================================
-            // 2. DATA BẢNG SKU & BIỂU ĐỒ DONUT (BỎ CHỢ, GIỮ TỔNG)
-            // ==========================================
-            const areaQtyGroups = {};
-            let valSongLan = 0, valMienTuoi = 0, valMienDauXanh = 0;
-            let grandTotalQty = { total: 0, months: {} };
-
-            filteredSec.forEach(r => {
-                let sVal = parseFloat(r.s) || 0;
-                let qtVal = parseFloat(r.qt) || 0;
-                
-                if (!areaQtyGroups[r.ar]) areaQtyGroups[r.ar] = { rows: {}, subTotal: 0, subMonths: {} };
-                
-                // Key nhóm bây giờ chỉ còn HQ và SKU (Bỏ r.m)
-                const skuKey = `${r.hq}_${r.sku}`;
-                if (!areaQtyGroups[r.ar].rows[skuKey]) areaQtyGroups[r.ar].rows[skuKey] = { hq: r.hq, sku: r.sku, months: {}, total: 0 };
-                
-                areaQtyGroups[r.ar].rows[skuKey].months[r.mo] = (areaQtyGroups[r.ar].rows[skuKey].months[r.mo] || 0) + qtVal;
-                areaQtyGroups[r.ar].rows[skuKey].total += qtVal;
-                
-                areaQtyGroups[r.ar].subMonths[r.mo] = (areaQtyGroups[r.ar].subMonths[r.mo] || 0) + qtVal;
-                areaQtyGroups[r.ar].subTotal += qtVal;
-                
-                grandTotalQty.months[r.mo] = (grandTotalQty.months[r.mo] || 0) + qtVal;
-                grandTotalQty.total += qtVal;
-
-                if(r.sku.includes("Song Lân")) valSongLan += sVal;
-                else if(r.sku.includes("Miến đậu xanh")) valMienDauXanh += sVal;
-                else if(r.sku.includes("Miến tươi")) valMienTuoi += sVal;
-            });
-
-            // Table Head (Đã xóa th Market)
-            let qtyHead = `<th>HQ</th><th>Area</th><th>SKU</th>`;
-            availableMonths.forEach(m => qtyHead += `<th class="text-right">${m}</th>`);
-            qtyHead += `<th class="text-right">Tổng (Thùng)</th>`;
-            document.getElementById('sec-sku-table-head').innerHTML = qtyHead;
-
-            // Table Body
-            let qtyBody = '';
-            Object.keys(areaQtyGroups).sort().forEach(ar => {
-                let grp = areaQtyGroups[ar];
-                
-                // Dòng chi tiết từng SKU
-                Object.values(grp.rows).forEach(row => {
-                    qtyBody += `<tr><td>${row.hq}</td><td>${ar}</td><td style="font-weight:500;">${row.sku}</td>`;
-                    availableMonths.forEach(m => qtyBody += `<td class="text-right">${(row.months[m] || 0) > 0 ? (row.months[m]).toFixed(2) : '-'}</td>`);
-                    qtyBody += `<td class="text-right" style="font-weight:500; color:#3B8686;">${row.total.toFixed(2)}</td></tr>`;
-                });
-                
-                // Dòng Tổng cho Area
-                qtyBody += `<tr style="background-color: #e0f2f1;"><td colspan="3" class="text-right" style="font-weight:bold; color:#3B8686;">TỔNG ${ar.toUpperCase()}</td>`;
-                availableMonths.forEach(m => qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${(grp.subMonths[m] || 0).toFixed(2)}</td>`);
-                qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${grp.subTotal.toFixed(2)}</td></tr>`;
-            });
-            document.getElementById('sec-sku-table-body').innerHTML = qtyBody;
-
-            // Table Footer
-            let skuFoot = `<tr><td colspan="3" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
-            availableMonths.forEach(m => skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${(grandTotalQty.months[m] || 0).toFixed(2)}</td>`);
-            skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${grandTotalQty.total.toFixed(2)}</td></tr>`;
-            document.getElementById('sec-sku-table-foot').innerHTML = skuFoot;
-
-            // Donut Chart
-            const ctxSecDonut = document.getElementById('sec-donutChart').getContext('2d');
-            if(secDonutChartInstance) secDonutChartInstance.destroy();
-            const realDonutData = [valSongLan, valMienTuoi, valMienDauXanh];
-            const totalDonutVal = realDonutData.reduce((a, b) => a + b, 0);
-            const visualDonutData = realDonutData.map(val => { if (val === 0) return 0; let pct = val / totalDonutVal; return pct < 0.05 ? totalDonutVal * 0.05 : val; });
-            const offsetArr = visualDonutData.map((v, i) => (realDonutData[i] > 0 && (realDonutData[i] / totalDonutVal) < 0.15) ? 30 : 0);
-
-            secDonutChartInstance = new Chart(ctxSecDonut, {
-                type: 'doughnut',
-                data: { labels: ['Song Lân', 'Miến Tươi', 'Miến Đậu Xanh'], datasets: [{ data: visualDonutData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686'], borderWidth: 2, hoverOffset: 15, offset: offsetArr }] },
-                options: { responsive: true, maintainAspectRatio: false, layout: { padding: 30 }, cutout: '55%', plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Phân Bổ Giá Trị Các Dòng Sản Phẩm' }, tooltip: { callbacks: { label: function(c) { let idx = c.dataIndex; let realValue = realDonutData[idx]; let percentage = ((realValue / totalDonutVal) * 100).toFixed(2) + "%"; return `${c.chart.data.labels[idx]}: ${formatCurrency(realValue)} VND (${percentage})`; } } } } }
-            });
-        }
-
-        window.addEventListener('DOMContentLoaded', initDashboard);
     </script>
 </body>
 </html>
