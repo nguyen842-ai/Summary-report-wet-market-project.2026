@@ -613,11 +613,10 @@
             });
         }
 
-        /* ----------------------------------------------------
-           SECONDARY SALES (CÓ KHẢ NĂNG GOM DATA TỰ ĐỘNG)
+       /* ----------------------------------------------------
+           SECONDARY SALES (ĐÃ BỎ CỘT CHỢ - GOM TỔNG THEO AREA)
            ---------------------------------------------------- */
         function renderSecondarySale() {
-            // Sử dụng hàm tự động thu gom thay vì gọi cứng 1 mảng dbSalesM6
             const allSecSales = getAggregatedSecondarySales();
             const filteredSec = filterData(allSecSales, true);
             
@@ -625,59 +624,63 @@
             filteredSec.forEach(r => monthsSet.add(r.mo));
             const availableMonths = Array.from(monthsSet).sort();
 
-            // Nếu người dùng chưa up file hoặc không có data phù hợp bộ lọc
             if(filteredSec.length === 0) {
-                document.getElementById('sec-value-table-body').innerHTML = '<tr><td colspan="10" style="text-align:center;">Không có dữ liệu (Vui lòng upload thêm file Data hoặc đổi bộ lọc)</td></tr>';
+                document.getElementById('sec-value-table-body').innerHTML = '<tr><td colspan="10" style="text-align:center;">Không có dữ liệu</td></tr>';
                 document.getElementById('sec-sku-table-body').innerHTML = '<tr><td colspan="10" style="text-align:center;">Không có dữ liệu</td></tr>';
                 if(secBarChartInstance) secBarChartInstance.destroy();
                 if(secDonutChartInstance) secDonutChartInstance.destroy();
                 return;
             }
 
+            // ==========================================
+            // 1. DATA BẢNG VALUE & BIỂU ĐỒ BAR (CHỈ CÒN AREA)
+            // ==========================================
             const areaValueGroups = {}; 
             const chartDataObj = {};
             let grandTotalValues = { total: 0, months: {} };
 
             filteredSec.forEach(r => {
                 let sVal = parseFloat(r.s) || 0;
-                if (!areaValueGroups[r.ar]) areaValueGroups[r.ar] = { rows: {}, subTotal: 0, subMonths: {} };
-                const pKey = `${r.hq}_${r.m}`;
-                if (!areaValueGroups[r.ar].rows[pKey]) areaValueGroups[r.ar].rows[pKey] = { hq: r.hq, m: r.m, months: {}, total: 0 };
                 
-                areaValueGroups[r.ar].rows[pKey].months[r.mo] = (areaValueGroups[r.ar].rows[pKey].months[r.mo] || 0) + sVal;
-                areaValueGroups[r.ar].rows[pKey].total += sVal;
-                areaValueGroups[r.ar].subMonths[r.mo] = (areaValueGroups[r.ar].subMonths[r.mo] || 0) + sVal;
-                areaValueGroups[r.ar].subTotal += sVal;
+                // Gom thẳng vào Area (không còn Market)
+                if (!areaValueGroups[r.ar]) {
+                    areaValueGroups[r.ar] = { hq: r.hq, months: {}, total: 0 };
+                }
+                
+                areaValueGroups[r.ar].months[r.mo] = (areaValueGroups[r.ar].months[r.mo] || 0) + sVal;
+                areaValueGroups[r.ar].total += sVal;
+
                 grandTotalValues.months[r.mo] = (grandTotalValues.months[r.mo] || 0) + sVal;
                 grandTotalValues.total += sVal;
 
                 chartDataObj[r.ar] = (chartDataObj[r.ar] || 0) + sVal; 
             });
 
-            let valHead = `<th>HQ</th><th>Area</th><th>Market (Chợ)</th>`;
+            // Table Head (Đã xóa th Market)
+            let valHead = `<th>HQ</th><th>Area</th>`;
             availableMonths.forEach(m => valHead += `<th class="text-right">Tháng ${m}</th>`);
             valHead += `<th class="text-right">Total Value</th>`;
             document.getElementById('sec-value-table-head').innerHTML = valHead;
 
+            // Table Body (Mỗi Area là 1 dòng Tổng luôn)
             let valBody = '';
             Object.keys(areaValueGroups).sort().forEach(ar => {
                 let grp = areaValueGroups[ar];
-                Object.values(grp.rows).forEach(row => {
-                    valBody += `<tr><td>${row.hq}</td><td>${ar}</td><td>${row.m}</td>`;
-                    availableMonths.forEach(m => valBody += `<td class="text-right">${formatCurrency(row.months[m] || 0)}</td>`);
-                    valBody += `<td class="text-right" style="color:#0B486B; font-weight:500;">${formatCurrency(row.total)}</td></tr>`;
-                });
-                valBody += `<tr style="background-color: #e3f2fd;"><td colspan="3" class="text-right" style="font-weight:bold; color:#0B486B;">TỔNG ${ar.toUpperCase()}</td>`;
-                availableMonths.forEach(m => valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.subMonths[m] || 0)}</td>`);
-                valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.subTotal)}</td></tr>`;
+                valBody += `<tr style="background-color: #e3f2fd;">
+                    <td style="font-weight:bold; color:#0B486B;">${grp.hq}</td>
+                    <td style="font-weight:bold; color:#0B486B;">TỔNG ${ar.toUpperCase()}</td>`;
+                availableMonths.forEach(m => valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.months[m] || 0)}</td>`);
+                valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.total)}</td></tr>`;
             });
             document.getElementById('sec-value-table-body').innerHTML = valBody;
 
-            let valFoot = `<tr><td colspan="3" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
+            // Table Footer (Grand Total)
+            let valFoot = `<tr><td colspan="2" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
             availableMonths.forEach(m => valFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${formatCurrency(grandTotalValues.months[m] || 0)}</td>`);
             valFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${formatCurrency(grandTotalValues.total)}</td></tr>`;
             document.getElementById('sec-value-table-foot').innerHTML = valFoot;
 
+            // Bar Chart
             const uniqAreas = Object.keys(chartDataObj);
             const ctxSecBar = document.getElementById('sec-barChart').getContext('2d');
             if(secBarChartInstance) secBarChartInstance.destroy();
@@ -687,6 +690,9 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Tổng doanh thu theo Khu Vực (Area)' } }, scales: { y: { beginAtZero: true, ticks: { callback: val => new Intl.NumberFormat('vi-VN', {notation: 'compact'}).format(val) } } } }
             });
 
+            // ==========================================
+            // 2. DATA BẢNG SKU & BIỂU ĐỒ DONUT (BỎ CHỢ, GIỮ TỔNG)
+            // ==========================================
             const areaQtyGroups = {};
             let valSongLan = 0, valMienTuoi = 0, valMienDauXanh = 0;
             let grandTotalQty = { total: 0, months: {} };
@@ -694,13 +700,19 @@
             filteredSec.forEach(r => {
                 let sVal = parseFloat(r.s) || 0;
                 let qtVal = parseFloat(r.qt) || 0;
+                
                 if (!areaQtyGroups[r.ar]) areaQtyGroups[r.ar] = { rows: {}, subTotal: 0, subMonths: {} };
-                const skuKey = `${r.hq}_${r.m}_${r.sku}`;
-                if (!areaQtyGroups[r.ar].rows[skuKey]) areaQtyGroups[r.ar].rows[skuKey] = { hq: r.hq, m: r.m, sku: r.sku, months: {}, total: 0 };
+                
+                // Key nhóm bây giờ chỉ còn HQ và SKU (Bỏ r.m)
+                const skuKey = `${r.hq}_${r.sku}`;
+                if (!areaQtyGroups[r.ar].rows[skuKey]) areaQtyGroups[r.ar].rows[skuKey] = { hq: r.hq, sku: r.sku, months: {}, total: 0 };
+                
                 areaQtyGroups[r.ar].rows[skuKey].months[r.mo] = (areaQtyGroups[r.ar].rows[skuKey].months[r.mo] || 0) + qtVal;
                 areaQtyGroups[r.ar].rows[skuKey].total += qtVal;
+                
                 areaQtyGroups[r.ar].subMonths[r.mo] = (areaQtyGroups[r.ar].subMonths[r.mo] || 0) + qtVal;
                 areaQtyGroups[r.ar].subTotal += qtVal;
+                
                 grandTotalQty.months[r.mo] = (grandTotalQty.months[r.mo] || 0) + qtVal;
                 grandTotalQty.total += qtVal;
 
@@ -709,31 +721,38 @@
                 else if(r.sku.includes("Miến tươi")) valMienTuoi += sVal;
             });
 
-            let qtyHead = `<th>HQ</th><th>Area</th><th>Market (Chợ)</th><th>SKU</th>`;
+            // Table Head (Đã xóa th Market)
+            let qtyHead = `<th>HQ</th><th>Area</th><th>SKU</th>`;
             availableMonths.forEach(m => qtyHead += `<th class="text-right">Tháng ${m}</th>`);
             qtyHead += `<th class="text-right">Tổng (Thùng)</th>`;
             document.getElementById('sec-sku-table-head').innerHTML = qtyHead;
 
+            // Table Body
             let qtyBody = '';
             Object.keys(areaQtyGroups).sort().forEach(ar => {
                 let grp = areaQtyGroups[ar];
+                
+                // Dòng chi tiết từng SKU
                 Object.values(grp.rows).forEach(row => {
-                    qtyBody += `<tr><td>${row.hq}</td><td>${ar}</td><td>${row.m}</td><td style="font-weight:500;">${row.sku}</td>`;
+                    qtyBody += `<tr><td>${row.hq}</td><td>${ar}</td><td style="font-weight:500;">${row.sku}</td>`;
                     availableMonths.forEach(m => qtyBody += `<td class="text-right">${(row.months[m] || 0) > 0 ? (row.months[m]).toFixed(2) : '-'}</td>`);
                     qtyBody += `<td class="text-right" style="font-weight:500; color:#3B8686;">${row.total.toFixed(2)}</td></tr>`;
                 });
                 
-                qtyBody += `<tr style="background-color: #e0f2f1;"><td colspan="4" class="text-right" style="font-weight:bold; color:#3B8686;">TỔNG ${ar.toUpperCase()}</td>`;
+                // Dòng Tổng cho Area
+                qtyBody += `<tr style="background-color: #e0f2f1;"><td colspan="3" class="text-right" style="font-weight:bold; color:#3B8686;">TỔNG ${ar.toUpperCase()}</td>`;
                 availableMonths.forEach(m => qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${(grp.subMonths[m] || 0).toFixed(2)}</td>`);
                 qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${grp.subTotal.toFixed(2)}</td></tr>`;
             });
             document.getElementById('sec-sku-table-body').innerHTML = qtyBody;
 
-            let skuFoot = `<tr><td colspan="4" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
+            // Table Footer
+            let skuFoot = `<tr><td colspan="3" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
             availableMonths.forEach(m => skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${(grandTotalQty.months[m] || 0).toFixed(2)}</td>`);
             skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${grandTotalQty.total.toFixed(2)}</td></tr>`;
             document.getElementById('sec-sku-table-foot').innerHTML = skuFoot;
 
+            // Donut Chart
             const ctxSecDonut = document.getElementById('sec-donutChart').getContext('2d');
             if(secDonutChartInstance) secDonutChartInstance.destroy();
             const realDonutData = [valSongLan, valMienTuoi, valMienDauXanh];
