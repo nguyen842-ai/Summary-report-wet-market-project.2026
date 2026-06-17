@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Vermicelli Team Dashboard</title>
+    <style>
+        body {
+            background-color: #0f0f12; color: #e2e2e9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px;
+        }
+        h1, h2 { color: #00ffcc; font-family: 'Courier New', monospace; }
+
+        /* --- CSS MÀN HÌNH LOADING GAME TOÀN TRANG --- */
+        #loading-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #121214; display: flex; justify-content: center; align-items: center;
+            z-index: 9999; font-family: 'Courier New', monospace; transition: opacity 0.4s;
+        }
+        .loading-container { width: 80%; max-width: 450px; text-align: center; }
+        .progress-bar-wrapper {
+            width: 100%; height: 20px; background-color: #1a1a1e;
+            border: 2px solid #00ffcc; padding: 2px; border-radius: 4px; box-sizing: border-box;
+        }
+        #main-progress-bar {
+            width: 0%; height: 100%; background-color: #00ffcc;
+            transition: width 0.3s ease;
+        }
+
+        /* --- CSS TIẾN ĐỘ GANTT LOADING BAR --- */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; background: #16161a; }
+        th, td { border: 1px solid #2a2a35; padding: 8px; text-align: center; }
+        th { background-color: #1f1f26; color: #9a9aae; }
+        
+        .gantt-bar-wrapper {
+            width: 100%; height: 24px; background-color: #22222b;
+            border: 1px solid #444454; border-radius: 4px; overflow: hidden; position: relative;
+        }
+        .gantt-loading-bar {
+            height: 100%; display: flex; align-items: center; justify-content: flex-end;
+            background-size: 30px 30px;
+        }
+        .bar-text-percent { color: #fff; font-size: 11px; font-weight: bold; margin-right: 5px; z-index: 2; }
+
+        /* Các Trạng thái màu sắc Loading */
+        .bar-ongoing {
+            background-color: #00b3ff;
+            background-image: linear-gradient(45deg, rgba(0,0,0,0.15) 25%, transparent 25%, transparent 50%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.15) 75%, transparent 75%, transparent);
+            animation: stripesMove 1s linear infinite;
+        }
+        .bar-done { background-color: #00cc66; } /* Hoàn thành đứng yên xanh lá */
+        .bar-delay {
+            background-color: #ff3366;
+            background-image: linear-gradient(45deg, rgba(0,0,0,0.2) 25%, transparent 25%, transparent 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2) 75%, transparent 75%, transparent);
+            animation: stripesMove 0.6s linear infinite; /* Chạy nhanh cảnh báo trễ hạn */
+        }
+        @keyframes stripesMove {
+            from { background-position: 30px 0; } to { background-position: 0 0; }
+        }
+
+        /* --- CSS SWOT GRID BOXES --- */
+        .swot-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;
+        }
+        .swot-box { padding: 15px; border-radius: 6px; border: 1px solid #2a2a35; min-height: 120px; }
+        .swot-box h3 { margin-top: 0; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
+        .box-s { background-color: #0f251d; color: #5effa3; }
+        .box-w { background-color: #2c1a10; color: #ff9d5c; }
+        .box-o { background-color: #0e2035; color: #5cb3ff; }
+        .box-t { background-color: #2d1218; color: #ff5c7a; }
+        .box-support { background-color: #1c152d; color: #cc99ff; grid-column: span 2; border: 1px solid #442a75; padding: 15px; border-radius: 6px; }
+        
+        ul { padding-left: 20px; margin: 8px 0 0 0; }
+        li { margin-bottom: 5px; font-size: 14px; color: #e2e2e9; }
+    </style>
+</head>
+<body>
+
+    <div id="loading-screen">
+        <div class="loading-container">
+            <h3 style="color:#00ffcc; margin-bottom:10px;">LOADING SYSTEM DATA...</h3>
+            <div class="progress-bar-wrapper">
+                <div id="main-progress-bar"></div>
+            </div>
+            <p id="loading-status" style="color:#888; font-size:12px; margin-top:8px;">Initializing...</p>
+        </div>
+    </div>
+
+    <div id="dashboard-content" style="display: none;">
+        <h1>RTM PROJECT TRACKING DASHBOARD</h1>
+
+        <h2>1. PROJECT GANTT CHART</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th rowspan="2" style="width: 40px;">No.</th>
+                    <th rowspan="2">Task Activity</th>
+                    <th rowspan="2" style="width: 80px;">PIC</th>
+                    <th colspan="2">May-26</th>
+                    <th colspan="4">Jun-26</th>
+                </tr>
+                <tr>
+                    <th style="width: 80px;">W3</th>
+                    <th style="width: 80px;">W4</th>
+                    <th style="width: 80px;">W1</th>
+                    <th style="width: 80px;">W2</th>
+                    <th style="width: 80px;">W3</th>
+                    <th style="width: 80px;">W4</th>
+                </tr>
+            </thead>
+            <tbody id="gantt-tbody">
+                </tbody>
+        </table>
+
+        <h2>2. REGIONAL SWOT ANALYSIS</h2>
+        <div class="swot-grid">
+            <div class="swot-box box-s">
+                <h3>STRENGTHS (S)</h3>
+                <ul id="swot-s"></ul>
+            </div>
+            <div class="swot-box box-w">
+                <h3>WEAKNESSES (W)</h3>
+                <ul id="swot-w"></ul>
+            </div>
+            <div class="swot-box box-o">
+                <h3>OPPORTUNITIES (O)</h3>
+                <ul id="swot-o"></ul>
+            </div>
+            <div class="swot-box box-t">
+                <h3>THREATS (T)</h3>
+                <ul id="swot-t"></ul>
+            </div>
+            <div class="box-support">
+                <h3 style="color: #cc99ff;">REQUISITION & SUPPORT ACTION PLAN</h3>
+                <ul id="swot-support-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
