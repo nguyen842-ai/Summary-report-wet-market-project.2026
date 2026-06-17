@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ Thống Quản Lý Tiến Độ & Phân Tích SWOT</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script src="./dbin.js"></script>
+    
+    <script src="./dataM5.js"></script> 
     <script src="./dataM6.js"></script>
-
     <style>
         /* ==========================================================================
            1. CẤU HÌNH GIAO DIỆN CHUNG (CSS RESET & BASE)
@@ -139,7 +139,7 @@
     <div id="loading-screen">
         <div class="loader-box">
             <h2 style="margin-bottom: 5px; font-size: 18px;">HỆ THỐNG ĐANG KHỞI TẠO</h2>
-            <div id="loading-status">Đang tải và đồng bộ...</div>
+            <div id="loading-status">Đang tải và đồng bộ dữ liệu...</div>
             <div class="progress-bar-container">
                 <div id="main-progress-bar"></div>
             </div>
@@ -335,14 +335,31 @@
             });
         }
 
+        /* ----------------------------------------------------
+           HÀM MỚI: TỰ ĐỘNG GOM DATA SECONDARY TỪ MỌI FILE M5, M6, M7...
+           ---------------------------------------------------- */
+        function getAggregatedSecondarySales() {
+            let combinedData = [];
+            // Lặp qua toàn bộ các biến trong bộ nhớ của trình duyệt
+            for (let key in window) {
+                // Nếu tìm thấy biến có tên bắt đầu bằng "dbSalesM" (ví dụ: dbSalesM5, dbSalesM6...)
+                if (key.startsWith('dbSalesM') && Array.isArray(window[key])) {
+                    combinedData = combinedData.concat(window[key]);
+                }
+            }
+            return combinedData;
+        }
+
         function renderDashboard() {
             renderGanttChart();
             renderSWOT();
             renderTreeDiagram();
             
-            // Đảm bảo dbinSales và dbSalesM6 tồn tại từ các file script ngoài
+            // Xử lý Primary Sales (nếu có file dbin.js)
             if (typeof dbinSales !== 'undefined') renderPrimarySale();
-            if (typeof dbSalesM6 !== 'undefined') renderSecondarySale();
+            
+            // Xử lý Secondary Sales (tự động gom dữ liệu từ tất cả các file có sẵn)
+            renderSecondarySale(); 
         }
 
         /* ----------------------------------------------------
@@ -355,7 +372,7 @@
             return null;
         }
 
-       function renderGanttChart() {
+        function renderGanttChart() {
             const tbody = document.getElementById('gantt-tbody');
             const headerDays = document.getElementById('gantt-header-days');
             const firstHeader = document.getElementById('gantt-header-first'); 
@@ -413,8 +430,6 @@
                 let statusClass = 'status-ongoing';
                 if (sts.includes('done') || prog === '100%') statusClass = 'status-done';
                 if (sts.includes('delay')) statusClass = 'status-delay';
-                
-                // ĐÃ SỬA TẠI ĐÂY: Nhận diện linh hoạt mọi kiểu đặt tên cột khu vực (ar, AR, Area, Khu vực)
                 let fCol = (selectedArea === 'All') ? (task['ar'] || task['AR'] || task['Area'] || task['Khu vực'] || '') : (idx + 1);
 
                 tbody.innerHTML += `
@@ -431,17 +446,25 @@
                     </tr>`;
             });
         }
+
         function renderSWOT() {
             const fSwot = filterData(globalData.swot);
             ['swot-s', 'swot-w', 'swot-o', 'swot-t', 'swot-support'].forEach(id => document.getElementById(id).innerHTML = '');
             fSwot.forEach(item => {
-                const p = item['PR'] || item['Province'] || '';
+                const p = item['pr'] || item['PR'] || item['Province'] || item['province'] || '';
                 const h = p ? `<span class="province-title">${p}</span>` : '';
-                if (item['S']) document.getElementById('swot-s').innerHTML += `<li>${h}<span class="swot-content-text">${item['S']}</span></li>`;
-                if (item['W']) document.getElementById('swot-w').innerHTML += `<li>${h}<span class="swot-content-text">${item['W']}</span></li>`;
-                if (item['O']) document.getElementById('swot-o').innerHTML += `<li>${h}<span class="swot-content-text">${item['O']}</span></li>`;
-                if (item['T']) document.getElementById('swot-t').innerHTML += `<li>${h}<span class="swot-content-text">${item['T']}</span></li>`;
-                if (item['Support']) document.getElementById('swot-support').innerHTML += `<li>${h}<span class="swot-content-text">${item['Support']}</span></li>`;
+                
+                const sVal = item['S'] || item['s'] || '';
+                const wVal = item['W'] || item['w'] || '';
+                const oVal = item['O'] || item['o'] || '';
+                const tVal = item['T'] || item['t'] || '';
+                const supVal = item['Support'] || item['support'] || item['SUPPORT'] || '';
+                
+                if (sVal) document.getElementById('swot-s').innerHTML += `<li>${h}<span class="swot-content-text">${sVal}</span></li>`;
+                if (wVal) document.getElementById('swot-w').innerHTML += `<li>${h}<span class="swot-content-text">${wVal}</span></li>`;
+                if (oVal) document.getElementById('swot-o').innerHTML += `<li>${h}<span class="swot-content-text">${oVal}</span></li>`;
+                if (tVal) document.getElementById('swot-t').innerHTML += `<li>${h}<span class="swot-content-text">${tVal}</span></li>`;
+                if (supVal) document.getElementById('swot-support').innerHTML += `<li>${h}<span class="swot-content-text">${supVal}</span></li>`;
             });
         }
 
@@ -581,15 +604,25 @@
         }
 
         /* ----------------------------------------------------
-           SECONDARY SALES
+           SECONDARY SALES (CÓ KHẢ NĂNG GOM DATA TỰ ĐỘNG)
            ---------------------------------------------------- */
         function renderSecondarySale() {
-            const filteredSec = filterData(dbSalesM6, true);
+            // Sử dụng hàm tự động thu gom thay vì gọi cứng 1 mảng dbSalesM6
+            const allSecSales = getAggregatedSecondarySales();
+            const filteredSec = filterData(allSecSales, true);
+            
             const monthsSet = new Set();
             filteredSec.forEach(r => monthsSet.add(r.mo));
             const availableMonths = Array.from(monthsSet).sort();
 
-            if(filteredSec.length === 0) return;
+            // Nếu người dùng chưa up file hoặc không có data phù hợp bộ lọc
+            if(filteredSec.length === 0) {
+                document.getElementById('sec-value-table-body').innerHTML = '<tr><td colspan="10" style="text-align:center;">Không có dữ liệu (Vui lòng upload thêm file Data hoặc đổi bộ lọc)</td></tr>';
+                document.getElementById('sec-sku-table-body').innerHTML = '<tr><td colspan="10" style="text-align:center;">Không có dữ liệu</td></tr>';
+                if(secBarChartInstance) secBarChartInstance.destroy();
+                if(secDonutChartInstance) secDonutChartInstance.destroy();
+                return;
+            }
 
             const areaValueGroups = {}; 
             const chartDataObj = {};
@@ -679,6 +712,7 @@
                     availableMonths.forEach(m => qtyBody += `<td class="text-right">${(row.months[m] || 0) > 0 ? (row.months[m]).toFixed(2) : '-'}</td>`);
                     qtyBody += `<td class="text-right" style="font-weight:500; color:#3B8686;">${row.total.toFixed(2)}</td></tr>`;
                 });
+                
                 qtyBody += `<tr style="background-color: #e0f2f1;"><td colspan="4" class="text-right" style="font-weight:bold; color:#3B8686;">TỔNG ${ar.toUpperCase()}</td>`;
                 availableMonths.forEach(m => qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${(grp.subMonths[m] || 0).toFixed(2)}</td>`);
                 qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${grp.subTotal.toFixed(2)}</td></tr>`;
