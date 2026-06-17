@@ -18,11 +18,12 @@
         body {
             background-color: #f4f6f9;
             color: #333;
-            padding: 20px;
+            padding: 0 15px;
+            margin: 0 auto;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 100%;
             margin: 0 auto;
         }
 
@@ -515,28 +516,65 @@
             const totalProjectMs = maxProjectDate.getTime() - minProjectDate.getTime();
             const totalDays = Math.round(totalProjectMs / (1000 * 60 * 60 * 24)) + 1;
 
-            // B. TỰ ĐỘNG IN THƯỚC ĐO NGÀY LÊN TIÊU ĐỀ (Tô màu Thứ 7/Chủ Nhật)
+            // B. TỰ ĐỘNG IN THƯỚC ĐO THÁNG & NGÀY LÊN TIÊU ĐỀ
             if (headerDays) {
-                let headerHtml = '<div style="display: flex; width: 100%; height: 100%;">';
+                let months = []; 
+                let currentMonthLabel = '';
+                let currentMonthDays = 0;
+                
+                let daysHtml = '<div style="display: flex; width: 100%;">';
+
                 for (let i = 0; i < totalDays; i++) {
                     let d = new Date(minProjectDate);
                     d.setDate(d.getDate() + i);
                     let day = d.getDate();
                     let month = d.getMonth() + 1;
+                    let year = d.getFullYear();
                     let dayOfWeek = d.getDay(); 
                     
+                    // Xác định nhãn Tháng/Năm
+                    let monthLabel = `Tháng ${month}/${year}`;
+                    
+                    if (i === 0) currentMonthLabel = monthLabel;
+
+                    // Gộp số ngày cho từng tháng
+                    if (monthLabel !== currentMonthLabel) {
+                        months.push({ label: currentMonthLabel, count: currentMonthDays });
+                        currentMonthLabel = monthLabel;
+                        currentMonthDays = 1;
+                    } else {
+                        currentMonthDays++;
+                    }
+
+                    // Tô màu cuối tuần cho hàng Ngày
                     let isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
                     let bg = isWeekend ? 'background-color: #ffeaea;' : '';
                     let color = isWeekend ? 'color: #d32f2f;' : 'color: #555;';
                     
-                    headerHtml += `
+                    daysHtml += `
                         <div style="flex: 1; text-align: center; font-size: 11px; border-right: 1px solid #e0e0e0; padding: 4px 0; ${bg} ${color}">
-                            <strong>${day}</strong><br><span style="font-size: 9px;">Th${month}</span>
+                            <strong>${day}</strong>
                         </div>
                     `;
                 }
-                headerHtml += '</div>';
-                headerDays.innerHTML = headerHtml;
+                // Đẩy tháng cuối cùng vào mảng
+                months.push({ label: currentMonthLabel, count: currentMonthDays });
+                daysHtml += '</div>';
+
+                // Vẽ hàng Tháng ở trên
+                let monthHtml = '<div style="display: flex; width: 100%; border-bottom: 1px solid #e0e0e0;">';
+                months.forEach(m => {
+                    // Flex theo số lượng ngày của tháng đó để độ rộng phủ chính xác
+                    monthHtml += `
+                        <div style="flex: ${m.count}; text-align: center; font-size: 12px; font-weight: bold; background-color: #e9ecef; color: #1a237e; padding: 5px 0; border-right: 1px solid #e0e0e0;">
+                            ${m.label}
+                        </div>
+                    `;
+                });
+                monthHtml += '</div>';
+
+                // Gộp hàng Tháng và hàng Ngày lại
+                headerDays.innerHTML = monthHtml + daysHtml;
             }
 
             // Tính tỷ lệ phần trăm của 1 ngày để tạo các vạch lưới sọc dọc nền
