@@ -6,8 +6,15 @@
     <title>Hệ Thống Quản Lý Tiến Độ & Phân Tích SWOT</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script src="./dbin.js"></script>
-    <script src="./dataM6.js"></script>
+    <script type="module">
+        // Import từ file dbin.js và đẩy ra biến window
+        import { dbinSales } from './dbin.js';
+        window.dbinSales = dbinSales;
+
+        // Import từ file dataM6.js và đẩy ra biến window
+        import { dbSalesM6 } from './dataM6.js';
+        window.dbSalesM6 = dbSalesM6;
+    </script>
 
     <style>
         /* ==========================================================================
