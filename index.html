@@ -22,7 +22,7 @@
         }
 
         .container {
-            max-width: 100%; /* Đã mở rộng full màn hình theo yêu cầu */
+            max-width: 100%; 
             padding: 0 15px;
             margin: 0 auto;
         }
@@ -153,7 +153,7 @@
         .col-task {
             font-weight: 500;
             color: #1a237e;
-            word-break: break-word; /* Cho phép xuống hàng nếu tên task dài để bóp nhỏ cột */
+            word-break: break-word;
         }
 
         /* Ô chứa dòng Timeline và Mũi tên trôi nổi */
@@ -209,7 +209,7 @@
         .status-delay { background: linear-gradient(90deg, #F44336, #E53935); }
 
         /* ==========================================================================
-           5. MÔ HÌNH PHÂN TÍCH SWOT (SWOT GRID)
+           5. MÔ HÌNH PHÂN TÍCH SWOT (CẬP NHẬT MÃ MÀU YÊU CẦU)
            ========================================================================== */
         .swot-grid {
             display: grid;
@@ -221,30 +221,59 @@
         .swot-box {
             padding: 20px;
             border-radius: 8px;
-            color: #ffffff;
             min-height: 180px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        .swot-box h3 {
+        .swot-box h3, .swot-support h3 {
             margin-bottom: 12px;
             font-size: 18px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border-bottom: 1px solid rgba(255,255,255,0.3);
             padding-bottom: 5px;
         }
 
-        .swot-box ul {
-            padding-left: 20px;
+        .swot-box ul, .swot-support ul {
+            padding-left: 15px;
             font-size: 14px;
             line-height: 1.6;
         }
 
-        .swot-s { background-color: #2e7d32; } 
-        .swot-w { background-color: #c62828; } 
-        .swot-o { background-color: #ef6c00; } 
-        .swot-t { background-color: #37474f; } 
+        /* Áp dụng 5 mã màu theo đúng số thứ tự */
+        .swot-s { background-color: #0B486B; color: #ffffff; } /* Mã 1 - Xanh đậm */
+        .swot-w { background-color: #3B8686; color: #ffffff; } /* Mã 2 - Xanh ngọc sẫm */
+        .swot-o { background-color: #79BD9A; color: #111111; } /* Mã 3 - Xanh mint lá nhạt (Chữ tối rõ ràng) */
+        .swot-t { background-color: #A8DBA8; color: #111111; } /* Mã 4 - Xanh lá nhạt pastel (Chữ tối rõ ràng) */
+        
+        /* Hàng Support nằm trải dài hết trang phía dưới */
+        .swot-support { 
+            background-color: #CFF09E; /* Mã 5 - Xanh chuối nhạt pastel */
+            color: #111111; 
+            margin-top: 20px; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        /* Đường kẻ phân cách tiêu đề tương thích độ sáng nền */
+        .swot-s h3, .swot-w h3 { border-bottom: 1px solid rgba(255,255,255,0.3); }
+        .swot-o h3, .swot-t h3, .swot-support h3 { border-bottom: 1px solid rgba(0,0,0,0.15); color: #0B486B; }
+
+        .province-title {
+            display: block;
+            margin-top: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: inherit;
+        }
+        
+        .swot-content-text {
+            display: block;
+            margin-bottom: 8px;
+            padding-left: 10px;
+            opacity: 0.95;
+        }
     </style>
 </head>
 <body>
@@ -300,11 +329,9 @@
                 <table>
                     <thead>
                         <tr>
-                            <!-- Đã bóp nhỏ tối đa các cột text để nhường chỗ cho các cột ngày không bị hẹp -->
                             <th id="gantt-header-first" style="width: 1%; white-space: nowrap; text-align: center;">STT</th>
                             <th style="width: 15%; min-width: 140px;">Main task</th>
                             <th style="width: 1%; white-space: nowrap; text-align: center;">Deadline</th>
-                            <!-- Trục đo thời gian tự động chiếm trọn phần không gian còn lại -->
                             <th id="gantt-header-days" style="width: auto; padding: 0; min-width: 500px; background-color: #fafafa;"></th>
                         </tr>
                     </thead>
@@ -321,20 +348,26 @@
             <div class="swot-grid">
                 <div class="swot-box swot-s">
                     <h3>Strengths (Điểm mạnh)</h3>
-                    <ul id="swot-s"></ul>
+                    <ul id="swot-s" style="list-style: none; padding-left: 0;"></ul>
                 </div>
                 <div class="swot-box swot-w">
                     <h3>Weaknesses (Điểm yếu)</h3>
-                    <ul id="swot-w"></ul>
+                    <ul id="swot-w" style="list-style: none; padding-left: 0;"></ul>
                 </div>
                 <div class="swot-box swot-o">
                     <h3>Opportunities (Cơ hội)</h3>
-                    <ul id="swot-o"></ul>
+                    <ul id="swot-o" style="list-style: none; padding-left: 0;"></ul>
                 </div>
                 <div class="swot-box swot-t">
                     <h3>Threats (Thách thức)</h3>
-                    <ul id="swot-t"></ul>
+                    <ul id="swot-t" style="list-style: none; padding-left: 0;"></ul>
                 </div>
+            </div>
+            
+            <!-- DÒNG SUPPORT ĐÃ THÊM NẰM DÀI TRẢI HẾT TRANG PHÍA DƯỚI -->
+            <div class="swot-support">
+                <h3>Support (Hỗ trợ)</h3>
+                <ul id="swot-support" style="list-style: none; padding-left: 0;"></ul>
             </div>
         </div>
 
@@ -344,16 +377,14 @@
        6. TOÀN BỘ LOGIC XỬ LÝ (JAVASCRIPT BẢN CẬP NHẬT GỘP TẤT CẢ)
        ========================================================================== -->
     <script>
-        // CẤU HÌNH LIÊN KẾT ĐẾN GOOGLE SHEET CỦA BẠN
         const SPREADSHEET_ID = '1Xtwk_Y7UGKNw2YC9c4kblae71mHahzr7GqV-sfiie6E';
-        const API_KEY = 'AIzaSyC8oIfsPGtSedj73Qky4aasg98xqkrWT5s'; // <-- Thay khóa API của bạn tại đây
+        const API_KEY = 'AIzaSyC8oIfsPGtSedj73Qky4aasg98xqkrWT5s'; 
 
         let globalData = {
             gantt: [],
             swot: []
         };
 
-        // Hàm xử lý mảng dữ liệu thô từ Google Sheets thành Object cụ thể
         function convertRawToObjects(rawValues) {
             if (!rawValues || rawValues.length === 0) return [];
             const headers = rawValues[0];
@@ -366,7 +397,6 @@
             });
         }
 
-        // Gọi API tải từng Tab trên file Sheets
         async function fetchSheetTab(tabName) {
             const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(tabName)}?key=${API_KEY}`;
             const response = await fetch(url);
@@ -375,7 +405,6 @@
             return data.values;
         }
 
-        // Khởi động hệ thống Dashboard khi truy cập trang web
         async function initDashboard() {
             const progressBar = document.getElementById('main-progress-bar');
             const loadScreen = document.getElementById('loading-screen');
@@ -399,7 +428,6 @@
                 setupFilters();
                 renderDashboard();
 
-                // Hiệu ứng mờ dần màn hình loading biến mất
                 setTimeout(() => {
                     if (loadScreen) loadScreen.style.opacity = '0';
                     setTimeout(() => {
@@ -415,13 +443,13 @@
             }
         }
 
-        // Tạo cấu trúc cho các hộp lọc (Filters Select)
         function setupFilters() {
             const areaFilter = document.getElementById('filter-area');
             const monthFilter = document.getElementById('filter-month');
             if (!areaFilter || !monthFilter) return;
 
-            const areas = [...new Set(globalData.gantt.map(item => item['ar'] || item['Area'] || item['Khu vực']).filter(x => x))];
+            // Tìm trường khu vực linh động chữ hoa/thường
+            const areas = [...new Set(globalData.gantt.map(item => item['ar'] || item['AR'] || item['Area'] || item['Khu vực']).filter(x => x))];
             
             areaFilter.innerHTML = '<option value="All">Tất cả khu vực</option>';
             areas.forEach(area => {
@@ -432,8 +460,7 @@
             monthFilter.addEventListener('change', renderDashboard);
         }
 
-        // Lọc mảng dữ liệu dựa theo lựa chọn trên giao diện
-        function filterData(dataArray) {
+        function filterData(dataArray, isSwot = false) {
             if (!dataArray || !Array.isArray(dataArray)) return [];
             
             const areaFilterEl = document.getElementById('filter-area');
@@ -443,19 +470,18 @@
             const selectedMonth = monthFilterEl ? monthFilterEl.value : 'All';
 
             return dataArray.filter(item => {
-                const areaVal = item['ar'] || item['Area'] || item['Khu vực'] || '';
-                const matchArea = (selectedArea === 'All') || (areaVal === selectedArea);
+                const areaVal = item['ar'] || item['AR'] || item['Area'] || item['Khu vực'] || '';
+                const matchArea = (selectedArea === 'All') || (areaVal.toString().trim().toLowerCase() === selectedArea.toString().trim().toLowerCase());
                 
                 let matchMonth = true;
-                if (selectedMonth !== 'All') {
-                    const endDate = item['End'] || item['End date'] || item['Deadline'] || '';
+                if (!isSwot && selectedMonth !== 'All') {
+                    const endDate = item['End'] || item['End date'] || item['Deadline'] || item['end'] || item['deadline'] || '';
                     matchMonth = endDate.includes(`/${selectedMonth}/`) || endDate.includes(`-${selectedMonth}-`);
                 }
                 return matchArea && matchMonth;
             });
         }
 
-        // Chuyển chuỗi văn bản ngày tháng dd/mm/yyyy thành Object Date trong JS
         function parseDateString(dateStr) {
             if (!dateStr) return null;
             const parts = dateStr.toString().split(/[/-]/); 
@@ -469,13 +495,11 @@
             return null;
         }
 
-        // Hàm kích hoạt kết xuất đồng thời các thành phần
         function renderDashboard() {
             renderGanttChart();
             renderSWOT();
         }
 
-        // LẬP TRÌNH VẼ BIỂU ĐỒ GANTT TỰ ĐỘNG THEO NGÀY CÓ LƯỚI VÀ LABEL TRÊN KHUNG
         function renderGanttChart() {
             const tbody = document.getElementById('gantt-tbody');
             const headerDays = document.getElementById('gantt-header-days'); 
@@ -486,27 +510,24 @@
             const areaFilterEl = document.getElementById('filter-area');
             const selectedArea = areaFilterEl ? areaFilterEl.value : 'All';
 
-            // Đổi tiêu đề cột đầu tiên dynamically dựa trên filter Area
             if (firstHeader) {
                 firstHeader.innerText = (selectedArea === 'All') ? 'Area' : 'STT';
             }
 
-            let filteredGantt = filterData(globalData.gantt);
+            let filteredGantt = filterData(globalData.gantt, false);
 
             if (filteredGantt.length === 0) {
-                let totalCols = 4;
-                tbody.innerHTML = `<tr><td colspan="${totalCols}" style="padding: 20px; text-align: center; color: #999;">Không tìm thấy dữ liệu tiến độ phù hợp bộ lọc</td></tr>`;
+                tbody.innerHTML = '<tr><td colspan="4" style="padding: 20px; text-align: center; color: #999;">Không tìm thấy dữ liệu tiến độ phù hợp bộ lọc</td></tr>';
                 if (headerDays) headerDays.innerHTML = 'Timeline';
                 return;
             }
 
-            // A. ĐỊNH VỊ KHUNG NGÀY CHO TOÀN DỰ ÁN
             let minProjectDate = null;
             let maxProjectDate = null;
 
             filteredGantt.forEach(task => {
-                let s = parseDateString(task['Start']);
-                let e = parseDateString(task['End'] || task['End date'] || task['Deadline']);
+                let s = parseDateString(task['Start'] || task['start']);
+                let e = parseDateString(task['End'] || task['End date'] || task['Deadline'] || task['end'] || task['deadline']);
                 if (s && (!minProjectDate || s < minProjectDate)) minProjectDate = s;
                 if (e && (!maxProjectDate || e > maxProjectDate)) maxProjectDate = e;
             });
@@ -525,16 +546,14 @@
             const totalProjectMs = maxProjectDate.getTime() - minProjectDate.getTime();
             let totalDays = Math.round(totalProjectMs / (1000 * 60 * 60 * 24)) + 1;
 
-            // Chốt chặn an toàn chống kẹt loop nếu gõ sai năm trên Sheets
             if (totalDays > 730) {
                 console.error("Khoảng ngày bất thường:", totalDays, "ngày.");
-                alert("⚠️ CẢNH BÁO: Có ô ngày tháng trên Google Sheets bị nhập sai năm (kéo dài " + totalDays + " ngày). Để tránh treo máy, hệ thống tạm thời chỉ hiển thị 30 ngày. Vui lòng kiểm tra lại Sheets!");
+                alert("⚠️ CẢNH BÁO: Có ô ngày tháng trên Google Sheets bị nhập sai năm (kéo dài " + totalDays + " ngày). Hệ thống tạm thời chỉ hiển thị 30 ngày.");
                 totalDays = 30; 
                 maxProjectDate = new Date(minProjectDate);
                 maxProjectDate.setDate(maxProjectDate.getDate() + 30);
             }
 
-            // B. TỰ ĐỘNG IN THƯỚC ĐO THÁNG & NGÀY LÊN TIÊU ĐỀ (ĐÃ CẬP NHẬT PHỦ THÁNG HÀNG TRÊN)
             if (headerDays) {
                 let months = []; 
                 let currentMonthLabel = '';
@@ -589,23 +608,21 @@
             let dayWidthPercent = (1 / totalDays) * 100;
             let bgGrid = `background-image: repeating-linear-gradient(to right, transparent, transparent calc(100% - 1px), #e8e8e8 calc(100% - 1px), #e8e8e8 100%); background-size: ${dayWidthPercent}% 100%;`;
 
-            // C. VẼ TỪNG THANH MŨI TÊN NHIỆM VỤ LÊN KHUNG
             filteredGantt.forEach((task, index) => {
                 let tr = document.createElement('tr');
                 
-                let taskName = task['Task'] || task['Tên công việc'] || '';
-                let picName = task['PIC'] || task['Phụ trách'] || '';
-                let startStr = task['Start'] || '';
-                let endStr = task['End'] || task['End date'] || task['Deadline'] || '';
-                let progressVal = task['Progress'] || task['Hoàn thành'] || '0%';
+                let taskName = task['Task'] || task['Tên công việc'] || task['task'] || '';
+                let picName = task['PIC'] || task['Phụ trách'] || task['pic'] || '';
+                let startStr = task['Start'] || task['start'] || '';
+                let endStr = task['End'] || task['End date'] || task['Deadline'] || task['end'] || task['deadline'] || '';
+                let progressVal = task['Progress'] || task['Hoàn thành'] || task['progress'] || '0%';
                 
-                let rawStatus = (task['Status'] || task['Remark'] || '').toString().toLowerCase();
+                let rawStatus = (task['Status'] || task['Remark'] || task['status'] || task['remark'] || '').toString().toLowerCase();
                 let statusClass = 'status-ongoing';
                 if (rawStatus.includes('done') || progressVal === '100%') statusClass = 'status-done';
                 if (rawStatus.includes('delay')) statusClass = 'status-delay';
 
-                // Đổi giá trị hiển thị cột đầu tiên dựa vào việc lựa chọn Area
-                let firstColValue = (selectedArea === 'All') ? (task['ar'] || task['Area'] || task['Khu vực'] || '') : (index + 1);
+                let firstColValue = (selectedArea === 'All') ? (task['ar'] || task['AR'] || task['Area'] || task['Khu vực'] || '') : (index + 1);
 
                 let htmlContent = `
                     <td style="white-space: nowrap; text-align: center;">${firstColValue}</td>
@@ -652,20 +669,50 @@
             });
         }
 
-        // KẾT XUẤT CÁC Ô THÔNG TIN SWOT
+        // KẾT XUẤT CÁC Ô THÔNG TIN SWOT THEO CẤU TRÚC PROVINCE -> XUỐNG DÒNG -> NỘI DUNG
         function renderSWOT() {
-            const filteredSwot = filterData(globalData.swot);
+            const filteredSwot = filterData(globalData.swot, true);
             
-            ['swot-s', 'swot-w', 'swot-o', 'swot-t'].forEach(id => {
+            // Clear dữ liệu cũ
+            ['swot-s', 'swot-w', 'swot-o', 'swot-t', 'swot-support'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.innerHTML = '';
             });
 
+            if (filteredSwot.length === 0) {
+                ['swot-s', 'swot-w', 'swot-o', 'swot-t', 'swot-support'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerHTML = '<li style="opacity: 0.6; padding: 10px;">Không có dữ liệu phù hợp</li>';
+                });
+                return;
+            }
+
+            // Đọc dữ liệu linh động theo cấu trúc cột chữ hoa/thường: hq, ar, pr, s, w, o, t, support
             filteredSwot.forEach(item => {
-                if (item.STRENGTHS) document.getElementById('swot-s').innerHTML += `<li>${item.STRENGTHS}</li>`;
-                if (item.WEAKNESSES) document.getElementById('swot-w').innerHTML += `<li>${item.WEAKNESSES}</li>`;
-                if (item.OPPORTUNITIES) document.getElementById('swot-o').innerHTML += `<li>${item.OPPORTUNITIES}</li>`;
-                if (item.THREATS) document.getElementById('swot-t').innerHTML += `<li>${item.THREATS}</li>`;
+                const province = item['pr'] || item['PR'] || item['province'] || item['Province'] || '';
+                const pHeader = province ? `<span class="province-title">${province}</span>` : '';
+
+                const sVal = item['s'] || item['S'] || '';
+                const wVal = item['w'] || item['W'] || '';
+                const oVal = item['o'] || item['O'] || '';
+                const tVal = item['t'] || item['T'] || '';
+                const supportVal = item['support'] || item['Support'] || item['SUPPORT'] || '';
+
+                if (sVal.trim()) {
+                    document.getElementById('swot-s').innerHTML += `<li>${pHeader}<span class="swot-content-text">${sVal}</span></li>`;
+                }
+                if (wVal.trim()) {
+                    document.getElementById('swot-w').innerHTML += `<li>${pHeader}<span class="swot-content-text">${wVal}</span></li>`;
+                }
+                if (oVal.trim()) {
+                    document.getElementById('swot-o').innerHTML += `<li>${pHeader}<span class="swot-content-text">${oVal}</span></li>`;
+                }
+                if (tVal.trim()) {
+                    document.getElementById('swot-t').innerHTML += `<li>${pHeader}<span class="swot-content-text">${tVal}</span></li>`;
+                }
+                if (supportVal.trim()) {
+                    document.getElementById('swot-support').innerHTML += `<li>${pHeader}<span class="swot-content-text">${supportVal}</span></li>`;
+                }
             });
         }
 
