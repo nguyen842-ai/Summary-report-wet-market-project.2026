@@ -3,94 +3,628 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Báo Cáo Dự Án - Wet Market</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Hệ Thống Quản Lý Tiến Độ & Phân Tích SWOT</title>
+    <style>
+        /* ==========================================================================
+           1. CẤU HÌNH GIAO DIỆN CHUNG (CSS RESET & BASE)
+           ========================================================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1, h2 {
+            margin-bottom: 20px;
+            color: #1a237e;
+        }
+
+        /* ==========================================================================
+           2. MÀN HÌNH CHỜ TẢI DỮ LIỆU (LOADING SCREEN)
+           ========================================================================== */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader-box {
+            text-align: center;
+            width: 300px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 8px;
+            margin-top: 15px;
+        }
+
+        #main-progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: #1a237e;
+            transition: width 0.4s ease;
+        }
+
+        #loading-status {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        /* ==========================================================================
+           3. BỘ LỌC DỮ LIỆU (FILTERS PANEL)
+           ========================================================================== */
+        .filter-panel {
+            background: #ffffff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            min-width: 180px;
+            font-size: 14px;
+            outline: none;
+            background-color: #fff;
+        }
+
+        /* ==========================================================================
+           4. BIỂU ĐỒ GANTT CHỮA CHUẨN NGÀY & PHỤ TRÁCH (GANTT CHART)
+           ========================================================================== */
+        .card {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            padding: 20px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .col-task {
+            font-weight: 500;
+            color: #1a237e;
+        }
+
+        /* Ô chứa dòng Timeline và Mũi tên trôi nổi */
+        .timeline-cell {
+            position: relative;
+            padding: 0 !important;
+            height: 55px; /* Tăng chiều cao để chứa cả chữ PIC phía trên */
+        }
+
+        /* Nhãn tên PIC nằm lơ lửng phía trên mũi tên */
+        .pic-label {
+            position: absolute;
+            top: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #222;
+            white-space: nowrap;
+            z-index: 10;
+            text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+            pointer-events: none;
+        }
+
+        /* Khung bao bọc thanh tiến độ */
+        .task-arrow-wrapper {
+            position: absolute;
+            top: 24px; /* Đẩy xuống dưới nhãn PIC */
+            height: 22px;
+            background-color: #eaeaea;
+            border-radius: 4px;
+            z-index: 5;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Thanh màu hiển thị phần trăm hoàn thành bên trong mũi tên */
+        .task-arrow-fill {
+            height: 100%;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        /* Trạng thái công việc */
+        .status-ongoing { background: linear-gradient(90deg, #2196F3, #1E88E5); }
+        .status-done { background: linear-gradient(90deg, #4CAF50, #43A047); }
+        .status-delay { background: linear-gradient(90deg, #F44336, #E53935); }
+
+        /* ==========================================================================
+           5. MÔ HÌNH PHÂN TÍCH SWOT (SWOT GRID)
+           ========================================================================== */
+        .swot-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .swot-box {
+            padding: 20px;
+            border-radius: 8px;
+            color: #ffffff;
+            min-height: 180px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .swot-box h3 {
+            margin-bottom: 12px;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            padding-bottom: 5px;
+        }
+
+        .swot-box ul {
+            padding-left: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .swot-s { background-color: #2e7d32; } /* Màu xanh lá nhạt sang trọng */
+        .swot-w { background-color: #c62828; } /* Màu đỏ gạch ấm áp */
+        .swot-o { background-color: #ef6c00; } /* Màu cam đất ấm áp */
+        .swot-t { background-color: #37474f; } /* Màu xám than tối tinh tế */
+    </style>
 </head>
 <body>
+
+    <!-- MÀN HÌNH CHỜ (LOADING SCREEN) -->
     <div id="loading-screen">
-        <div class="loading-container">
-            <h2 style="color: #333; margin-bottom: 10px;">Đang tải hệ thống</h2>
-            <div class="progress-bar-bg">
+        <div class="loader-box">
+            <h2 style="margin-bottom: 5px; font-size: 18px;">HỆ THỐNG ĐANG KHỞI TẠO</h2>
+            <div id="loading-status">Đang thiết lập kết nối...</div>
+            <div class="progress-bar-container">
                 <div id="main-progress-bar"></div>
             </div>
-            <p id="loading-status">loading dữ liệu...</p>
         </div>
     </div>
 
-    <div id="dashboard-content">
-        <div class="dashboard-header">
-            <div class="header-left">
-                <h1 class="main-title">BÁO CÁO DỰ ÁN WET MARKET</h1>
-                <p class="subtitle">Ngày cập nhật: 18/06/2026</p>
-            </div>
-            <div class="header-right">
-                <div class="filter-group">
-                    <label for="filter-area">Khu vực:</label>
-                    <select id="filter-area">
-                        <option value="All">Tất cả khu vực</option>
-                        </select>
+    <!-- TOÀN BỘ NỘI DUNG DASHBOARD -->
+    <div class="container" id="dashboard-content" style="display: none;">
+        
+        <h1>Báo Cáo Tổng Hợp Dự Án</h1>
 
-                    <label for="filter-month">Thời hạn (Tháng):</label>
-                    <select id="filter-month">
-                        <option value="All">Tất cả các tháng</option>
-                        <option value="05">Tháng 5</option>
-                        <option value="06">Tháng 6</option>
-                    </select>
-                </div>
+        <!-- BỘ LỌC DỮ LIỆU (FILTERS) -->
+        <div class="filter-panel">
+            <div class="filter-group">
+                <label for="filter-area">Khu Vực</label>
+                <select id="filter-area">
+                    <option value="All">Đang tải...</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-month">Tháng Báo Cáo (Deadline)</label>
+                <select id="filter-month">
+                    <option value="All">Tất cả các tháng</option>
+                    <option value="01">Tháng 1</option>
+                    <option value="02">Tháng 2</option>
+                    <option value="03">Tháng 3</option>
+                    <option value="04">Tháng 4</option>
+                    <option value="05">Tháng 5</option>
+                    <option value="06">Tháng 6</option>
+                    <option value="07">Tháng 7</option>
+                    <option value="08">Tháng 8</option>
+                    <option value="09">Tháng 9</option>
+                    <option value="10">Tháng 10</option>
+                    <option value="11">Tháng 11</option>
+                    <option value="12">Tháng 12</option>
+                </select>
             </div>
         </div>
 
-        <section id="gantt-section">
-            <div class="section-title">Tiến độ công việc (Gantt Plan)</div>
-            <div class="gantt-container">
-                <table id="gantt-table">
+        <!-- BIỂU ĐỒ TIẾN ĐỘ GANTT CHART -->
+        <div class="card">
+            <h2>Biểu đồ tiến độ dự án (Gantt Chart từng ngày)</h2>
+            <div class="table-responsive">
+                <table>
                     <thead>
                         <tr>
-                            <th rowspan="2" class="col-fixed">STT</th>
-                            <th rowspan="2" class="col-task">Tên công việc (Task)</th>
-                            <th rowspan="2" class="col-fixed">Phụ trách (PIC)</th>
-                            <th rowspan="2" class="col-fixed">Deadline</th>
-                            <th colspan="2" class="month-header">Tháng 5 (May)</th>
-                            <th colspan="4" class="month-header">Tháng 6 (Jun)</th>
-                        </tr>
-                        <tr class="week-row">
-                            <th>W3</th>
-                            <th>W4</th>
-                            <th>W1</th>
-                            <th>W2</th>
-                            <th>W3</th>
-                            <th>W4</th>
+                            <th style="width: 5%;">STT</th>
+                            <th style="width: 30%;">Tên công việc</th>
+                            <th style="width: 10%;">Deadline</th>
+                            <!-- Trục đo thời gian tự động do JS khởi tạo -->
+                            <th id="gantt-header-days" style="width: 55%; padding: 0; min-width: 500px; background-color: #fafafa;"></th>
                         </tr>
                     </thead>
                     <tbody id="gantt-tbody">
-                        </tbody>
+                        <!-- Code JS sẽ tự động bơm dữ liệu vào đây -->
+                    </tbody>
                 </table>
             </div>
-        </section>
+        </div>
 
-        <section id="swot-section">
-            <div class="section-title">Phân tích SWOT</div>
+        <!-- MÔ HÌNH PHÂN TÍCH SWOT -->
+        <div class="card">
+            <h2>Phân Tích Chiến Lược Dự Án (SWOT)</h2>
             <div class="swot-grid">
-                <div class="swot-card">
-                    <div class="card-header s-bg">STRENGTHS (Điểm mạnh)</div>
+                <div class="swot-box swot-s">
+                    <h3>Strengths (Điểm mạnh)</h3>
                     <ul id="swot-s"></ul>
                 </div>
-                <div class="swot-card">
-                    <div class="card-header w-bg">WEAKNESSES (Điểm yếu)</div>
+                <div class="swot-box swot-w">
+                    <h3>Weaknesses (Điểm yếu)</h3>
                     <ul id="swot-w"></ul>
                 </div>
-                <div class="swot-card">
-                    <div class="card-header o-bg">OPPORTUNITIES (Cơ hội)</div>
+                <div class="swot-box swot-o">
+                    <h3>Opportunities (Cơ hội)</h3>
                     <ul id="swot-o"></ul>
                 </div>
-                <div class="swot-card">
-                    <div class="card-header t-bg">THREATS (Thách thức)</div>
+                <div class="swot-box swot-t">
+                    <h3>Threats (Thách thức)</h3>
                     <ul id="swot-t"></ul>
                 </div>
             </div>
-        </section>
+        </div>
+
     </div>
 
-    <script src="app.js"></script>
+    <!-- ==========================================================================
+       6. TOÀN BỘ LOGIC XỬ LÝ (JAVASCRIPT BẢN CẬP NHẬT GỘP TẤT CẢ)
+       ========================================================================== -->
+    <script>
+        // CẤU HÌNH LIÊN KẾT ĐẾN GOOGLE SHEET CỦA BẠN
+        const SPREADSHEET_ID = '1Xtwk_Y7UGKNw2YC9c4kblae71mHahzr7GqV-sfiie6E';
+        const API_KEY = 'AIzaSyC8oIfsPGtSedj73Qky4aasg98xqkrWT5s'; // <-- Thay khóa API của bạn tại đây
+
+        let globalData = {
+            gantt: [],
+            swot: []
+        };
+
+        // Hàm xử lý mảng dữ liệu thô từ Google Sheets thành Object cụ thể
+        function convertRawToObjects(rawValues) {
+            if (!rawValues || rawValues.length === 0) return [];
+            const headers = rawValues[0];
+            return rawValues.slice(1).map(row => {
+                let obj = {};
+                headers.forEach((header, index) => {
+                    obj[header] = row[index] || '';
+                });
+                return obj;
+            });
+        }
+
+        // Gọi API tải từng Tab trên file Sheets
+        async function fetchSheetTab(tabName) {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(tabName)}?key=${API_KEY}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Không thể tải được tab dữ liệu: ${tabName}`);
+            const data = await response.json();
+            return data.values;
+        }
+
+        // Khởi động hệ thống Dashboard khi truy cập trang web
+        async function initDashboard() {
+            const progressBar = document.getElementById('main-progress-bar');
+            const loadScreen = document.getElementById('loading-screen');
+            const mainContent = document.getElementById('dashboard-content');
+            const statusText = document.getElementById('loading-status');
+
+            try {
+                if (statusText) statusText.innerText = "Đang đọc dữ liệu Tiến độ (Gantt)...";
+                if (progressBar) progressBar.style.width = '40%';
+                const rawGantt = await fetchSheetTab('Gantt'); 
+                globalData.gantt = convertRawToObjects(rawGantt);
+
+                if (statusText) statusText.innerText = "Đang đọc dữ liệu Phân tích (SWOT)...";
+                if (progressBar) progressBar.style.width = '80%';
+                const rawSwot = await fetchSheetTab('Swot'); 
+                globalData.swot = convertRawToObjects(rawSwot);
+
+                if (progressBar) progressBar.style.width = '100%';
+                if (statusText) statusText.innerText = "Hoàn tất! Đang đồng bộ giao diện...";
+                
+                setupFilters();
+                renderDashboard();
+
+                // Hiệu ứng mờ dần màn hình loading biến mất
+                setTimeout(() => {
+                    if (loadScreen) loadScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        if (loadScreen) loadScreen.style.display = 'none';
+                        if (mainContent) mainContent.style.display = 'block';
+                    }, 500);
+                }, 600);
+
+            } catch (error) {
+                console.error(error);
+                if (statusText) statusText.innerText = 'LỖI: ' + error.message;
+                if (progressBar) progressBar.style.backgroundColor = '#f44336';
+            }
+        }
+
+        // Tạo cấu trúc cho các hộp lọc (Filters Select)
+        function setupFilters() {
+            const areaFilter = document.getElementById('filter-area');
+            const monthFilter = document.getElementById('filter-month');
+            if (!areaFilter || !monthFilter) return;
+
+            // Tìm toàn bộ Khu vực có mặt trong dữ liệu (loại trừ trùng lặp)
+            const areas = [...new Set(globalData.gantt.map(item => item['ar'] || item['Area'] || item['Khu vực']).filter(x => x))];
+            
+            areaFilter.innerHTML = '<option value="All">Tất cả khu vực</option>';
+            areas.forEach(area => {
+                areaFilter.innerHTML += `<option value="${area}">${area}</option>`;
+            });
+
+            // Gắn hành động lắng nghe sự kiện khi thay đổi bộ lọc
+            areaFilter.addEventListener('change', renderDashboard);
+            monthFilter.addEventListener('change', renderDashboard);
+        }
+
+        // Lọc mảng dữ liệu dựa theo lựa chọn trên giao diện
+        function filterData(dataArray) {
+            if (!dataArray || !Array.isArray(dataArray)) return [];
+            
+            const areaFilterEl = document.getElementById('filter-area');
+            const monthFilterEl = document.getElementById('filter-month');
+            
+            const selectedArea = areaFilterEl ? areaFilterEl.value : 'All';
+            const selectedMonth = monthFilterEl ? monthFilterEl.value : 'All';
+
+            return dataArray.filter(item => {
+                const areaVal = item['ar'] || item['Area'] || item['Khu vực'] || '';
+                const matchArea = (selectedArea === 'All') || (areaVal === selectedArea);
+                
+                let matchMonth = true;
+                if (selectedMonth !== 'All') {
+                    const endDate = item['End'] || item['End date'] || item['Deadline'] || '';
+                    matchMonth = endDate.includes(`/${selectedMonth}/`) || endDate.includes(`-${selectedMonth}-`);
+                }
+                return matchArea && matchMonth;
+            });
+        }
+
+        // Chuyển chuỗi văn bản ngày tháng dd/mm/yyyy thành Object Date trong JS chuẩn xác
+        function parseDateString(dateStr) {
+            if (!dateStr) return null;
+            const parts = dateStr.toString().split(/[/-]/); 
+            if (parts.length === 3) {
+                let day = parseInt(parts[0]);
+                let month = parseInt(parts[1]) - 1; 
+                let year = parseInt(parts[2]);
+                if (year < 100) year += 2000;
+                return new Date(year, month, day);
+            }
+            return null;
+        }
+
+        // Hàm kích hoạt kết xuất đồng thời các thành phần
+        function renderDashboard() {
+            renderGanttChart();
+            renderSWOT();
+        }
+
+        // LẬP TRÌNH VẼ BIỂU ĐỒ GANTT TỰ ĐỘNG THEO NGÀY CÓ LƯỚI VÀ LABEL TRÊN KHUNG
+        function renderGanttChart() {
+            const tbody = document.getElementById('gantt-tbody');
+            const headerDays = document.getElementById('gantt-header-days'); 
+            if (!tbody) return;
+            tbody.innerHTML = ''; 
+
+            let filteredGantt = filterData(globalData.gantt);
+
+            if (filteredGantt.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="padding: 20px; text-align: center; color: #999;">Không tìm thấy dữ liệu tiến độ phù hợp bộ lọc</td></tr>';
+                if (headerDays) headerDays.innerHTML = 'Timeline';
+                return;
+            }
+
+            // A. ĐỊNH VỊ KHUNG NGÀY CHO TOÀN DỰ ÁN (Ngày sớm nhất -> Ngày trễ nhất)
+            let minProjectDate = null;
+            let maxProjectDate = null;
+
+            filteredGantt.forEach(task => {
+                let s = parseDateString(task['Start']);
+                let e = parseDateString(task['End'] || task['End date'] || task['Deadline']);
+                if (s && (!minProjectDate || s < minProjectDate)) minProjectDate = s;
+                if (e && (!maxProjectDate || e > maxProjectDate)) maxProjectDate = e;
+            });
+
+            // Nới rộng trục thời gian thêm 2 ngày ở 2 đầu cho thoáng biểu đồ
+            if (minProjectDate && maxProjectDate) {
+                minProjectDate.setDate(minProjectDate.getDate() - 2);
+                maxProjectDate.setDate(maxProjectDate.getDate() + 2);
+            } else {
+                minProjectDate = new Date();
+                maxProjectDate = new Date(); maxProjectDate.setDate(maxProjectDate.getDate() + 30);
+            }
+
+            minProjectDate.setHours(0,0,0,0);
+            maxProjectDate.setHours(0,0,0,0);
+
+            const totalProjectMs = maxProjectDate.getTime() - minProjectDate.getTime();
+            const totalDays = Math.round(totalProjectMs / (1000 * 60 * 60 * 24)) + 1;
+
+            // B. TỰ ĐỘNG IN THƯỚC ĐO NGÀY LÊN TIÊU ĐỀ (Tô màu Thứ 7/Chủ Nhật)
+            if (headerDays) {
+                let headerHtml = '<div style="display: flex; width: 100%; height: 100%;">';
+                for (let i = 0; i < totalDays; i++) {
+                    let d = new Date(minProjectDate);
+                    d.setDate(d.getDate() + i);
+                    let day = d.getDate();
+                    let month = d.getMonth() + 1;
+                    let dayOfWeek = d.getDay(); 
+                    
+                    let isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+                    let bg = isWeekend ? 'background-color: #ffeaea;' : '';
+                    let color = isWeekend ? 'color: #d32f2f;' : 'color: #555;';
+                    
+                    headerHtml += `
+                        <div style="flex: 1; text-align: center; font-size: 11px; border-right: 1px solid #e0e0e0; padding: 4px 0; ${bg} ${color}">
+                            <strong>${day}</strong><br><span style="font-size: 9px;">Th${month}</span>
+                        </div>
+                    `;
+                }
+                headerHtml += '</div>';
+                headerDays.innerHTML = headerHtml;
+            }
+
+            // Tính tỷ lệ phần trăm của 1 ngày để tạo các vạch lưới sọc dọc nền
+            let dayWidthPercent = (1 / totalDays) * 100;
+            let bgGrid = `background-image: repeating-linear-gradient(to right, transparent, transparent calc(100% - 1px), #e8e8e8 calc(100% - 1px), #e8e8e8 100%); background-size: ${dayWidthPercent}% 100%;`;
+
+            // C. VẼ TỪNG THANH MŨI TÊN NHIỆM VỤ LÊN KHUNG
+            filteredGantt.forEach((task, index) => {
+                let tr = document.createElement('tr');
+                
+                let taskName = task['Task'] || task['Tên công việc'] || '';
+                let picName = task['PIC'] || task['Phụ trách'] || '';
+                let startStr = task['Start'] || '';
+                let endStr = task['End'] || task['End date'] || task['Deadline'] || '';
+                let progressVal = task['Progress'] || task['Hoàn thành'] || '0%';
+                
+                let rawStatus = (task['Status'] || task['Remark'] || '').toString().toLowerCase();
+                let statusClass = 'status-ongoing';
+                if (rawStatus.includes('done') || progressVal === '100%') statusClass = 'status-done';
+                if (rawStatus.includes('delay')) statusClass = 'status-delay';
+
+                let htmlContent = `
+                    <td>${index + 1}</td>
+                    <td class="col-task">${taskName}</td>
+                    <td><strong>${endStr}</strong></td>
+                `;
+
+                let startDateObj = parseDateString(startStr);
+                let endDateObj = parseDateString(endStr);
+                let leftPercent = 0;
+                let widthPercent = 100;
+
+                if (startDateObj && endDateObj) {
+                    if (endDateObj < startDateObj) endDateObj = startDateObj; 
+                    startDateObj.setHours(0,0,0,0);
+                    endDateObj.setHours(0,0,0,0);
+                    
+                    leftPercent = ((startDateObj.getTime() - minProjectDate.getTime()) / totalProjectMs) * 100;
+                    let taskDurationDays = Math.round((endDateObj.getTime() - startDateObj.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+                    widthPercent = (taskDurationDays / totalDays) * 100;
+                    
+                } else if (endDateObj) {
+                    endDateObj.setHours(0,0,0,0);
+                    leftPercent = ((endDateObj.getTime() - minProjectDate.getTime()) / totalProjectMs) * 100;
+                    widthPercent = dayWidthPercent; 
+                }
+
+                if (leftPercent < 0) leftPercent = 0;
+                if (leftPercent + widthPercent > 100) widthPercent = 100 - leftPercent;
+
+                // Thêm nhãn pic-label nằm lơ lửng ngay phía trên bên trái của arrow-wrapper
+                htmlContent += `
+                    <td class="timeline-cell" style="padding: 0; position: relative; ${bgGrid}">
+                        <div class="pic-label" style="left: calc(${leftPercent}% + 4px);">${picName}</div>
+                        <div class="task-arrow-wrapper" style="left: ${leftPercent}%; width: ${widthPercent}%;" title="Bắt đầu: ${startStr} | Kết thúc: ${endStr} | PIC: ${picName}">
+                            <div class="task-arrow-fill ${statusClass}" style="width: ${progressVal};">
+                                <span class="progress-text">${progressVal}</span>
+                            </div>
+                        </div>
+                    </td>
+                `;
+
+                tr.innerHTML = htmlContent;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // KẾT XUẤT CÁC Ô THÔNG TIN SWOT
+        function renderSWOT() {
+            const filteredSwot = filterData(globalData.swot);
+            
+            // Xóa rỗng nội dung cũ trước khi vẽ
+            ['swot-s', 'swot-w', 'swot-o', 'swot-t'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '';
+            });
+
+            // Bơm các dòng danh sách li vào từng góc phần tư tương ứng
+            filteredSwot.forEach(item => {
+                if (item.STRENGTHS) document.getElementById('swot-s').innerHTML += `<li>${item.STRENGTHS}</li>`;
+                if (item.WEAKNESSES) document.getElementById('swot-w').innerHTML += `<li>${item.WEAKNESSES}</li>`;
+                if (item.OPPORTUNITIES) document.getElementById('swot-o').innerHTML += `<li>${item.OPPORTUNITIES}</li>`;
+                if (item.THREATS) document.getElementById('swot-t').innerHTML += `<li>${item.THREATS}</li>`;
+            });
+        }
+
+        // Lắng nghe sự kiện tải trang hoàn tất để chạy ứng dụng
+        window.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
 </body>
 </html>
