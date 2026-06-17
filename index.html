@@ -338,15 +338,25 @@
         /* ----------------------------------------------------
            HÀM MỚI: TỰ ĐỘNG GOM DATA SECONDARY TỪ MỌI FILE M5, M6, M7...
            ---------------------------------------------------- */
+       /* ----------------------------------------------------
+           HÀM MỚI: GOM DATA SECONDARY (BỌC THÉP CHO M1 -> M12)
+           ---------------------------------------------------- */
         function getAggregatedSecondarySales() {
             let combinedData = [];
-            // Lặp qua toàn bộ các biến trong bộ nhớ của trình duyệt
-            for (let key in window) {
-                // Nếu tìm thấy biến có tên bắt đầu bằng "dbSalesM" (ví dụ: dbSalesM5, dbSalesM6...)
-                if (key.startsWith('dbSalesM') && Array.isArray(window[key])) {
-                    combinedData = combinedData.concat(window[key]);
-                }
-            }
+            // Kiểm tra điểm danh từ Tháng 1 đến Tháng 12 xem biến nào đã được load
+            if (typeof dbSalesM1 !== 'undefined') combinedData = combinedData.concat(dbSalesM1);
+            if (typeof dbSalesM2 !== 'undefined') combinedData = combinedData.concat(dbSalesM2);
+            if (typeof dbSalesM3 !== 'undefined') combinedData = combinedData.concat(dbSalesM3);
+            if (typeof dbSalesM4 !== 'undefined') combinedData = combinedData.concat(dbSalesM4);
+            if (typeof dbSalesM5 !== 'undefined') combinedData = combinedData.concat(dbSalesM5);
+            if (typeof dbSalesM6 !== 'undefined') combinedData = combinedData.concat(dbSalesM6);
+            if (typeof dbSalesM7 !== 'undefined') combinedData = combinedData.concat(dbSalesM7);
+            if (typeof dbSalesM8 !== 'undefined') combinedData = combinedData.concat(dbSalesM8);
+            if (typeof dbSalesM9 !== 'undefined') combinedData = combinedData.concat(dbSalesM9);
+            if (typeof dbSalesM10 !== 'undefined') combinedData = combinedData.concat(dbSalesM10);
+            if (typeof dbSalesM11 !== 'undefined') combinedData = combinedData.concat(dbSalesM11);
+            if (typeof dbSalesM12 !== 'undefined') combinedData = combinedData.concat(dbSalesM12);
+            
             return combinedData;
         }
 
