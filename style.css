@@ -90,3 +90,57 @@ th { background-color: var(--light-bg); color: var(--primary-color); font-weight
     .header-left, .header-right { flex: 1 1 100%; width: 100%; }
     .filter-group { width: 100%; justify-content: flex-start; }
 }
+/* --- CẬP NHẬT GANTT CHẠY THEO NGÀY CỤ THỂ & HÌNH MŨI TÊN --- */
+
+.timeline-cell {
+    position: relative;
+    height: 55px;
+    padding: 0 !important;
+    /* Tạo các đường gióng dọc nền mờ mờ chia khung thời gian */
+    background: repeating-linear-gradient(
+        to right,
+        transparent,
+        transparent 16.66%,
+        rgba(0,0,0,0.03) 16.66%,
+        rgba(0,0,0,0.04) 16.76%
+    );
+}
+
+.task-arrow-wrapper {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 26px;
+    background-color: #e0e0e0;
+    border-radius: 4px 0 0 4px; /* Bo tròn đầu trái */
+    
+    /* CẮT HÌNH MŨI TÊN BÊN PHẢI */
+    clip-path: polygon(0% 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 0% 100%);
+    
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    z-index: 10;
+    min-width: 40px; /* Đảm bảo đủ chiều dài vẽ mũi tên */
+    transition: all 0.3s ease;
+}
+
+.task-arrow-wrapper:hover {
+    filter: brightness(1.1);
+    transform: translateY(-50%) scale(1.02);
+    z-index: 20;
+}
+
+.task-arrow-fill {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    transition: width 0.5s ease-in-out;
+}
+
+.progress-text {
+    white-space: nowrap;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+}
