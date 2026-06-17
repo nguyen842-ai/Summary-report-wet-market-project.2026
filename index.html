@@ -18,12 +18,12 @@
         body {
             background-color: #f4f6f9;
             color: #333;
-            padding: 0 15px;
-            margin: 0 auto;
+            padding: 20px;
         }
 
         .container {
-            max-width: 100%;
+            max-width: 100%; /* Đã mở rộng full màn hình theo yêu cầu */
+            padding: 0 15px;
             margin: 0 auto;
         }
 
@@ -115,7 +115,7 @@
         }
 
         /* ==========================================================================
-           4. BIỂU ĐỒ GANTT CHỮA CHUẨN NGÀY & PHỤ TRÁCH (GANTT CHART)
+           4. BIỂU ĐỒ GANTT TỰ ĐỘNG THEO NGÀY (GANTT CHART)
            ========================================================================== */
         .card {
             background: #ffffff;
@@ -138,9 +138,9 @@
         }
 
         th, td {
-            padding: 12px;
+            padding: 10px;
             border: 1px solid #e0e0e0;
-            font-size: 14px;
+            font-size: 13px;
             vertical-align: middle;
         }
 
@@ -153,13 +153,14 @@
         .col-task {
             font-weight: 500;
             color: #1a237e;
+            word-break: break-word; /* Cho phép xuống hàng nếu tên task dài để bóp nhỏ cột */
         }
 
         /* Ô chứa dòng Timeline và Mũi tên trôi nổi */
         .timeline-cell {
             position: relative;
             padding: 0 !important;
-            height: 55px; /* Tăng chiều cao để chứa cả chữ PIC phía trên */
+            height: 55px; 
         }
 
         /* Nhãn tên PIC nằm lơ lửng phía trên mũi tên */
@@ -178,7 +179,7 @@
         /* Khung bao bọc thanh tiến độ */
         .task-arrow-wrapper {
             position: absolute;
-            top: 24px; /* Đẩy xuống dưới nhãn PIC */
+            top: 24px; 
             height: 22px;
             background-color: #eaeaea;
             border-radius: 4px;
@@ -240,10 +241,10 @@
             line-height: 1.6;
         }
 
-        .swot-s { background-color: #2e7d32; } /* Màu xanh lá nhạt sang trọng */
-        .swot-w { background-color: #c62828; } /* Màu đỏ gạch ấm áp */
-        .swot-o { background-color: #ef6c00; } /* Màu cam đất ấm áp */
-        .swot-t { background-color: #37474f; } /* Màu xám than tối tinh tế */
+        .swot-s { background-color: #2e7d32; } 
+        .swot-w { background-color: #c62828; } 
+        .swot-o { background-color: #ef6c00; } 
+        .swot-t { background-color: #37474f; } 
     </style>
 </head>
 <body>
@@ -299,11 +300,12 @@
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 5%;">STT</th>
-                            <th style="width: 30%;">Tên công việc</th>
-                            <th style="width: 10%;">Deadline</th>
-                            <!-- Trục đo thời gian tự động do JS khởi tạo -->
-                            <th id="gantt-header-days" style="width: 55%; padding: 0; min-width: 500px; background-color: #fafafa;"></th>
+                            <!-- Đã bóp nhỏ tối đa các cột text để nhường chỗ cho các cột ngày không bị hẹp -->
+                            <th id="gantt-header-first" style="width: 1%; white-space: nowrap; text-align: center;">STT</th>
+                            <th style="width: 15%; min-width: 140px;">Main task</th>
+                            <th style="width: 1%; white-space: nowrap; text-align: center;">Deadline</th>
+                            <!-- Trục đo thời gian tự động chiếm trọn phần không gian còn lại -->
+                            <th id="gantt-header-days" style="width: auto; padding: 0; min-width: 500px; background-color: #fafafa;"></th>
                         </tr>
                     </thead>
                     <tbody id="gantt-tbody">
@@ -344,7 +346,7 @@
     <script>
         // CẤU HÌNH LIÊN KẾT ĐẾN GOOGLE SHEET CỦA BẠN
         const SPREADSHEET_ID = '1Xtwk_Y7UGKNw2YC9c4kblae71mHahzr7GqV-sfiie6E';
-        const API_KEY = 'AIzaSyC8oIfsPGtSedj73Qky4aasg98xqkrWT5s'; // <-- Thay khóa API của bạn tại đây
+        const API_KEY = 'DÁN_API_KEY_CỦA_BẠN_VÀO_ĐÂY'; // <-- Thay khóa API của bạn tại đây
 
         let globalData = {
             gantt: [],
@@ -419,7 +421,6 @@
             const monthFilter = document.getElementById('filter-month');
             if (!areaFilter || !monthFilter) return;
 
-            // Tìm toàn bộ Khu vực có mặt trong dữ liệu (loại trừ trùng lặp)
             const areas = [...new Set(globalData.gantt.map(item => item['ar'] || item['Area'] || item['Khu vực']).filter(x => x))];
             
             areaFilter.innerHTML = '<option value="All">Tất cả khu vực</option>';
@@ -427,7 +428,6 @@
                 areaFilter.innerHTML += `<option value="${area}">${area}</option>`;
             });
 
-            // Gắn hành động lắng nghe sự kiện khi thay đổi bộ lọc
             areaFilter.addEventListener('change', renderDashboard);
             monthFilter.addEventListener('change', renderDashboard);
         }
@@ -455,7 +455,7 @@
             });
         }
 
-        // Chuyển chuỗi văn bản ngày tháng dd/mm/yyyy thành Object Date trong JS chuẩn xác
+        // Chuyển chuỗi văn bản ngày tháng dd/mm/yyyy thành Object Date trong JS
         function parseDateString(dateStr) {
             if (!dateStr) return null;
             const parts = dateStr.toString().split(/[/-]/); 
@@ -479,18 +479,28 @@
         function renderGanttChart() {
             const tbody = document.getElementById('gantt-tbody');
             const headerDays = document.getElementById('gantt-header-days'); 
+            const firstHeader = document.getElementById('gantt-header-first'); 
             if (!tbody) return;
             tbody.innerHTML = ''; 
+
+            const areaFilterEl = document.getElementById('filter-area');
+            const selectedArea = areaFilterEl ? areaFilterEl.value : 'All';
+
+            // Đổi tiêu đề cột đầu tiên dynamically dựa trên filter Area
+            if (firstHeader) {
+                firstHeader.innerText = (selectedArea === 'All') ? 'Area' : 'STT';
+            }
 
             let filteredGantt = filterData(globalData.gantt);
 
             if (filteredGantt.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="padding: 20px; text-align: center; color: #999;">Không tìm thấy dữ liệu tiến độ phù hợp bộ lọc</td></tr>';
+                let totalCols = 4;
+                tbody.innerHTML = `<tr><td colspan="${totalCols}" style="padding: 20px; text-align: center; color: #999;">Không tìm thấy dữ liệu tiến độ phù hợp bộ lọc</td></tr>`;
                 if (headerDays) headerDays.innerHTML = 'Timeline';
                 return;
             }
 
-            // A. ĐỊNH VỊ KHUNG NGÀY CHO TOÀN DỰ ÁN (Ngày sớm nhất -> Ngày trễ nhất)
+            // A. ĐỊNH VỊ KHUNG NGÀY CHO TOÀN DỰ ÁN
             let minProjectDate = null;
             let maxProjectDate = null;
 
@@ -501,7 +511,6 @@
                 if (e && (!maxProjectDate || e > maxProjectDate)) maxProjectDate = e;
             });
 
-            // Nới rộng trục thời gian thêm 2 ngày ở 2 đầu cho thoáng biểu đồ
             if (minProjectDate && maxProjectDate) {
                 minProjectDate.setDate(minProjectDate.getDate() - 2);
                 maxProjectDate.setDate(maxProjectDate.getDate() + 2);
@@ -514,14 +523,22 @@
             maxProjectDate.setHours(0,0,0,0);
 
             const totalProjectMs = maxProjectDate.getTime() - minProjectDate.getTime();
-            const totalDays = Math.round(totalProjectMs / (1000 * 60 * 60 * 24)) + 1;
+            let totalDays = Math.round(totalProjectMs / (1000 * 60 * 60 * 24)) + 1;
 
-            // B. TỰ ĐỘNG IN THƯỚC ĐO THÁNG & NGÀY LÊN TIÊU ĐỀ
+            // Chốt chặn an toàn chống kẹt loop nếu gõ sai năm trên Sheets
+            if (totalDays > 730) {
+                console.error("Khoảng ngày bất thường:", totalDays, "ngày.");
+                alert("⚠️ CẢNH BÁO: Có ô ngày tháng trên Google Sheets bị nhập sai năm (kéo dài " + totalDays + " ngày). Để tránh treo máy, hệ thống tạm thời chỉ hiển thị 30 ngày. Vui lòng kiểm tra lại Sheets!");
+                totalDays = 30; 
+                maxProjectDate = new Date(minProjectDate);
+                maxProjectDate.setDate(maxProjectDate.getDate() + 30);
+            }
+
+            // B. TỰ ĐỘNG IN THƯỚC ĐO THÁNG & NGÀY LÊN TIÊU ĐỀ (ĐÃ CẬP NHẬT PHỦ THÁNG HÀNG TRÊN)
             if (headerDays) {
                 let months = []; 
                 let currentMonthLabel = '';
                 let currentMonthDays = 0;
-                
                 let daysHtml = '<div style="display: flex; width: 100%;">';
 
                 for (let i = 0; i < totalDays; i++) {
@@ -532,12 +549,9 @@
                     let year = d.getFullYear();
                     let dayOfWeek = d.getDay(); 
                     
-                    // Xác định nhãn Tháng/Năm
                     let monthLabel = `Tháng ${month}/${year}`;
-                    
                     if (i === 0) currentMonthLabel = monthLabel;
 
-                    // Gộp số ngày cho từng tháng
                     if (monthLabel !== currentMonthLabel) {
                         months.push({ label: currentMonthLabel, count: currentMonthDays });
                         currentMonthLabel = monthLabel;
@@ -546,7 +560,6 @@
                         currentMonthDays++;
                     }
 
-                    // Tô màu cuối tuần cho hàng Ngày
                     let isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
                     let bg = isWeekend ? 'background-color: #ffeaea;' : '';
                     let color = isWeekend ? 'color: #d32f2f;' : 'color: #555;';
@@ -557,27 +570,22 @@
                         </div>
                     `;
                 }
-                // Đẩy tháng cuối cùng vào mảng
                 months.push({ label: currentMonthLabel, count: currentMonthDays });
                 daysHtml += '</div>';
 
-                // Vẽ hàng Tháng ở trên
                 let monthHtml = '<div style="display: flex; width: 100%; border-bottom: 1px solid #e0e0e0;">';
                 months.forEach(m => {
-                    // Flex theo số lượng ngày của tháng đó để độ rộng phủ chính xác
                     monthHtml += `
-                        <div style="flex: ${m.count}; text-align: center; font-size: 12px; font-weight: bold; background-color: #e9ecef; color: #1a237e; padding: 5px 0; border-right: 1px solid #e0e0e0;">
+                        <div style="flex: ${m.count}; text-align: center; font-size: 11px; font-weight: bold; background-color: #e9ecef; color: #1a237e; padding: 5px 0; border-right: 1px solid #e0e0e0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                             ${m.label}
                         </div>
                     `;
                 });
                 monthHtml += '</div>';
 
-                // Gộp hàng Tháng và hàng Ngày lại
                 headerDays.innerHTML = monthHtml + daysHtml;
             }
 
-            // Tính tỷ lệ phần trăm của 1 ngày để tạo các vạch lưới sọc dọc nền
             let dayWidthPercent = (1 / totalDays) * 100;
             let bgGrid = `background-image: repeating-linear-gradient(to right, transparent, transparent calc(100% - 1px), #e8e8e8 calc(100% - 1px), #e8e8e8 100%); background-size: ${dayWidthPercent}% 100%;`;
 
@@ -596,10 +604,13 @@
                 if (rawStatus.includes('done') || progressVal === '100%') statusClass = 'status-done';
                 if (rawStatus.includes('delay')) statusClass = 'status-delay';
 
+                // Đổi giá trị hiển thị cột đầu tiên dựa vào việc lựa chọn Area
+                let firstColValue = (selectedArea === 'All') ? (task['ar'] || task['Area'] || task['Khu vực'] || '') : (index + 1);
+
                 let htmlContent = `
-                    <td>${index + 1}</td>
+                    <td style="white-space: nowrap; text-align: center;">${firstColValue}</td>
                     <td class="col-task">${taskName}</td>
-                    <td><strong>${endStr}</strong></td>
+                    <td style="white-space: nowrap; text-align: center;"><strong>${endStr}</strong></td>
                 `;
 
                 let startDateObj = parseDateString(startStr);
@@ -625,7 +636,6 @@
                 if (leftPercent < 0) leftPercent = 0;
                 if (leftPercent + widthPercent > 100) widthPercent = 100 - leftPercent;
 
-                // Thêm nhãn pic-label nằm lơ lửng ngay phía trên bên trái của arrow-wrapper
                 htmlContent += `
                     <td class="timeline-cell" style="padding: 0; position: relative; ${bgGrid}">
                         <div class="pic-label" style="left: calc(${leftPercent}% + 4px);">${picName}</div>
@@ -646,13 +656,11 @@
         function renderSWOT() {
             const filteredSwot = filterData(globalData.swot);
             
-            // Xóa rỗng nội dung cũ trước khi vẽ
             ['swot-s', 'swot-w', 'swot-o', 'swot-t'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.innerHTML = '';
             });
 
-            // Bơm các dòng danh sách li vào từng góc phần tư tương ứng
             filteredSwot.forEach(item => {
                 if (item.STRENGTHS) document.getElementById('swot-s').innerHTML += `<li>${item.STRENGTHS}</li>`;
                 if (item.WEAKNESSES) document.getElementById('swot-w').innerHTML += `<li>${item.WEAKNESSES}</li>`;
@@ -661,7 +669,6 @@
             });
         }
 
-        // Lắng nghe sự kiện tải trang hoàn tất để chạy ứng dụng
         window.addEventListener('DOMContentLoaded', initDashboard);
     </script>
 </body>
