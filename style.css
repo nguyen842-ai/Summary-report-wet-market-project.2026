@@ -1,178 +1,92 @@
-/* --- PHONG CÁCH TỔNG THỂ --- */
 :root {
-    /* Bảng màu mới của bạn */
-    --color-dark-bg: #0B486B;      /* Màu nền chính (Xanh đậm) */
-    --color-card-bg: #3B8686;      /* Màu nền thẻ/bảng (Xanh ngọc) */
-    --color-text-main: #CFF09E;    /* Màu chữ chính (Xanh lá mạ nhạt) */
-    --color-accent: #79BD9A;       /* Màu nhấn (Xanh lá trung bình) */
-    
-    /* Màu cho thanh tiến độ - Sử dụng dải màu gradient */
-    --bar-gradient-start: #79BD9A; /* Bắt đầu thanh loading */
-    --bar-gradient-end: #A8DBA8;   /* Kết thúc thanh loading */
-    
-    /* Màu trạng thái (giữ nguyên để dễ phân biệt hoặc điều chỉnh sau) */
-    --color-done: #CFF09E;         /* Hoàn thành - dùng màu chữ chính */
-    --color-delay: #FF3366;        /* Trễ tiến độ - giữ màu đỏ */
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --border-color: #e0e0e0;
+    --primary-color: #0b486b;
+    --secondary-color: #3b8686;
+    --accent-color: #79bd9a;
+    --light-bg: #f8f9fa;
+    --swot-s: #e8f5e9;
+    --swot-w: #ffebee;
+    --swot-o: #e3f2fd;
+    --swot-t: #fff3e0;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--color-dark-bg);
-    color: var(--color-text-main);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     height: 100vh;
-    overflow: hidden;
+    overflow: hidden; /* Ngăn cuộn toàn trang, chỉ cuộn bên trong khối báo cáo */
 }
 
-/* --- MÀN HÌNH LOADING TRANG CHỦ --- */
+/* Loading screen */
 #loading-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--color-dark-bg);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    transition: opacity 0.5s ease;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: #ffffff;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    z-index: 1000; transition: opacity 0.5s ease;
 }
+.progress-bar-bg { width: 300px; height: 8px; background-color: #eee; border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
+#main-progress-bar { height: 100%; width: 0%; background: var(--secondary-color); border-radius: 4px; transition: width 0.3s; }
+#loading-status { font-size: 13px; color: #666; font-style: italic; }
 
-.loading-container {
-    width: 300px;
-    text-align: center;
-}
-
-#loading-status {
-    font-size: 14px;
-    color: var(--color-accent);
-    margin-bottom: 10px;
-    font-weight: bold;
-}
-
-.progress-bar-bg {
-    width: 100%;
-    height: 12px;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-#main-progress-bar {
-    height: 100%;
-    width: 0%;
-    /* Hiệu ứng chuyển màu dải (Gradient) cho thanh loading */
-    background: linear-gradient(90deg, var(--bar-gradient-start) 0%, var(--bar-gradient-end) 100%);
-    border-radius: 6px;
-    transition: width 0.3s ease;
-    box-shadow: 0 0 10px rgba(168, 219, 168, 0.5); /* Tạo hiệu ứng phát sáng nhẹ */
-}
-
-/* --- GIAO DIỆN CHÍNH DASHBOARD --- */
+/* Dashboard Content - Tràn viền & co giãn */
 #dashboard-content {
-    display: none; /* Ẩn mặc định, sẽ hiện khi load xong */
-    width: 95%;
-    max-width: 1200px;
-    height: 90vh;
-    padding: 20px;
-    background-color: var(--color-card-bg);
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-    overflow-y: auto; /* Cho phép cuộn nếu nội dung quá dài */
+    display: none; width: 100%; height: 100%; padding: 25px 40px; overflow-y: auto; background-color: #ffffff;
 }
 
-/* --- CẤU TRÚC BẢNG (TABLE) CHUNG --- */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-    background-color: rgba(255, 255, 255, 0.05); /* Nền nhẹ cho bảng */
-    border-radius: 8px;
-    overflow: hidden;
+/* Header chia khối 40/60 */
+.dashboard-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    border-bottom: 2px solid var(--border-color); padding-bottom: 15px; margin-bottom: 25px;
 }
+.header-left { flex: 0 0 40%; }
+.main-title { color: var(--primary-color); font-size: 28px; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
+.subtitle { color: #888; font-size: 15px; font-style: italic; }
 
-th, td {
-    padding: 12px;
-    text-align: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
+.header-right { flex: 0 0 60%; display: flex; justify-content: flex-end; }
+.filter-group { display: flex; align-items: center; gap: 15px; background: var(--light-bg); padding: 12px 25px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.filter-group label { font-weight: 600; font-size: 14px; color: var(--primary-color); }
+.filter-group select { padding: 8px 15px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; outline: none; background: #fff; cursor: pointer; transition: border 0.3s;}
+.filter-group select:hover { border-color: var(--secondary-color); }
 
-th {
-    background-color: rgba(0, 0, 0, 0.2); /* Nền đậm hơn cho tiêu đề */
-    color: var(--color-accent);
-    text-transform: uppercase;
-    font-size: 13px;
-    letter-spacing: 1px;
-}
+/* Bảng Gantt Chart */
+.section-title { font-size: 20px; font-weight: 700; color: var(--secondary-color); margin-bottom: 15px; text-transform: uppercase; border-left: 5px solid var(--secondary-color); padding-left: 10px; }
+.gantt-container { overflow-x: auto; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 10px rgba(0,0,0,0.02); margin-bottom: 35px; }
+table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+th, td { padding: 12px 15px; text-align: center; border: 1px solid var(--border-color); font-size: 13px; }
+th { background-color: var(--light-bg); color: var(--primary-color); font-weight: 600; }
+.col-task { text-align: left; min-width: 250px; font-weight: 500; }
+.month-header { background-color: #eaf2f8; color: var(--primary-color); font-size: 14px; }
+.week-row th { background-color: #f4f6f7; font-size: 12px; color: #555; }
 
-/* --- PHONG CÁCH GANTT CHART ĐẶC BIỆT --- */
-#gantt-table {
-    font-size: 14px;
-}
+/* Timeline Bar Styling */
+.bar-wrapper { width: 100%; height: 24px; background-color: #f0f0f0; border-radius: 6px; overflow: hidden; position: relative; }
+.bar-fill { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #fff; border-radius: 6px; transition: width 0.5s; box-shadow: inset 0 -2px 5px rgba(0,0,0,0.1);}
+.status-done { background-color: #4CAF50; }
+.status-ongoing { background-color: #2196F3; }
+.status-delay { background-color: #f44336; }
 
-#gantt-tbody td {
-    color: var(--color-text-main);
-}
+/* Khối SWOT */
+.swot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.swot-card { border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: transform 0.2s;}
+.swot-card:hover { transform: translateY(-3px); }
+.card-header { padding: 15px; font-weight: 700; color: var(--primary-color); text-align: center; border-bottom: 1px solid var(--border-color); font-size: 15px;}
+.s-bg { background-color: var(--swot-s); border-bottom-color: #c8e6c9;}
+.w-bg { background-color: var(--swot-w); border-bottom-color: #ffcdd2;}
+.o-bg { background-color: var(--swot-o); border-bottom-color: #bbdefb;}
+.t-bg { background-color: var(--swot-t); border-bottom-color: #ffe0b2;}
+.swot-card ul { list-style-type: none; padding: 20px; min-height: 150px; font-size: 14px; color: #444; }
+.swot-card li { margin-bottom: 10px; position: relative; padding-left: 18px; line-height: 1.5; }
+.swot-card li::before { content: '✓'; position: absolute; left: 0; color: var(--secondary-color); font-weight: bold; }
 
-/* Cột Task Name căn trái */
-#gantt-tbody td:nth-child(2) {
-    text-align: left;
-    color: var(--color-text-main);
-    font-weight: 500;
-}
-
-/* Container chứa thanh loading */
-.gantt-bar-wrapper {
-    width: 100%;
-    height: 20px;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-}
-
-/* Thanh loading chính bên trong */
-.gantt-loading-bar {
-    height: 100%;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: width 0.4s ease;
-    /* Gradient dải màu cho phần trăm hoàn thành */
-    background: linear-gradient(90deg, var(--color-accent) 0%, var(--bar-gradient-end) 100%);
-}
-
-/* Chữ hiển thị phần trăm bên trong thanh */
-.bar-text-percent {
-    font-size: 11px;
-    color: var(--color-dark-bg); /* Chữ màu đậm trên nền sáng */
-    font-weight: bold;
-    position: absolute;
-    width: 100%;
-    text-align: center;
-}
-
-/* Các lớp trạng thái (ghi đè màu nếu cần) */
-.bar-done {
-    background: var(--color-done) !important;
-}
-
-.bar-delay {
-    background: var(--color-delay) !important;
-}
-
-.bar-ongoing {
-    /* Sử dụng gradient mặc định đã khai báo ở trên */
+/* Responsive trên màn hình hẹp */
+@media (max-width: 1024px) {
+    .swot-grid { grid-template-columns: repeat(2, 1fr); }
+    .dashboard-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+    .header-left, .header-right { flex: 1 1 100%; width: 100%; }
+    .filter-group { width: 100%; justify-content: flex-start; }
 }
