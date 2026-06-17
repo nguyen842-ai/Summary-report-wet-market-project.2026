@@ -199,9 +199,13 @@
             font-weight: bold;
         }
 
-        .status-ongoing { background: linear-gradient(90deg, #2196F3, #1E88E5); }
-        .status-done { background: linear-gradient(90deg, #4CAF50, #43A047); }
-        .status-delay { background: linear-gradient(90deg, #F44336, #E53935); }
+        /* Tinh chỉnh màu Gantt Chart theo mã màu cung cấp */
+        .status-ongoing { background-color: #0B486B; } /* Mã 1 */
+        .status-done { background-color: #79BD9A; color: #111111; } /* Mã 3 */
+        .status-delay { background-color: #3B8686; color: #ffffff; } /* Mã 2 */
+
+        /* Nếu text bên trong status-done (Mã 3) tối quá thì chỉnh màu chữ */
+        .status-done .progress-text { color: #111111; } 
 
         /* ==========================================================================
            5. BỐ CỤC SWOT VÀ TREE DIAGRAM (60% - 40%)
@@ -226,7 +230,6 @@
             flex-direction: column;
         }
 
-        /* SWOT Styles */
         .swot-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -269,9 +272,6 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        .swot-s h3, .swot-w h3 { border-bottom: 1px solid rgba(255,255,255,0.3); }
-        .swot-o h3, .swot-t h3, .swot-support h3 { border-bottom: 1px solid rgba(0,0,0,0.15); color: #0B486B; }
-
         .province-title {
             display: block;
             margin-top: 8px;
@@ -289,44 +289,52 @@
         }
 
         /* ==========================================================================
-           6. TREE DIAGRAM STYLES (SƠ ĐỒ NHÂN SỰ)
+           6. TREE DIAGRAM STYLES (SƠ ĐỒ NHÂN SỰ CÓ ICON)
            ========================================================================== */
         .org-tree {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
-            padding: 10px 0;
+            padding: 20px 0;
             flex-grow: 1;
-            justify-content: center;
         }
 
         .tree-node {
-            background: #ffffff;
-            border: 2px solid #1a237e;
-            border-radius: 8px;
-            padding: 15px 20px;
+            border-radius: 12px;
+            padding: 18px 20px;
             text-align: center;
-            width: 85%;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            width: 220px; 
+            box-shadow: 0 6px 12px rgba(0,0,0,0.12);
             position: relative;
             z-index: 2;
+            border: 1px solid rgba(0,0,0,0.1);
         }
 
+        /* Mã màu theo cấp bậc */
+        .node-cdm { background-color: #0B486B; color: #ffffff; } /* Mã 1 */
+        .node-kam { background-color: #3B8686; color: #ffffff; } /* Mã 2 */
+        .node-kae { background-color: #79BD9A; color: #111111; } /* Mã 3 */
+        .node-dsr { background-color: #A8DBA8; color: #111111; } /* Mã 4 */
+
         .tree-node-title {
-            font-weight: bold;
-            color: #1a237e;
-            font-size: 16px;
-            margin-bottom: 8px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 8px;
+            font-weight: 800;
+            font-size: 20px; 
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 10px;
             text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .node-kae .tree-node-title, .node-dsr .tree-node-title {
+            border-bottom: 1px solid rgba(0,0,0,0.1);
         }
 
         .tree-node-data {
             display: flex;
             justify-content: space-around;
-            font-size: 14px;
+            font-size: 15px;
         }
 
         .data-block {
@@ -336,26 +344,45 @@
         }
 
         .data-label {
-            font-size: 11px;
-            color: #666;
-            margin-bottom: 2px;
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 4px;
         }
 
-        .data-plan { color: #0056b3; font-weight: bold; font-size: 16px;}
-        .data-actual { color: #28a745; font-weight: bold; font-size: 16px;}
+        .data-plan { font-weight: bold; font-size: 22px; }
+        .data-actual { font-weight: bold; font-size: 22px; }
 
+        /* Icon con người nằm bên dưới số liệu */
+        .tree-node-icons {
+            margin-top: 12px;
+            font-size: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 3px;
+            line-height: 1;
+        }
+
+        /* Đường kẻ nối */
         .tree-line {
-            width: 3px;
-            height: 35px;
-            background-color: #1a237e;
+            width: 2px;
+            height: 30px;
+            background-color: #ccc;
             z-index: 1;
+        }
+
+        /* Hàng ngang cho KAE và DSR */
+        .tree-row {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            width: 100%;
+            position: relative;
         }
 
         /* Responsive */
         @media (max-width: 992px) {
-            .swot-column, .tree-column {
-                flex: 0 0 100%;
-            }
+            .swot-column, .tree-column { flex: 0 0 100%; }
         }
     </style>
 </head>
@@ -372,7 +399,6 @@
     </div>
 
     <div class="container" id="dashboard-content" style="display: none;">
-        
         <h1>Báo Cáo Tổng Hợp Dự Án</h1>
 
         <div class="filter-panel">
@@ -414,75 +440,47 @@
                             <th id="gantt-header-days" style="width: auto; padding: 0; min-width: 500px; background-color: #fafafa;"></th>
                         </tr>
                     </thead>
-                    <tbody id="gantt-tbody">
-                        </tbody>
+                    <tbody id="gantt-tbody"></tbody>
                 </table>
             </div>
         </div>
 
         <div class="bottom-layout-wrapper">
-            
             <div class="swot-column">
                 <div class="card" style="margin-bottom: 0; height: 100%;">
                     <h2>Phân Tích Chiến Lược Dự Án (SWOT)</h2>
                     <div class="swot-grid">
-                        <div class="swot-box swot-s">
-                            <h3>Strengths (Điểm mạnh)</h3>
-                            <ul id="swot-s" style="list-style: none; padding-left: 0;"></ul>
-                        </div>
-                        <div class="swot-box swot-w">
-                            <h3>Weaknesses (Điểm yếu)</h3>
-                            <ul id="swot-w" style="list-style: none; padding-left: 0;"></ul>
-                        </div>
-                        <div class="swot-box swot-o">
-                            <h3>Opportunities (Cơ hội)</h3>
-                            <ul id="swot-o" style="list-style: none; padding-left: 0;"></ul>
-                        </div>
-                        <div class="swot-box swot-t">
-                            <h3>Threats (Thách thức)</h3>
-                            <ul id="swot-t" style="list-style: none; padding-left: 0;"></ul>
-                        </div>
+                        <div class="swot-box swot-s"><h3>Strengths</h3><ul id="swot-s"></ul></div>
+                        <div class="swot-box swot-w"><h3>Weaknesses</h3><ul id="swot-w"></ul></div>
+                        <div class="swot-box swot-o"><h3>Opportunities</h3><ul id="swot-o"></ul></div>
+                        <div class="swot-box swot-t"><h3>Threats</h3><ul id="swot-t"></ul></div>
                     </div>
-                    
-                    <div class="swot-support">
-                        <h3>Support (Hỗ trợ)</h3>
-                        <ul id="swot-support" style="list-style: none; padding-left: 0;"></ul>
-                    </div>
+                    <div class="swot-support"><h3>Support</h3><ul id="swot-support"></ul></div>
                 </div>
             </div>
 
             <div class="tree-column">
                 <div class="card" style="margin-bottom: 0; height: 100%; display: flex; flex-direction: column;">
                     <h2>Sơ Đồ Nhân Sự (Headcount)</h2>
-                    <div id="tree-container" style="flex-grow: 1; display: flex; align-items: center; justify-content: center; overflow-y: auto;">
-                        </div>
+                    <div id="tree-container" style="flex-grow: 1; display: flex; align-items: flex-start; justify-content: center; overflow-y: auto;">
+                    </div>
                 </div>
             </div>
-
         </div>
-
     </div>
 
     <script>
         const SPREADSHEET_ID = '1Xtwk_Y7UGKNw2YC9c4kblae71mHahzr7GqV-sfiie6E';
-        // Đã cập nhật API Key theo yêu cầu của bạn
         const API_KEY = 'AIzaSyC8oIfsPGtSedj73Qky4aasg98xqkrWT5s'; 
 
-        let globalData = {
-            gantt: [],
-            swot: [],
-            hcPlan: [],
-            hcActual: []
-        };
+        let globalData = { gantt: [], swot: [], hcPlan: [], hcActual: [] };
 
         function convertRawToObjects(rawValues) {
             if (!rawValues || rawValues.length === 0) return [];
             const headers = rawValues[0];
             return rawValues.slice(1).map(row => {
                 let obj = {};
-                headers.forEach((header, index) => {
-                    obj[header] = row[index] || '';
-                });
+                headers.forEach((header, index) => { obj[header] = row[index] || ''; });
                 return obj;
             });
         }
@@ -490,7 +488,6 @@
         async function fetchSheetTab(tabName) {
             const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(tabName)}?key=${API_KEY}`;
             const response = await fetch(url);
-            if (!response.ok) throw new Error(`Không thể tải được tab dữ liệu: ${tabName}`);
             const data = await response.json();
             return data.values;
         }
@@ -502,81 +499,50 @@
             const statusText = document.getElementById('loading-status');
 
             try {
-                if (statusText) statusText.innerText = "Đang đọc dữ liệu Tiến độ (Gantt)...";
-                if (progressBar) progressBar.style.width = '25%';
-                const rawGantt = await fetchSheetTab('Gantt'); 
-                globalData.gantt = convertRawToObjects(rawGantt);
-
-                if (statusText) statusText.innerText = "Đang đọc dữ liệu Phân tích (SWOT)...";
-                if (progressBar) progressBar.style.width = '50%';
-                const rawSwot = await fetchSheetTab('Swot'); 
-                globalData.swot = convertRawToObjects(rawSwot);
-
-                if (statusText) statusText.innerText = "Đang đọc dữ liệu Headcount Plan...";
-                if (progressBar) progressBar.style.width = '75%';
-                const rawHcPlan = await fetchSheetTab('Headcount plan'); 
-                globalData.hcPlan = convertRawToObjects(rawHcPlan);
-
-                if (statusText) statusText.innerText = "Đang đọc dữ liệu Headcount Actual...";
-                if (progressBar) progressBar.style.width = '95%';
-                const rawHcActual = await fetchSheetTab('Headcount actual'); 
-                globalData.hcActual = convertRawToObjects(rawHcActual);
-
-                if (progressBar) progressBar.style.width = '100%';
-                if (statusText) statusText.innerText = "Hoàn tất! Đang đồng bộ giao diện...";
+                statusText.innerText = "Đang tải dữ liệu...";
+                progressBar.style.width = '30%';
+                globalData.gantt = convertRawToObjects(await fetchSheetTab('Gantt'));
+                progressBar.style.width = '50%';
+                globalData.swot = convertRawToObjects(await fetchSheetTab('Swot'));
+                progressBar.style.width = '80%';
+                globalData.hcPlan = convertRawToObjects(await fetchSheetTab('Headcount plan'));
+                globalData.hcActual = convertRawToObjects(await fetchSheetTab('Headcount actual'));
+                progressBar.style.width = '100%';
                 
                 setupFilters();
                 renderDashboard();
 
                 setTimeout(() => {
-                    if (loadScreen) loadScreen.style.opacity = '0';
+                    loadScreen.style.opacity = '0';
                     setTimeout(() => {
-                        if (loadScreen) loadScreen.style.display = 'none';
-                        if (mainContent) mainContent.style.display = 'block';
+                        loadScreen.style.display = 'none';
+                        mainContent.style.display = 'block';
                     }, 500);
                 }, 600);
-
             } catch (error) {
-                console.error(error);
-                if (statusText) statusText.innerText = 'LỖI: ' + error.message;
-                if (progressBar) progressBar.style.backgroundColor = '#f44336';
+                statusText.innerText = 'LỖI: ' + error.message;
             }
         }
 
         function setupFilters() {
             const areaFilter = document.getElementById('filter-area');
             const monthFilter = document.getElementById('filter-month');
-            if (!areaFilter || !monthFilter) return;
-
-            // Tìm trường khu vực linh động chữ hoa/thường
             const areas = [...new Set(globalData.gantt.map(item => item['ar'] || item['AR'] || item['Area'] || item['Khu vực']).filter(x => x))];
-            
             areaFilter.innerHTML = '<option value="All">Tất cả khu vực</option>';
-            areas.forEach(area => {
-                areaFilter.innerHTML += `<option value="${area}">${area}</option>`;
-            });
-
+            areas.forEach(area => { areaFilter.innerHTML += `<option value="${area}">${area}</option>`; });
             areaFilter.addEventListener('change', renderDashboard);
             monthFilter.addEventListener('change', renderDashboard);
         }
 
-        // Bổ sung tham số để bỏ qua lọc theo Tháng đối với SWOT và Headcount
         function filterData(dataArray, ignoreMonth = false) {
-            if (!dataArray || !Array.isArray(dataArray)) return [];
-            
-            const areaFilterEl = document.getElementById('filter-area');
-            const monthFilterEl = document.getElementById('filter-month');
-            
-            const selectedArea = areaFilterEl ? areaFilterEl.value : 'All';
-            const selectedMonth = monthFilterEl ? monthFilterEl.value : 'All';
-
+            const selectedArea = document.getElementById('filter-area').value;
+            const selectedMonth = document.getElementById('filter-month').value;
             return dataArray.filter(item => {
                 const areaVal = item['ar'] || item['AR'] || item['Area'] || item['Khu vực'] || '';
-                const matchArea = (selectedArea === 'All') || (areaVal.toString().trim().toLowerCase() === selectedArea.toString().trim().toLowerCase());
-                
+                const matchArea = (selectedArea === 'All') || (areaVal.trim().toLowerCase() === selectedArea.trim().toLowerCase());
                 let matchMonth = true;
                 if (!ignoreMonth && selectedMonth !== 'All') {
-                    const endDate = item['End'] || item['End date'] || item['Deadline'] || item['end'] || item['deadline'] || '';
+                    const endDate = item['End'] || item['Deadline'] || '';
                     matchMonth = endDate.includes(`/${selectedMonth}/`) || endDate.includes(`-${selectedMonth}-`);
                 }
                 return matchArea && matchMonth;
@@ -586,13 +552,7 @@
         function parseDateString(dateStr) {
             if (!dateStr) return null;
             const parts = dateStr.toString().split(/[/-]/); 
-            if (parts.length === 3) {
-                let day = parseInt(parts[0]);
-                let month = parseInt(parts[1]) - 1; 
-                let year = parseInt(parts[2]);
-                if (year < 100) year += 2000;
-                return new Date(year, month, day);
-            }
+            if (parts.length === 3) return new Date(parts[2], parts[1]-1, parts[0]);
             return null;
         }
 
@@ -604,274 +564,114 @@
 
         function renderGanttChart() {
             const tbody = document.getElementById('gantt-tbody');
-            const headerDays = document.getElementById('gantt-header-days'); 
-            const firstHeader = document.getElementById('gantt-header-first'); 
-            if (!tbody) return;
-            tbody.innerHTML = ''; 
-
-            const areaFilterEl = document.getElementById('filter-area');
-            const selectedArea = areaFilterEl ? areaFilterEl.value : 'All';
-
-            if (firstHeader) {
-                firstHeader.innerText = (selectedArea === 'All') ? 'Area' : 'STT';
-            }
-
+            const headerDays = document.getElementById('gantt-header-days');
+            tbody.innerHTML = '';
             let filteredGantt = filterData(globalData.gantt, false);
+            if (filteredGantt.length === 0) return;
 
-            if (filteredGantt.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="padding: 20px; text-align: center; color: #999;">Không tìm thấy dữ liệu tiến độ phù hợp bộ lọc</td></tr>';
-                if (headerDays) headerDays.innerHTML = 'Timeline';
-                return;
-            }
-
-            let minProjectDate = null;
-            let maxProjectDate = null;
-
+            let minProjectDate = null, maxProjectDate = null;
             filteredGantt.forEach(task => {
                 let s = parseDateString(task['Start'] || task['start']);
-                let e = parseDateString(task['End'] || task['End date'] || task['Deadline'] || task['end'] || task['deadline']);
+                let e = parseDateString(task['End'] || task['Deadline']);
                 if (s && (!minProjectDate || s < minProjectDate)) minProjectDate = s;
                 if (e && (!maxProjectDate || e > maxProjectDate)) maxProjectDate = e;
             });
 
-            if (minProjectDate && maxProjectDate) {
-                minProjectDate.setDate(minProjectDate.getDate() - 2);
-                maxProjectDate.setDate(maxProjectDate.getDate() + 2);
-            } else {
-                minProjectDate = new Date();
-                maxProjectDate = new Date(); maxProjectDate.setDate(maxProjectDate.getDate() + 30);
-            }
-
-            minProjectDate.setHours(0,0,0,0);
-            maxProjectDate.setHours(0,0,0,0);
+            if (!minProjectDate) minProjectDate = new Date();
+            if (!maxProjectDate) { maxProjectDate = new Date(minProjectDate); maxProjectDate.setDate(maxProjectDate.getDate() + 30); }
+            minProjectDate.setDate(minProjectDate.getDate() - 2);
+            maxProjectDate.setDate(maxProjectDate.getDate() + 2);
 
             const totalProjectMs = maxProjectDate.getTime() - minProjectDate.getTime();
-            let totalDays = Math.round(totalProjectMs / (1000 * 60 * 60 * 24)) + 1;
+            const totalDays = Math.round(totalProjectMs / (1000 * 60 * 60 * 24)) + 1;
 
-            if (totalDays > 730) {
-                console.error("Khoảng ngày bất thường:", totalDays, "ngày.");
-                alert("⚠️ CẢNH BÁO: Có ô ngày tháng trên Google Sheets bị nhập sai năm. Hệ thống tạm thời chỉ hiển thị 30 ngày.");
-                totalDays = 30; 
-                maxProjectDate = new Date(minProjectDate);
-                maxProjectDate.setDate(maxProjectDate.getDate() + 30);
+            let daysHtml = '<div style="display: flex; width: 100%;">';
+            for (let i = 0; i < totalDays; i++) {
+                let d = new Date(minProjectDate); d.setDate(d.getDate() + i);
+                let isWeekend = (d.getDay() === 0 || d.getDay() === 6);
+                daysHtml += `<div style="flex: 1; text-align: center; font-size: 11px; border-right: 1px solid #e0e0e0; padding: 4px 0; ${isWeekend ? 'background-color: #ffeaea;' : ''}">${d.getDate()}</div>`;
             }
-
-            if (headerDays) {
-                let months = []; 
-                let currentMonthLabel = '';
-                let currentMonthDays = 0;
-                let daysHtml = '<div style="display: flex; width: 100%;">';
-
-                for (let i = 0; i < totalDays; i++) {
-                    let d = new Date(minProjectDate);
-                    d.setDate(d.getDate() + i);
-                    let day = d.getDate();
-                    let month = d.getMonth() + 1;
-                    let year = d.getFullYear();
-                    let dayOfWeek = d.getDay(); 
-                    
-                    let monthLabel = `Tháng ${month}/${year}`;
-                    if (i === 0) currentMonthLabel = monthLabel;
-
-                    if (monthLabel !== currentMonthLabel) {
-                        months.push({ label: currentMonthLabel, count: currentMonthDays });
-                        currentMonthLabel = monthLabel;
-                        currentMonthDays = 1;
-                    } else {
-                        currentMonthDays++;
-                    }
-
-                    let isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
-                    let bg = isWeekend ? 'background-color: #ffeaea;' : '';
-                    let color = isWeekend ? 'color: #d32f2f;' : 'color: #555;';
-                    
-                    daysHtml += `
-                        <div style="flex: 1; text-align: center; font-size: 11px; border-right: 1px solid #e0e0e0; padding: 4px 0; ${bg} ${color}">
-                            <strong>${day}</strong>
-                        </div>
-                    `;
-                }
-                months.push({ label: currentMonthLabel, count: currentMonthDays });
-                daysHtml += '</div>';
-
-                let monthHtml = '<div style="display: flex; width: 100%; border-bottom: 1px solid #e0e0e0;">';
-                months.forEach(m => {
-                    monthHtml += `
-                        <div style="flex: ${m.count}; text-align: center; font-size: 11px; font-weight: bold; background-color: #e9ecef; color: #1a237e; padding: 5px 0; border-right: 1px solid #e0e0e0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                            ${m.label}
-                        </div>
-                    `;
-                });
-                monthHtml += '</div>';
-
-                headerDays.innerHTML = monthHtml + daysHtml;
-            }
-
-            let dayWidthPercent = (1 / totalDays) * 100;
-            let bgGrid = `background-image: repeating-linear-gradient(to right, transparent, transparent calc(100% - 1px), #e8e8e8 calc(100% - 1px), #e8e8e8 100%); background-size: ${dayWidthPercent}% 100%;`;
+            headerDays.innerHTML = daysHtml + '</div>';
 
             filteredGantt.forEach((task, index) => {
-                let tr = document.createElement('tr');
-                
-                let taskName = task['Task'] || task['Tên công việc'] || task['task'] || '';
-                let picName = task['PIC'] || task['Phụ trách'] || task['pic'] || '';
-                let startStr = task['Start'] || task['start'] || '';
-                let endStr = task['End'] || task['End date'] || task['Deadline'] || task['end'] || task['deadline'] || '';
+                let sObj = parseDateString(task['Start'] || task['start']);
+                let eObj = parseDateString(task['End'] || task['Deadline']);
+                let left = sObj ? ((sObj.getTime() - minProjectDate.getTime()) / totalProjectMs) * 100 : 0;
+                let width = (sObj && eObj) ? ((eObj.getTime() - sObj.getTime()) / totalProjectMs) * 100 : (1/totalDays)*100;
+
                 let progressVal = task['Progress'] || task['Hoàn thành'] || task['progress'] || '0%';
-                
                 let rawStatus = (task['Status'] || task['Remark'] || task['status'] || task['remark'] || '').toString().toLowerCase();
+                
                 let statusClass = 'status-ongoing';
                 if (rawStatus.includes('done') || progressVal === '100%') statusClass = 'status-done';
                 if (rawStatus.includes('delay')) statusClass = 'status-delay';
 
-                let firstColValue = (selectedArea === 'All') ? (task['ar'] || task['AR'] || task['Area'] || task['Khu vực'] || '') : (index + 1);
-
-                let htmlContent = `
-                    <td style="white-space: nowrap; text-align: center;">${firstColValue}</td>
-                    <td class="col-task">${taskName}</td>
-                    <td style="white-space: nowrap; text-align: center;"><strong>${endStr}</strong></td>
-                `;
-
-                let startDateObj = parseDateString(startStr);
-                let endDateObj = parseDateString(endStr);
-                let leftPercent = 0;
-                let widthPercent = 100;
-
-                if (startDateObj && endDateObj) {
-                    if (endDateObj < startDateObj) endDateObj = startDateObj; 
-                    startDateObj.setHours(0,0,0,0);
-                    endDateObj.setHours(0,0,0,0);
-                    
-                    leftPercent = ((startDateObj.getTime() - minProjectDate.getTime()) / totalProjectMs) * 100;
-                    let taskDurationDays = Math.round((endDateObj.getTime() - startDateObj.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-                    widthPercent = (taskDurationDays / totalDays) * 100;
-                    
-                } else if (endDateObj) {
-                    endDateObj.setHours(0,0,0,0);
-                    leftPercent = ((endDateObj.getTime() - minProjectDate.getTime()) / totalProjectMs) * 100;
-                    widthPercent = dayWidthPercent; 
-                }
-
-                if (leftPercent < 0) leftPercent = 0;
-                if (leftPercent + widthPercent > 100) widthPercent = 100 - leftPercent;
-
-                htmlContent += `
-                    <td class="timeline-cell" style="padding: 0; position: relative; ${bgGrid}">
-                        <div class="pic-label" style="left: calc(${leftPercent}% + 4px);">${picName}</div>
-                        <div class="task-arrow-wrapper" style="left: ${leftPercent}%; width: ${widthPercent}%;" title="Bắt đầu: ${startStr} | Kết thúc: ${endStr} | PIC: ${picName}">
-                            <div class="task-arrow-fill ${statusClass}" style="width: ${progressVal};">
-                                <span class="progress-text">${progressVal}</span>
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="text-align: center;">${index+1}</td>
+                        <td class="col-task">${task['Task'] || ''}</td>
+                        <td style="text-align: center;">${task['End'] || task['Deadline'] || ''}</td>
+                        <td class="timeline-cell" style="background-image: repeating-linear-gradient(to right, transparent, transparent calc(${(1/totalDays)*100}% - 1px), #eee calc(${(1/totalDays)*100}% - 1px), #eee ${(1/totalDays)*100}%); background-size: ${(1/totalDays)*100}% 100%;">
+                            <div class="pic-label" style="left: ${left+0.5}%;">${task['PIC'] || ''}</div>
+                            <div class="task-arrow-wrapper" style="left: ${left}%; width: ${width}%;">
+                                <div class="task-arrow-fill ${statusClass}" style="width: ${progressVal}">
+                                    <span class="progress-text">${progressVal}</span>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                `;
-
-                tr.innerHTML = htmlContent;
-                tbody.appendChild(tr);
+                        </td>
+                    </tr>`;
             });
         }
 
         function renderSWOT() {
             const filteredSwot = filterData(globalData.swot, true);
-            
-            ['swot-s', 'swot-w', 'swot-o', 'swot-t', 'swot-support'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.innerHTML = '';
-            });
-
-            if (filteredSwot.length === 0) {
-                ['swot-s', 'swot-w', 'swot-o', 'swot-t', 'swot-support'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.innerHTML = '<li style="opacity: 0.6; padding: 10px;">Không có dữ liệu phù hợp</li>';
-                });
-                return;
-            }
-
+            ['swot-s', 'swot-w', 'swot-o', 'swot-t', 'swot-support'].forEach(id => document.getElementById(id).innerHTML = '');
             filteredSwot.forEach(item => {
-                const province = item['pr'] || item['PR'] || item['province'] || item['Province'] || '';
-                const pHeader = province ? `<span class="province-title">${province}</span>` : '';
-
-                const sVal = item['s'] || item['S'] || '';
-                const wVal = item['w'] || item['W'] || '';
-                const oVal = item['o'] || item['O'] || '';
-                const tVal = item['t'] || item['T'] || '';
-                const supportVal = item['support'] || item['Support'] || item['SUPPORT'] || '';
-
-                if (sVal.trim()) {
-                    document.getElementById('swot-s').innerHTML += `<li>${pHeader}<span class="swot-content-text">${sVal}</span></li>`;
-                }
-                if (wVal.trim()) {
-                    document.getElementById('swot-w').innerHTML += `<li>${pHeader}<span class="swot-content-text">${wVal}</span></li>`;
-                }
-                if (oVal.trim()) {
-                    document.getElementById('swot-o').innerHTML += `<li>${pHeader}<span class="swot-content-text">${oVal}</span></li>`;
-                }
-                if (tVal.trim()) {
-                    document.getElementById('swot-t').innerHTML += `<li>${pHeader}<span class="swot-content-text">${tVal}</span></li>`;
-                }
-                if (supportVal.trim()) {
-                    document.getElementById('swot-support').innerHTML += `<li>${pHeader}<span class="swot-content-text">${supportVal}</span></li>`;
-                }
+                const p = item['PR'] || '';
+                const h = p ? `<span class="province-title">${p}</span>` : '';
+                if (item['S']) document.getElementById('swot-s').innerHTML += `<li>${h}<span class="swot-content-text">${item['S']}</span></li>`;
+                if (item['W']) document.getElementById('swot-w').innerHTML += `<li>${h}<span class="swot-content-text">${item['W']}</span></li>`;
+                if (item['O']) document.getElementById('swot-o').innerHTML += `<li>${h}<span class="swot-content-text">${item['O']}</span></li>`;
+                if (item['T']) document.getElementById('swot-t').innerHTML += `<li>${h}<span class="swot-content-text">${item['T']}</span></li>`;
+                if (item['Support']) document.getElementById('swot-support').innerHTML += `<li>${h}<span class="swot-content-text">${item['Support']}</span></li>`;
             });
         }
 
-        // Hàm tính tổng số người theo Role
-        function sumRole(dataArray, roleName) {
-            return dataArray.reduce((sum, item) => {
-                let val = 0;
-                for (let key in item) {
-                    // Tìm chính xác tên cột (không phân biệt hoa/thường)
-                    if (key.trim().toLowerCase() === roleName.toLowerCase()) {
-                        val = parseInt(item[key]) || 0;
-                        break;
-                    }
-                }
-                return sum + val;
-            }, 0);
+        function sumRole(data, role) {
+            return data.reduce((s, i) => s + (parseInt(i[role] || i[role.toLowerCase()] || 0)), 0);
         }
 
-        // KẾT XUẤT SƠ ĐỒ NHÂN SỰ (TREE DIAGRAM)
         function renderTreeDiagram() {
-            const container = document.getElementById('tree-container');
-            if (!container) return;
+            const plan = filterData(globalData.hcPlan, true);
+            const act = filterData(globalData.hcActual, true);
 
-            // Lọc dữ liệu Headcount dựa vào Khu vực (bỏ qua lọc Tháng)
-            const filteredPlan = filterData(globalData.hcPlan, true);
-            const filteredActual = filterData(globalData.hcActual, true);
-
-            // Cấu trúc phân cấp
-            const rolesHierarchy = ['CDM', 'KAM', 'KAE', 'DSR'];
-            
-            let treeHtml = '<div class="org-tree">';
-
-            rolesHierarchy.forEach((role, index) => {
-                const planCount = sumRole(filteredPlan, role);
-                const actualCount = sumRole(filteredActual, role);
-
-                treeHtml += `
-                    <div class="tree-node">
-                        <div class="tree-node-title">${role}</div>
-                        <div class="tree-node-data">
-                            <div class="data-block">
-                                <span class="data-label">Kế hoạch</span>
-                                <span class="data-plan">${planCount}</span>
-                            </div>
-                            <div class="data-block">
-                                <span class="data-label">Thực tế</span>
-                                <span class="data-actual">${actualCount}</span>
-                            </div>
-                        </div>
+            const createNode = (role, className) => {
+                const planCount = sumRole(plan, role);
+                const actCount = sumRole(act, role);
+                const icons = '👤'.repeat(actCount || 0); // Vòng lặp xuất icon tương ứng với Actual
+                
+                return `
+                <div class="tree-node ${className}">
+                    <div class="tree-node-title">${role}</div>
+                    <div class="tree-node-data">
+                        <div class="data-block"><span class="data-label">Plan</span><span class="data-plan">${planCount}</span></div>
+                        <div class="data-block"><span class="data-label">Actual</span><span class="data-actual">${actCount}</span></div>
                     </div>
-                `;
+                    <div class="tree-node-icons">${icons}</div>
+                </div>`;
+            };
 
-                // Nối đường kẻ nếu chưa phải là phần tử cuối cùng
-                if (index < rolesHierarchy.length - 1) {
-                    treeHtml += `<div class="tree-line"></div>`;
-                }
-            });
-
-            treeHtml += '</div>';
-            container.innerHTML = treeHtml;
+            document.getElementById('tree-container').innerHTML = `
+                <div class="org-tree">
+                    ${createNode('CDM', 'node-cdm')}
+                    <div class="tree-line"></div>
+                    ${createNode('KAM', 'node-kam')}
+                    <div class="tree-line"></div>
+                    <div class="tree-row">
+                        ${createNode('KAE', 'node-kae')}
+                        ${createNode('DSR', 'node-dsr')}
+                    </div>
+                </div>`;
         }
 
         window.addEventListener('DOMContentLoaded', initDashboard);
