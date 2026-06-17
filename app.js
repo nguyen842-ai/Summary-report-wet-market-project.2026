@@ -1,6 +1,6 @@
 // Cấu hình thông tin Google API của bạn
 const SPREADSHEET_ID = '1Xtwk_Y7UGKNw2YC9c4kblae71mHahzr7GqV-sfiie6E';
-const API_KEY = 'AIzaSyCxjb8VD1tbqok8ro1bO-KUjPGoNTerqi8';
+const API_KEY = 'AIzaSyC8oIfsPGtSedj73Qky4aasg98xqkrWT5s';
 
 // Hệ thống lưu trữ data sau khi tải xong để các hàm khác sử dụng
 let globalData = {
