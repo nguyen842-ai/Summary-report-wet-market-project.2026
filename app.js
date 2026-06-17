@@ -1,30 +1,25 @@
-// Cấu hình thông tin Google API của bạn
 const SPREADSHEET_ID = '1Xtwk_Y7UGKNw2YC9c4kblae71mHahzr7GqV-sfiie6E';
-const API_KEY = 'AIzaSyC8oIfsPGtSedj73Qky4aasg98xqkrWT5s';
+const API_KEY = 'AIzaSyC8oIfsPGtSedj73Qky4aasg98xqkrWT5s'; 
 
-// Hệ thống lưu trữ data sau khi tải xong để các hàm khác sử dụng
 let globalData = {
     gantt: [],
-    swot: [],
-    hcPlan: [],
-    hcActual: [],
-    marketList: []
+    swot: []
 };
 
-// Hàm bổ trợ: Biến đổi dữ liệu thô từ Google Sheets thành dạng Object JSON sạch dựa theo tiêu đề cột
+// Hàm chuẩn hóa dữ liệu
 function convertRawToObjects(rawValues) {
     if (!rawValues || rawValues.length === 0) return [];
-    const headers = rawValues[0]; // Dòng đầu tiên làm Key
+    const headers = rawValues[0];
     return rawValues.slice(1).map(row => {
         let obj = {};
         headers.forEach((header, index) => {
-            obj[header] = row[index] || ''; // Nếu ô trống thì để chuỗi rỗng
+            obj[header] = row[index] || '';
         });
         return obj;
     });
 }
 
-// Hàm fetch data từ một Tab cụ thể
+// Fetch API
 async function fetchSheetTab(tabName) {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(tabName)}?key=${API_KEY}`;
     const response = await fetch(url);
@@ -33,147 +28,155 @@ async function fetchSheetTab(tabName) {
     return data.values;
 }
 
-// Hàm khởi chạy chính (Quản lý thanh loading game toàn trang)
+// Khởi chạy hệ thống
 async function initDashboard() {
     const progressBar = document.getElementById('main-progress-bar');
-    const statusText = document.getElementById('loading-status');
     const loadScreen = document.getElementById('loading-screen');
     const mainContent = document.getElementById('dashboard-content');
+    const statusText = document.getElementById('loading-status');
 
     try {
-        // 1. Tải Gantt
-        statusText.innerText = 'Đang tải tiến độ Gantt Chart...';
-        progressBar.style.width = '20%';
+        statusText.innerText = "loading dữ liệu... (Đang tải tiến độ)";
+        progressBar.style.width = '40%';
         const rawGantt = await fetchSheetTab('Gantt'); 
         globalData.gantt = convertRawToObjects(rawGantt);
 
-        // 2. Tải SWOT
-        statusText.innerText = 'Đang tải phân tích SWOT...';
-        progressBar.style.width = '40%';
+        statusText.innerText = "loading dữ liệu... (Đang tải phân tích)";
+        progressBar.style.width = '80%';
         const rawSwot = await fetchSheetTab('Swot'); 
         globalData.swot = convertRawToObjects(rawSwot);
 
-        // 3. Tải Headcount Plan & Actual
-        statusText.innerText = 'Đang đồng bộ dữ liệu nhân sự (Headcount)...';
-        progressBar.style.width = '60%';
-        const rawHcPlan = await fetchSheetTab('Headcount plan');
-        const rawHcActual = await fetchSheetTab('Headcount actual');
-        globalData.hcPlan = convertRawToObjects(rawHcPlan);
-        globalData.hcActual = convertRawToObjects(rawHcActual);
-
-        // 4. Tải Market List
-        statusText.innerText = 'Đang cập nhật danh sách chợ (Market List)...';
-        progressBar.style.width = '80%';
-        const rawMarket = await fetchSheetTab('Market');
-        globalData.marketList = convertRawToObjects(rawMarket);
-
-        // Hoàn thành
-        statusText.innerText = 'Đồng bộ hoàn tất! Đang dựng giao diện...';
         progressBar.style.width = '100%';
+        statusText.innerText = "Hoàn tất! Đang kết xuất báo cáo...";
         
-        // Vẽ các bảng biểu lên UI
-        renderGanttChart();
-        renderSWOT();
+        // Thiết lập cấu hình bộ lọc từ dữ liệu
+        setupFilters();
 
-        // Ẩn màn hình loading, hiện Dashboard
+        // Render giao diện theo filter mặc định
+        renderDashboard();
+
+        // Xóa màn hình loading
         setTimeout(() => {
             if (loadScreen) loadScreen.style.opacity = '0';
             setTimeout(() => {
                 if (loadScreen) loadScreen.style.display = 'none';
                 if (mainContent) mainContent.style.display = 'block';
             }, 500);
-        }, 600);
+        }, 800);
 
     } catch (error) {
         console.error(error);
-        if (statusText) statusText.innerText = 'LỖI HỆ THỐNG: ' + error.message;
-        if (progressBar) progressBar.style.backgroundColor = '#ff3366';
+        if (statusText) statusText.innerText = 'LỖI: ' + error.message;
+        if (progressBar) progressBar.style.backgroundColor = '#f44336';
     }
 }
 
-// --- HÀM XỬ LÝ VẼ GANTT CHART ĐẶC BIỆT ---
+// Chạy bộ lọc và tạo danh sách Dropdown
+function setupFilters() {
+    const areaFilter = document.getElementById('filter-area');
+    const monthFilter = document.getElementById('filter-month');
+
+    // Lấy các khu vực độc nhất từ dữ liệu Gantt (cột 'ar') [cite: 5]
+    const areas = [...new Set(globalData.gantt.map(item => item.ar).filter(x => x))];
+    
+    // Đổ danh sách Khu vực vào ô chọn
+    areaFilter.innerHTML = '<option value="All">Tất cả khu vực</option>';
+    areas.forEach(area => {
+        areaFilter.innerHTML += `<option value="${area}">${area}</option>`;
+    });
+
+    // Lắng nghe sự kiện click thay đổi
+    areaFilter.addEventListener('change', renderDashboard);
+    monthFilter.addEventListener('change', renderDashboard);
+}
+
+// Cơ chế Lọc dữ liệu thông minh
+function filterData(dataArray) {
+    const selectedArea = document.getElementById('filter-area').value;
+    const selectedMonth = document.getElementById('filter-month').value;
+
+    return dataArray.filter(item => {
+        // Xét điều kiện Khu vực
+        const matchArea = (selectedArea === 'All') || (item.ar === selectedArea);
+        
+        // Xét điều kiện Tháng dựa vào cột End Date dạng DD/MM/YYYY [cite: 5]
+        let matchMonth = true;
+        if (selectedMonth !== 'All') {
+            const endDate = item['End date'] || item['End Date'] || '';
+            if (endDate.includes(`/${selectedMonth}/`)) {
+                matchMonth = true;
+            } else {
+                matchMonth = false;
+            }
+        }
+        return matchArea && matchMonth;
+    });
+}
+
+function renderDashboard() {
+    renderGanttChart();
+    renderSWOT();
+}
+
+// Đổ dữ liệu vào Gantt
 function renderGanttChart() {
     const tbody = document.getElementById('gantt-tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
 
-    // Danh sách các cột tuần cố định trên giao diện HTML
-    const weeksTimeline = ['W3-May', 'W4-May', 'W1-Jun', 'W2-Jun', 'W3-Jun', 'W4-Jun'];
+    const filteredGantt = filterData(globalData.gantt);
 
-    globalData.gantt.forEach((task, index) => {
+    if (filteredGantt.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="padding: 20px; color: #999;">Không có dữ liệu phù hợp với bộ lọc hiện tại</td></tr>';
+        return;
+    }
+
+    filteredGantt.forEach((task, index) => {
         let tr = document.createElement('tr');
         
-        // Điền thông tin cơ bản cột Số thứ tự, Tên Task, PIC
-        // Lưu ý: Các chữ task.Task, task.PIC... phải viết hoa chữ cái đầu đúng như tiêu đề cột trên Sheets của bạn
-        tr.innerHTML = `
+        let progressVal = task.Progress || '0%';
+        let endDate = task['End date'] || task['End Date'] || '';
+        let statusText = task.Remark ? task.Remark.toLowerCase() : '';
+        
+        let statusClass = 'status-ongoing';
+        if (statusText.includes('done') || progressVal === '100%') statusClass = 'status-done';
+        if (statusText.includes('delay')) statusClass = 'status-delay';
+
+        // Vì không có cột Start Date trong dữ liệu nên chúng ta thả khối Bar tiến độ trải dài lịch tháng
+        let htmlContent = `
             <td>${index + 1}</td>
-            <td style="text-align:left;">${task.Task || ''}</td>
+            <td class="col-task">${task.Task || ''}</td>
             <td>${task.PIC || ''}</td>
+            <td><strong>${endDate}</strong></td>
+            <td colspan="6" style="padding: 8px;">
+                <div class="bar-wrapper" title="Hoàn thành: ${progressVal}">
+                    <div class="bar-fill ${statusClass}" style="width: ${progressVal};">${progressVal}</div>
+                </div>
+            </td>
         `;
-
-        let startIdx = weeksTimeline.indexOf(task.Start);
-        let endIdx = weeksTimeline.indexOf(task.End);
-
-        if (startIdx !== -1 && endIdx !== -1 && endIdx >= startIdx) {
-            let colSpanValue = endIdx - startIdx + 1;
-
-            // Tạo các ô trống TRƯỚC thanh loading
-            for (let i = 0; i < startIdx; i++) {
-                tr.innerHTML += `<td></td>`;
-            }
-
-            // Tạo ô chứa thanh Loading dựa vào Status
-            let statusClass = 'bar-ongoing'; 
-            if (task.Status === 'done') statusClass = 'bar-done';
-            if (task.Status === 'delay') statusClass = 'bar-delay';
-
-            tr.innerHTML += `
-                <td colspan="${colSpanValue}" style="padding: 6px; vertical-align: middle;">
-                    <div class="gantt-bar-wrapper">
-                        <div class="gantt-loading-bar ${statusClass}" style="width: ${task.Progress || '0%'}">
-                            <span class="bar-text-percent">${task.Progress || ''}</span>
-                        </div>
-                    </div>
-                </td>
-            `;
-
-            // Tạo các ô trống SAU thanh loading
-            for (let i = endIdx + 1; i < weeksTimeline.length; i++) {
-                tr.innerHTML += `<td></td>`;
-            }
-        } else {
-            weeksTimeline.forEach(() => { tr.innerHTML += `<td></td>`; });
-        }
-
+        
+        tr.innerHTML = htmlContent;
         tbody.appendChild(tr);
     });
 }
 
-// --- HÀM XỬ LÝ VẼ SWOT GRID ---
+// Đổ dữ liệu vào SWOT
 function renderSWOT() {
-    const types = { 'S': 'swot-s', 'W': 'swot-w', 'O': 'swot-o', 'T': 'swot-t' };
+    const filteredSwot = filterData(globalData.swot);
     
-    // Xóa dữ liệu cũ trong các thẻ ul nếu có trên giao diện
-    Object.values(types).forEach(id => {
+    // Clear dữ liệu cũ
+    ['swot-s', 'swot-w', 'swot-o', 'swot-t'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.innerHTML = '';
     });
-    const supportList = document.getElementById('swot-support-list');
-    if (supportList) supportList.innerHTML = '';
 
-    // Đọc và phân bổ dữ liệu SWOT dựa vào cột Type và Content trên Sheets
-    globalData.swot.forEach(item => {
-        let li = document.createElement('li');
-        li.innerText = item.Content || '';
-
-        if (types[item.Type]) {
-            const container = document.getElementById(types[item.Type]);
-            if (container) container.appendChild(li);
-        } else if (item.Type === 'Support' && supportList) {
-            supportList.appendChild(li);
-        }
+    filteredSwot.forEach(item => {
+        // Quét các cột STRENGTHS, WEAKNESSES, OPPORTUNITIES, THREATS từ dữ liệu Sheets [cite: 4]
+        if (item.STRENGTHS) document.getElementById('swot-s').innerHTML += `<li>${item.STRENGTHS}</li>`;
+        if (item.WEAKNESSES) document.getElementById('swot-w').innerHTML += `<li>${item.WEAKNESSES}</li>`;
+        if (item.OPPORTUNITIES) document.getElementById('swot-o').innerHTML += `<li>${item.OPPORTUNITIES}</li>`;
+        if (item.THREATS) document.getElementById('swot-t').innerHTML += `<li>${item.THREATS}</li>`;
     });
 }
 
-// Tự động kích hoạt khi trang web tải xong
 window.addEventListener('DOMContentLoaded', initDashboard);
