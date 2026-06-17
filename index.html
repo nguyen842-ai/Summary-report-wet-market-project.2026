@@ -502,8 +502,8 @@
                 </div>`;
         }
 
-        /* ----------------------------------------------------
-           PRIMARY SALES
+       /* ----------------------------------------------------
+           PRIMARY SALES (ĐÃ SỬA LỖI CLEAR DATA)
            ---------------------------------------------------- */
         function renderPrimarySale() {
             const filteredDbin = filterData(dbinSales, true);
@@ -511,7 +511,20 @@
             filteredDbin.forEach(r => monthsSet.add(r.mo));
             const availableMonths = Array.from(monthsSet).sort();
 
-            if(filteredDbin.length === 0) return;
+            // SỬA LỖI TẠI ĐÂY: Xóa sạch dữ liệu cũ nếu mảng rỗng
+            if(filteredDbin.length === 0) {
+                document.getElementById('value-table-head').innerHTML = '';
+                document.getElementById('value-table-body').innerHTML = '<tr><td colspan="10" style="text-align:center; color:#999; padding:20px;">Không có dữ liệu</td></tr>';
+                document.getElementById('value-table-foot').innerHTML = '';
+                
+                document.getElementById('sku-table-head').innerHTML = '';
+                document.getElementById('sku-table-body').innerHTML = '<tr><td colspan="10" style="text-align:center; color:#999; padding:20px;">Không có dữ liệu</td></tr>';
+                document.getElementById('sku-table-foot').innerHTML = '';
+                
+                if(barChartInstance) barChartInstance.destroy();
+                if(donutChartInstance) donutChartInstance.destroy();
+                return;
+            }
 
             const areaValueGroups = {}; const chartDataObj = {};
             let grandTotalValues = { total: 0, months: {} };
@@ -613,8 +626,8 @@
             });
         }
 
-       /* ----------------------------------------------------
-           SECONDARY SALES (ĐÃ BỎ CỘT CHỢ - GOM TỔNG THEO AREA)
+        /* ----------------------------------------------------
+           SECONDARY SALES (ĐÃ SỬA LỖI CLEAR DATA)
            ---------------------------------------------------- */
         function renderSecondarySale() {
             const allSecSales = getAggregatedSecondarySales();
@@ -624,13 +637,137 @@
             filteredSec.forEach(r => monthsSet.add(r.mo));
             const availableMonths = Array.from(monthsSet).sort();
 
+            // SỬA LỖI TẠI ĐÂY: Xóa sạch dữ liệu cũ nếu mảng rỗng
             if(filteredSec.length === 0) {
-                document.getElementById('sec-value-table-body').innerHTML = '<tr><td colspan="10" style="text-align:center;">Không có dữ liệu</td></tr>';
-                document.getElementById('sec-sku-table-body').innerHTML = '<tr><td colspan="10" style="text-align:center;">Không có dữ liệu</td></tr>';
+                document.getElementById('sec-value-table-head').innerHTML = '';
+                document.getElementById('sec-value-table-body').innerHTML = '<tr><td colspan="10" style="text-align:center; color:#999; padding:20px;">Không có dữ liệu</td></tr>';
+                document.getElementById('sec-value-table-foot').innerHTML = '';
+
+                document.getElementById('sec-sku-table-head').innerHTML = '';
+                document.getElementById('sec-sku-table-body').innerHTML = '<tr><td colspan="10" style="text-align:center; color:#999; padding:20px;">Không có dữ liệu</td></tr>';
+                document.getElementById('sec-sku-table-foot').innerHTML = '';
+
                 if(secBarChartInstance) secBarChartInstance.destroy();
                 if(secDonutChartInstance) secDonutChartInstance.destroy();
                 return;
             }
+
+            const areaValueGroups = {}; 
+            const chartDataObj = {};
+            let grandTotalValues = { total: 0, months: {} };
+
+            filteredSec.forEach(r => {
+                let sVal = parseFloat(r.s) || 0;
+                
+                if (!areaValueGroups[r.ar]) {
+                    areaValueGroups[r.ar] = { hq: r.hq, months: {}, total: 0 };
+                }
+                
+                areaValueGroups[r.ar].months[r.mo] = (areaValueGroups[r.ar].months[r.mo] || 0) + sVal;
+                areaValueGroups[r.ar].total += sVal;
+
+                grandTotalValues.months[r.mo] = (grandTotalValues.months[r.mo] || 0) + sVal;
+                grandTotalValues.total += sVal;
+
+                chartDataObj[r.ar] = (chartDataObj[r.ar] || 0) + sVal; 
+            });
+
+            let valHead = `<th>HQ</th><th>Area</th>`;
+            availableMonths.forEach(m => valHead += `<th class="text-right">Tháng ${m}</th>`);
+            valHead += `<th class="text-right">Total Value</th>`;
+            document.getElementById('sec-value-table-head').innerHTML = valHead;
+
+            let valBody = '';
+            Object.keys(areaValueGroups).sort().forEach(ar => {
+                let grp = areaValueGroups[ar];
+                valBody += `<tr style="background-color: #e3f2fd;">
+                    <td style="font-weight:bold; color:#0B486B;">${grp.hq}</td>
+                    <td style="font-weight:bold; color:#0B486B;">TỔNG ${ar.toUpperCase()}</td>`;
+                availableMonths.forEach(m => valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.months[m] || 0)}</td>`);
+                valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.total)}</td></tr>`;
+            });
+            document.getElementById('sec-value-table-body').innerHTML = valBody;
+
+            let valFoot = `<tr><td colspan="2" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
+            availableMonths.forEach(m => valFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${formatCurrency(grandTotalValues.months[m] || 0)}</td>`);
+            valFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${formatCurrency(grandTotalValues.total)}</td></tr>`;
+            document.getElementById('sec-value-table-foot').innerHTML = valFoot;
+
+            const uniqAreas = Object.keys(chartDataObj);
+            const ctxSecBar = document.getElementById('sec-barChart').getContext('2d');
+            if(secBarChartInstance) secBarChartInstance.destroy();
+            secBarChartInstance = new Chart(ctxSecBar, {
+                type: 'bar',
+                data: { labels: uniqAreas, datasets: [{ label: 'Giá trị Sales (VND)', data: uniqAreas.map(a => chartDataObj[a]), backgroundColor: '#0B486B', borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Tổng doanh thu theo Khu Vực (Area)' } }, scales: { y: { beginAtZero: true, ticks: { callback: val => new Intl.NumberFormat('vi-VN', {notation: 'compact'}).format(val) } } } }
+            });
+
+            const areaQtyGroups = {};
+            let valSongLan = 0, valMienTuoi = 0, valMienDauXanh = 0;
+            let grandTotalQty = { total: 0, months: {} };
+
+            filteredSec.forEach(r => {
+                let sVal = parseFloat(r.s) || 0;
+                let qtVal = parseFloat(r.qt) || 0;
+                
+                if (!areaQtyGroups[r.ar]) areaQtyGroups[r.ar] = { rows: {}, subTotal: 0, subMonths: {} };
+                
+                const skuKey = `${r.hq}_${r.sku}`;
+                if (!areaQtyGroups[r.ar].rows[skuKey]) areaQtyGroups[r.ar].rows[skuKey] = { hq: r.hq, sku: r.sku, months: {}, total: 0 };
+                
+                areaQtyGroups[r.ar].rows[skuKey].months[r.mo] = (areaQtyGroups[r.ar].rows[skuKey].months[r.mo] || 0) + qtVal;
+                areaQtyGroups[r.ar].rows[skuKey].total += qtVal;
+                
+                areaQtyGroups[r.ar].subMonths[r.mo] = (areaQtyGroups[r.ar].subMonths[r.mo] || 0) + qtVal;
+                areaQtyGroups[r.ar].subTotal += qtVal;
+                
+                grandTotalQty.months[r.mo] = (grandTotalQty.months[r.mo] || 0) + qtVal;
+                grandTotalQty.total += qtVal;
+
+                if(r.sku.includes("Song Lân")) valSongLan += sVal;
+                else if(r.sku.includes("Miến đậu xanh")) valMienDauXanh += sVal;
+                else if(r.sku.includes("Miến tươi")) valMienTuoi += sVal;
+            });
+
+            let qtyHead = `<th>HQ</th><th>Area</th><th>SKU</th>`;
+            availableMonths.forEach(m => qtyHead += `<th class="text-right">Tháng ${m}</th>`);
+            qtyHead += `<th class="text-right">Tổng (Thùng)</th>`;
+            document.getElementById('sec-sku-table-head').innerHTML = qtyHead;
+
+            let qtyBody = '';
+            Object.keys(areaQtyGroups).sort().forEach(ar => {
+                let grp = areaQtyGroups[ar];
+                
+                Object.values(grp.rows).forEach(row => {
+                    qtyBody += `<tr><td>${row.hq}</td><td>${ar}</td><td style="font-weight:500;">${row.sku}</td>`;
+                    availableMonths.forEach(m => qtyBody += `<td class="text-right">${(row.months[m] || 0) > 0 ? (row.months[m]).toFixed(2) : '-'}</td>`);
+                    qtyBody += `<td class="text-right" style="font-weight:500; color:#3B8686;">${row.total.toFixed(2)}</td></tr>`;
+                });
+                
+                qtyBody += `<tr style="background-color: #e0f2f1;"><td colspan="3" class="text-right" style="font-weight:bold; color:#3B8686;">TỔNG ${ar.toUpperCase()}</td>`;
+                availableMonths.forEach(m => qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${(grp.subMonths[m] || 0).toFixed(2)}</td>`);
+                qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${grp.subTotal.toFixed(2)}</td></tr>`;
+            });
+            document.getElementById('sec-sku-table-body').innerHTML = qtyBody;
+
+            let skuFoot = `<tr><td colspan="3" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
+            availableMonths.forEach(m => skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${(grandTotalQty.months[m] || 0).toFixed(2)}</td>`);
+            skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${grandTotalQty.total.toFixed(2)}</td></tr>`;
+            document.getElementById('sec-sku-table-foot').innerHTML = skuFoot;
+
+            const ctxSecDonut = document.getElementById('sec-donutChart').getContext('2d');
+            if(secDonutChartInstance) secDonutChartInstance.destroy();
+            const realDonutData = [valSongLan, valMienTuoi, valMienDauXanh];
+            const totalDonutVal = realDonutData.reduce((a, b) => a + b, 0);
+            const visualDonutData = realDonutData.map(val => { if (val === 0) return 0; let pct = val / totalDonutVal; return pct < 0.05 ? totalDonutVal * 0.05 : val; });
+            const offsetArr = visualDonutData.map((v, i) => (realDonutData[i] > 0 && (realDonutData[i] / totalDonutVal) < 0.15) ? 30 : 0);
+
+            secDonutChartInstance = new Chart(ctxSecDonut, {
+                type: 'doughnut',
+                data: { labels: ['Song Lân', 'Miến Tươi', 'Miến Đậu Xanh'], datasets: [{ data: visualDonutData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686'], borderWidth: 2, hoverOffset: 15, offset: offsetArr }] },
+                options: { responsive: true, maintainAspectRatio: false, layout: { padding: 30 }, cutout: '55%', plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Phân Bổ Giá Trị Các Dòng Sản Phẩm' }, tooltip: { callbacks: { label: function(c) { let idx = c.dataIndex; let realValue = realDonutData[idx]; let percentage = ((realValue / totalDonutVal) * 100).toFixed(2) + "%"; return `${c.chart.data.labels[idx]}: ${formatCurrency(realValue)} VND (${percentage})`; } } } } }
+            });
+        }
 
             // ==========================================
             // 1. DATA BẢNG VALUE & BIỂU ĐỒ BAR (CHỈ CÒN AREA)
