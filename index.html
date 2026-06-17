@@ -6,15 +6,10 @@
     <title>Hệ Thống Quản Lý Tiến Độ & Phân Tích SWOT</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script type="module">
-        // Import từ file dbin.js và đẩy ra biến window
-        import { dbinSales } from './dbin.js';
-        window.dbinSales = dbinSales;
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        // Import từ file dataM6.js và đẩy ra biến window
-        import { dbSalesM6 } from './dataM6.js';
-        window.dbSalesM6 = dbSalesM6;
-    </script>
+    <script src="./dbin.js"></script>
+    <script src="./dataM6.js"></script>
 
     <style>
         /* ==========================================================================
@@ -360,7 +355,7 @@
             return null;
         }
 
-        function renderGanttChart() {
+       function renderGanttChart() {
             const tbody = document.getElementById('gantt-tbody');
             const headerDays = document.getElementById('gantt-header-days');
             const firstHeader = document.getElementById('gantt-header-first'); 
@@ -418,7 +413,9 @@
                 let statusClass = 'status-ongoing';
                 if (sts.includes('done') || prog === '100%') statusClass = 'status-done';
                 if (sts.includes('delay')) statusClass = 'status-delay';
-                let fCol = (selectedArea === 'All') ? (task['Area'] || task['Khu vực'] || '') : (idx + 1);
+                
+                // ĐÃ SỬA TẠI ĐÂY: Nhận diện linh hoạt mọi kiểu đặt tên cột khu vực (ar, AR, Area, Khu vực)
+                let fCol = (selectedArea === 'All') ? (task['ar'] || task['AR'] || task['Area'] || task['Khu vực'] || '') : (idx + 1);
 
                 tbody.innerHTML += `
                     <tr>
@@ -434,7 +431,6 @@
                     </tr>`;
             });
         }
-
         function renderSWOT() {
             const fSwot = filterData(globalData.swot);
             ['swot-s', 'swot-w', 'swot-o', 'swot-t', 'swot-support'].forEach(id => document.getElementById(id).innerHTML = '');
