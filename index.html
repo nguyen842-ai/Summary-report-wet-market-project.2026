@@ -3,63 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summary Miến project Report 2026</title>
+    <title>Báo Cáo Dự Án - Wet Market</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div id="loading-screen">
         <div class="loading-container">
-            <h2 style="color: var(--color-text-main); margin-bottom: 10px;">Loading...</h2>
+            <h2 style="color: #333; margin-bottom: 10px;">Đang tải hệ thống</h2>
             <div class="progress-bar-bg">
                 <div id="main-progress-bar"></div>
             </div>
-            <p id="loading-status">Đang khởi động hệ thống...</p>
+            <p id="loading-status">loading dữ liệu...</p>
         </div>
     </div>
 
     <div id="dashboard-content">
-        <header>
-            <h1 style="color: var(--color-accent); margin-bottom: 20px;">Summary Miến project Report 2026</h1>
-        </header>
+        <div class="dashboard-header">
+            <div class="header-left">
+                <h1 class="main-title">BÁO CÁO DỰ ÁN WET MARKET</h1>
+                <p class="subtitle">Ngày cập nhật: 18/06/2026</p>
+            </div>
+            <div class="header-right">
+                <div class="filter-group">
+                    <label for="filter-area">Khu vực:</label>
+                    <select id="filter-area">
+                        <option value="All">Tất cả khu vực</option>
+                        </select>
+
+                    <label for="filter-month">Thời hạn (Tháng):</label>
+                    <select id="filter-month">
+                        <option value="All">Tất cả các tháng</option>
+                        <option value="05">Tháng 5</option>
+                        <option value="06">Tháng 6</option>
+                    </select>
+                </div>
+            </div>
+        </div>
 
         <section id="gantt-section">
-            <h2 style="margin-bottom: 15px;">GANTT CHART</h2>
-            <table id="gantt-table">
-                <thead>
-                    <tr>
-                        <th>STT</th>
-                        <th>Task</th>
-                        <th>PIC</th>
-                        <th>W3-May</th>
-                        <th>W4-May</th>
-                        <th>W1-Jun</th>
-                        <th>W2-Jun</th>
-                        <th>W3-Jun</th>
-                        <th>W4-Jun</th>
-                    </tr>
-                </thead>
-                <tbody id="gantt-tbody">
-                    </tbody>
-            </table>
+            <div class="section-title">Tiến độ công việc (Gantt Plan)</div>
+            <div class="gantt-container">
+                <table id="gantt-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="col-fixed">STT</th>
+                            <th rowspan="2" class="col-task">Tên công việc (Task)</th>
+                            <th rowspan="2" class="col-fixed">Phụ trách (PIC)</th>
+                            <th rowspan="2" class="col-fixed">Deadline</th>
+                            <th colspan="2" class="month-header">Tháng 5 (May)</th>
+                            <th colspan="4" class="month-header">Tháng 6 (Jun)</th>
+                        </tr>
+                        <tr class="week-row">
+                            <th>W3</th>
+                            <th>W4</th>
+                            <th>W1</th>
+                            <th>W2</th>
+                            <th>W3</th>
+                            <th>W4</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gantt-tbody">
+                        </tbody>
+                </table>
+            </div>
         </section>
 
-        <section id="swot-section" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 30px;">
-            <div class="swot-card">
-                <h3>STRENGTHS (S)</h3>
-                <ul id="swot-s"></ul>
-            </div>
-            <div class="swot-card">
-                <h3>WEAKNESSES (W)</h3>
-                <ul id="swot-w"></ul>
-            </div>
-            <div class="swot-card">
-                <h3>OPPORTUNITIES (O)</h3>
-                <ul id="swot-o"></ul>
-            </div>
-            <div class="swot-card">
-                <h3>THREATS (T)</h3>
-                <ul id="swot-t"></ul>
+        <section id="swot-section">
+            <div class="section-title">Phân tích SWOT</div>
+            <div class="swot-grid">
+                <div class="swot-card">
+                    <div class="card-header s-bg">STRENGTHS (Điểm mạnh)</div>
+                    <ul id="swot-s"></ul>
+                </div>
+                <div class="swot-card">
+                    <div class="card-header w-bg">WEAKNESSES (Điểm yếu)</div>
+                    <ul id="swot-w"></ul>
+                </div>
+                <div class="swot-card">
+                    <div class="card-header o-bg">OPPORTUNITIES (Cơ hội)</div>
+                    <ul id="swot-o"></ul>
+                </div>
+                <div class="swot-card">
+                    <div class="card-header t-bg">THREATS (Thách thức)</div>
+                    <ul id="swot-t"></ul>
+                </div>
             </div>
         </section>
     </div>
