@@ -13,8 +13,9 @@ export const dbinSales = [
 {hq: "1.South",ar: "6. Central",Pv: "Đà Nẵng" ,sku: "Miến tươi Song Long 1kg",mo: "May",Qty: 360,s:95004000 },
 {hq: "1.South",ar: "6. Central",Pv: "Đà Nẵng" ,sku: "Miến tươi Song Long 3kg",mo: "May",Qty: 80,s:42588000 },
 {hq: "1.South",ar: "4. Eastern",Pv: "Đồng Nai" ,sku: "Miến đậu xanh Song Long 200g",mo: "May",Qty: 20,s:23296000 },
-{hq: "1.South",ar: "4. Eastern",Pv: "TP.Hồ Chí Minh" ,sku: "Miến đậu xanh Song Long 200g",mo: "May",Qty: 10,s:11648000 },
+{hq: "1.South",ar: "1. HCMC",Pv: "TP.Hồ Chí Minh" ,sku: "Miến đậu xanh Song Long 200g",mo: "May",Qty: 10,s:11648000 },
 {hq: "1.South",ar: "4. Eastern",Pv: "Đồng Nai" ,sku: "Miến tươi Song Long 1kg",mo: "May",Qty: 230,s:60697000 },
 {hq: "1.South",ar: "4. Eastern",Pv: "Đồng Nai" ,sku: "Miến tươi Song Long 3kg",mo: "May",Qty: 56,s:29811600 },
+
 
 ];
