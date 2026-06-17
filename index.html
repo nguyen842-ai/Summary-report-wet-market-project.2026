@@ -414,7 +414,7 @@
 
             for (let i = 0; i < totalDays; i++) {
                 let d = new Date(minDate); d.setDate(d.getDate() + i);
-                let monthLabel = `Tháng ${d.getMonth() + 1}/${d.getFullYear()}`;
+                let monthLabel = `${d.getMonth() + 1}/${d.getFullYear()}`;
                 if (i === 0) currentMonthLabel = monthLabel;
                 if (monthLabel !== currentMonthLabel) { months.push({ label: currentMonthLabel, count: currentMonthDays }); currentMonthLabel = monthLabel; currentMonthDays = 1; } else currentMonthDays++;
                 let isW = (d.getDay() === 0 || d.getDay() === 6);
@@ -544,7 +544,7 @@
             });
 
             let valHead = `<th>HQ</th><th>Area</th><th>Province (PR)</th>`;
-            availableMonths.forEach(m => valHead += `<th class="text-right">Tháng ${m}</th>`);
+            availableMonths.forEach(m => valHead += `<th class="text-right">${m}</th>`);
             valHead += `<th class="text-right">Total Value</th>`;
             document.getElementById('value-table-head').innerHTML = valHead;
 
@@ -590,7 +590,7 @@
             });
 
             let qtyHead = `<th>HQ</th><th>Area</th><th>Province (PR)</th><th>SKU</th>`;
-            availableMonths.forEach(m => qtyHead += `<th class="text-right">Tháng ${m}</th>`);
+            availableMonths.forEach(m => qtyHead += `<th class="text-right">${m}</th>`);
             qtyHead += `<th class="text-right">Tổng (Thùng)</th>`;
             document.getElementById('sku-table-head').innerHTML = qtyHead;
 
@@ -673,7 +673,7 @@
             });
 
             let valHead = `<th>HQ</th><th>Area</th>`;
-            availableMonths.forEach(m => valHead += `<th class="text-right">Tháng ${m}</th>`);
+            availableMonths.forEach(m => valHead += `<th class="text-right">${m}</th>`);
             valHead += `<th class="text-right">Total Value</th>`;
             document.getElementById('sec-value-table-head').innerHTML = valHead;
 
@@ -730,7 +730,7 @@
             });
 
             let qtyHead = `<th>HQ</th><th>Area</th><th>SKU</th>`;
-            availableMonths.forEach(m => qtyHead += `<th class="text-right">Tháng ${m}</th>`);
+            availableMonths.forEach(m => qtyHead += `<th class="text-right">${m}</th>`);
             qtyHead += `<th class="text-right">Tổng (Thùng)</th>`;
             document.getElementById('sec-sku-table-head').innerHTML = qtyHead;
 
@@ -795,7 +795,7 @@
 
             // Table Head (Đã xóa th Market)
             let valHead = `<th>HQ</th><th>Area</th>`;
-            availableMonths.forEach(m => valHead += `<th class="text-right">Tháng ${m}</th>`);
+            availableMonths.forEach(m => valHead += `<th class="text-right">${m}</th>`);
             valHead += `<th class="text-right">Total Value</th>`;
             document.getElementById('sec-value-table-head').innerHTML = valHead;
 
@@ -860,7 +860,7 @@
 
             // Table Head (Đã xóa th Market)
             let qtyHead = `<th>HQ</th><th>Area</th><th>SKU</th>`;
-            availableMonths.forEach(m => qtyHead += `<th class="text-right">Tháng ${m}</th>`);
+            availableMonths.forEach(m => qtyHead += `<th class="text-right">${m}</th>`);
             qtyHead += `<th class="text-right">Tổng (Thùng)</th>`;
             document.getElementById('sec-sku-table-head').innerHTML = qtyHead;
 
