@@ -27,13 +27,63 @@
             margin: 0 auto;
         }
 
-        h1, h2 {
-            margin-bottom: 20px;
+        /* ==========================================================================
+           2. BỐ CỤC TIÊU ĐỀ VÀ BỘ LỌC (50-50)
+           ========================================================================== */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 20px;
+        }
+
+        .header-left {
+            flex: 1;
+        }
+
+        .header-left h1 {
+            margin-bottom: 0;
             color: #1a237e;
         }
 
+        .header-right {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            min-width: 200px;
+            font-size: 14px;
+            outline: none;
+            background-color: #fff;
+            color: #333;
+        }
+
         /* ==========================================================================
-           2. MÀN HÌNH CHỜ TẢI DỮ LIỆU (LOADING SCREEN)
+           3. MÀN HÌNH CHỜ TẢI DỮ LIỆU (LOADING SCREEN)
            ========================================================================== */
         #loading-screen {
             position: fixed;
@@ -78,43 +128,6 @@
         }
 
         /* ==========================================================================
-           3. BỘ LỌC DỮ LIỆU (FILTERS PANEL)
-           ========================================================================== */
-        .filter-panel {
-            background: #ffffff;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .filter-group label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #666;
-            text-transform: uppercase;
-        }
-
-        .filter-group select {
-            padding: 8px 12px;
-            border: 1px solid #cccccc;
-            border-radius: 4px;
-            min-width: 180px;
-            font-size: 14px;
-            outline: none;
-            background-color: #fff;
-        }
-
-        /* ==========================================================================
            4. BIỂU ĐỒ GANTT TỰ ĐỘNG THEO NGÀY (GANTT CHART)
            ========================================================================== */
         .card {
@@ -124,6 +137,11 @@
             padding: 20px;
             margin-bottom: 30px;
             overflow: hidden;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #1a237e;
         }
 
         .table-responsive {
@@ -150,9 +168,10 @@
             font-weight: 600;
         }
 
+        /* Đổi màu text Main Task sang Mã 1 */
         .col-task {
-            font-weight: 500;
-            color: #1a237e;
+            font-weight: 600;
+            color: #0B486B; 
             word-break: break-word;
         }
 
@@ -160,6 +179,7 @@
             position: relative;
             padding: 0 !important;
             height: 55px; 
+            background-color: #ffffff; /* Đảm bảo nền màu trắng */
         }
 
         .pic-label {
@@ -199,12 +219,9 @@
             font-weight: bold;
         }
 
-        /* Tinh chỉnh màu Gantt Chart theo mã màu cung cấp */
         .status-ongoing { background-color: #0B486B; } /* Mã 1 */
         .status-done { background-color: #79BD9A; color: #111111; } /* Mã 3 */
         .status-delay { background-color: #3B8686; color: #ffffff; } /* Mã 2 */
-
-        /* Nếu text bên trong status-done (Mã 3) tối quá thì chỉnh màu chữ */
         .status-done .progress-text { color: #111111; } 
 
         /* ==========================================================================
@@ -289,7 +306,7 @@
         }
 
         /* ==========================================================================
-           6. TREE DIAGRAM STYLES (SƠ ĐỒ NHÂN SỰ CÓ ICON)
+           6. TREE DIAGRAM STYLES
            ========================================================================== */
         .org-tree {
             display: flex;
@@ -311,11 +328,10 @@
             border: 1px solid rgba(0,0,0,0.1);
         }
 
-        /* Mã màu theo cấp bậc */
-        .node-cdm { background-color: #0B486B; color: #ffffff; } /* Mã 1 */
-        .node-kam { background-color: #3B8686; color: #ffffff; } /* Mã 2 */
-        .node-kae { background-color: #79BD9A; color: #111111; } /* Mã 3 */
-        .node-dsr { background-color: #A8DBA8; color: #111111; } /* Mã 4 */
+        .node-cdm { background-color: #0B486B; color: #ffffff; } 
+        .node-kam { background-color: #3B8686; color: #ffffff; } 
+        .node-kae { background-color: #79BD9A; color: #111111; } 
+        .node-dsr { background-color: #A8DBA8; color: #111111; } 
 
         .tree-node-title {
             font-weight: 800;
@@ -352,7 +368,6 @@
         .data-plan { font-weight: bold; font-size: 22px; }
         .data-actual { font-weight: bold; font-size: 22px; }
 
-        /* Icon con người nằm bên dưới số liệu */
         .tree-node-icons {
             margin-top: 12px;
             font-size: 16px;
@@ -363,7 +378,6 @@
             line-height: 1;
         }
 
-        /* Đường kẻ nối */
         .tree-line {
             width: 2px;
             height: 30px;
@@ -371,7 +385,6 @@
             z-index: 1;
         }
 
-        /* Hàng ngang cho KAE và DSR */
         .tree-row {
             display: flex;
             gap: 30px;
@@ -380,9 +393,10 @@
             position: relative;
         }
 
-        /* Responsive */
         @media (max-width: 992px) {
             .swot-column, .tree-column { flex: 0 0 100%; }
+            .header-section { flex-direction: column; align-items: flex-start; }
+            .header-right { justify-content: flex-start; width: 100%; }
         }
     </style>
 </head>
@@ -399,32 +413,18 @@
     </div>
 
     <div class="container" id="dashboard-content" style="display: none;">
-        <h1>Báo Cáo Tổng Hợp Dự Án</h1>
-
-        <div class="filter-panel">
-            <div class="filter-group">
-                <label for="filter-area">Khu Vực</label>
-                <select id="filter-area">
-                    <option value="All">Đang tải...</option>
-                </select>
+        
+        <div class="header-section">
+            <div class="header-left">
+                <h1>Báo Cáo Tổng Hợp Dự Án</h1>
             </div>
-            <div class="filter-group">
-                <label for="filter-month">Tháng Báo Cáo (Deadline)</label>
-                <select id="filter-month">
-                    <option value="All">Tất cả các tháng</option>
-                    <option value="01">Tháng 1</option>
-                    <option value="02">Tháng 2</option>
-                    <option value="03">Tháng 3</option>
-                    <option value="04">Tháng 4</option>
-                    <option value="05">Tháng 5</option>
-                    <option value="06">Tháng 6</option>
-                    <option value="07">Tháng 7</option>
-                    <option value="08">Tháng 8</option>
-                    <option value="09">Tháng 9</option>
-                    <option value="10">Tháng 10</option>
-                    <option value="11">Tháng 11</option>
-                    <option value="12">Tháng 12</option>
-                </select>
+            <div class="header-right">
+                <div class="filter-group">
+                    <label for="filter-area">Khu Vực Báo Cáo:</label>
+                    <select id="filter-area">
+                        <option value="All">Đang tải...</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -437,7 +437,7 @@
                             <th id="gantt-header-first" style="width: 1%; white-space: nowrap; text-align: center;">STT</th>
                             <th style="width: 15%; min-width: 140px;">Main task</th>
                             <th style="width: 1%; white-space: nowrap; text-align: center;">Deadline</th>
-                            <th id="gantt-header-days" style="width: auto; padding: 0; min-width: 500px; background-color: #fafafa;"></th>
+                            <th id="gantt-header-days" style="width: auto; padding: 0; min-width: 500px; background-color: #ffffff;"></th>
                         </tr>
                     </thead>
                     <tbody id="gantt-tbody"></tbody>
@@ -526,33 +526,31 @@
 
         function setupFilters() {
             const areaFilter = document.getElementById('filter-area');
-            const monthFilter = document.getElementById('filter-month');
             const areas = [...new Set(globalData.gantt.map(item => item['ar'] || item['AR'] || item['Area'] || item['Khu vực']).filter(x => x))];
             areaFilter.innerHTML = '<option value="All">Tất cả khu vực</option>';
             areas.forEach(area => { areaFilter.innerHTML += `<option value="${area}">${area}</option>`; });
             areaFilter.addEventListener('change', renderDashboard);
-            monthFilter.addEventListener('change', renderDashboard);
         }
 
-        function filterData(dataArray, ignoreMonth = false) {
+        // Đã xóa bỏ logic lọc theo tháng
+        function filterData(dataArray) {
             const selectedArea = document.getElementById('filter-area').value;
-            const selectedMonth = document.getElementById('filter-month').value;
             return dataArray.filter(item => {
                 const areaVal = item['ar'] || item['AR'] || item['Area'] || item['Khu vực'] || '';
-                const matchArea = (selectedArea === 'All') || (areaVal.trim().toLowerCase() === selectedArea.trim().toLowerCase());
-                let matchMonth = true;
-                if (!ignoreMonth && selectedMonth !== 'All') {
-                    const endDate = item['End'] || item['Deadline'] || '';
-                    matchMonth = endDate.includes(`/${selectedMonth}/`) || endDate.includes(`-${selectedMonth}-`);
-                }
-                return matchArea && matchMonth;
+                return (selectedArea === 'All') || (areaVal.trim().toLowerCase() === selectedArea.trim().toLowerCase());
             });
         }
 
         function parseDateString(dateStr) {
             if (!dateStr) return null;
             const parts = dateStr.toString().split(/[/-]/); 
-            if (parts.length === 3) return new Date(parts[2], parts[1]-1, parts[0]);
+            if (parts.length === 3) {
+                let day = parseInt(parts[0]);
+                let month = parseInt(parts[1]) - 1; 
+                let year = parseInt(parts[2]);
+                if (year < 100) year += 2000;
+                return new Date(year, month, day);
+            }
             return null;
         }
 
@@ -565,14 +563,22 @@
         function renderGanttChart() {
             const tbody = document.getElementById('gantt-tbody');
             const headerDays = document.getElementById('gantt-header-days');
+            const firstHeader = document.getElementById('gantt-header-first'); 
             tbody.innerHTML = '';
-            let filteredGantt = filterData(globalData.gantt, false);
+            
+            const selectedArea = document.getElementById('filter-area').value;
+            // KHÔI PHỤC LOGIC: "Area" nếu chọn All, "STT" nếu đã chọn 1 vùng
+            if (firstHeader) {
+                firstHeader.innerText = (selectedArea === 'All') ? 'Area' : 'STT';
+            }
+
+            let filteredGantt = filterData(globalData.gantt);
             if (filteredGantt.length === 0) return;
 
             let minProjectDate = null, maxProjectDate = null;
             filteredGantt.forEach(task => {
                 let s = parseDateString(task['Start'] || task['start']);
-                let e = parseDateString(task['End'] || task['Deadline']);
+                let e = parseDateString(task['End'] || task['End date'] || task['Deadline'] || task['end'] || task['deadline']);
                 if (s && (!minProjectDate || s < minProjectDate)) minProjectDate = s;
                 if (e && (!maxProjectDate || e > maxProjectDate)) maxProjectDate = e;
             });
@@ -585,19 +591,64 @@
             const totalProjectMs = maxProjectDate.getTime() - minProjectDate.getTime();
             const totalDays = Math.round(totalProjectMs / (1000 * 60 * 60 * 24)) + 1;
 
-            let daysHtml = '<div style="display: flex; width: 100%;">';
+            // KHÔI PHỤC DẢI HIỂN THỊ THÁNG VÀ NGÀY
+            let months = []; 
+            let currentMonthLabel = '';
+            let currentMonthDays = 0;
+            let daysHtml = '<div style="display: flex; width: 100%; background-color: #ffffff;">';
+
             for (let i = 0; i < totalDays; i++) {
-                let d = new Date(minProjectDate); d.setDate(d.getDate() + i);
-                let isWeekend = (d.getDay() === 0 || d.getDay() === 6);
-                daysHtml += `<div style="flex: 1; text-align: center; font-size: 11px; border-right: 1px solid #e0e0e0; padding: 4px 0; ${isWeekend ? 'background-color: #ffeaea;' : ''}">${d.getDate()}</div>`;
+                let d = new Date(minProjectDate);
+                d.setDate(d.getDate() + i);
+                let day = d.getDate();
+                let month = d.getMonth() + 1;
+                let year = d.getFullYear();
+                let dayOfWeek = d.getDay(); 
+                
+                let monthLabel = `Tháng ${month}/${year}`;
+                if (i === 0) currentMonthLabel = monthLabel;
+
+                if (monthLabel !== currentMonthLabel) {
+                    months.push({ label: currentMonthLabel, count: currentMonthDays });
+                    currentMonthLabel = monthLabel;
+                    currentMonthDays = 1;
+                } else {
+                    currentMonthDays++;
+                }
+
+                let isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+                let bg = isWeekend ? 'background-color: #ffeaea;' : 'background-color: #ffffff;';
+                let color = isWeekend ? 'color: #d32f2f;' : 'color: #555;';
+                
+                daysHtml += `
+                    <div style="flex: 1; text-align: center; font-size: 11px; border-right: 1px solid #e0e0e0; padding: 4px 0; ${bg} ${color}">
+                        <strong>${day}</strong>
+                    </div>
+                `;
             }
-            headerDays.innerHTML = daysHtml + '</div>';
+            months.push({ label: currentMonthLabel, count: currentMonthDays });
+            daysHtml += '</div>';
+
+            let monthHtml = '<div style="display: flex; width: 100%; border-bottom: 1px solid #e0e0e0; background-color: #f8f9fa;">';
+            months.forEach(m => {
+                monthHtml += `
+                    <div style="flex: ${m.count}; text-align: center; font-size: 11px; font-weight: bold; color: #1a237e; padding: 5px 0; border-right: 1px solid #e0e0e0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${m.label}
+                    </div>
+                `;
+            });
+            monthHtml += '</div>';
+            headerDays.innerHTML = monthHtml + daysHtml;
+
+            // KHÔI PHỤC GRIDLINE BẰNG CSS BACKGROUND-IMAGE
+            let dayWidthPercent = (1 / totalDays) * 100;
+            let bgGrid = `background-color: #ffffff; background-image: repeating-linear-gradient(to right, transparent, transparent calc(100% - 1px), #e8e8e8 calc(100% - 1px), #e8e8e8 100%); background-size: ${dayWidthPercent}% 100%;`;
 
             filteredGantt.forEach((task, index) => {
                 let sObj = parseDateString(task['Start'] || task['start']);
-                let eObj = parseDateString(task['End'] || task['Deadline']);
+                let eObj = parseDateString(task['End'] || task['End date'] || task['Deadline'] || task['end'] || task['deadline']);
                 let left = sObj ? ((sObj.getTime() - minProjectDate.getTime()) / totalProjectMs) * 100 : 0;
-                let width = (sObj && eObj) ? ((eObj.getTime() - sObj.getTime()) / totalProjectMs) * 100 : (1/totalDays)*100;
+                let width = (sObj && eObj) ? ((eObj.getTime() - sObj.getTime()) / totalProjectMs) * 100 : dayWidthPercent;
 
                 let progressVal = task['Progress'] || task['Hoàn thành'] || task['progress'] || '0%';
                 let rawStatus = (task['Status'] || task['Remark'] || task['status'] || task['remark'] || '').toString().toLowerCase();
@@ -606,13 +657,16 @@
                 if (rawStatus.includes('done') || progressVal === '100%') statusClass = 'status-done';
                 if (rawStatus.includes('delay')) statusClass = 'status-delay';
 
+                // KHÔI PHỤC LOGIC STT vs AREA hiển thị ở hàng
+                let firstColValue = (selectedArea === 'All') ? (task['ar'] || task['AR'] || task['Area'] || task['Khu vực'] || '') : (index + 1);
+
                 tbody.innerHTML += `
                     <tr>
-                        <td style="text-align: center;">${index+1}</td>
-                        <td class="col-task">${task['Task'] || ''}</td>
-                        <td style="text-align: center;">${task['End'] || task['Deadline'] || ''}</td>
-                        <td class="timeline-cell" style="background-image: repeating-linear-gradient(to right, transparent, transparent calc(${(1/totalDays)*100}% - 1px), #eee calc(${(1/totalDays)*100}% - 1px), #eee ${(1/totalDays)*100}%); background-size: ${(1/totalDays)*100}% 100%;">
-                            <div class="pic-label" style="left: ${left+0.5}%;">${task['PIC'] || ''}</div>
+                        <td style="text-align: center; font-weight: bold;">${firstColValue}</td>
+                        <td class="col-task">${task['Task'] || task['Tên công việc'] || ''}</td>
+                        <td style="text-align: center; font-weight: 500;">${task['End'] || task['Deadline'] || ''}</td>
+                        <td class="timeline-cell" style="${bgGrid}">
+                            <div class="pic-label" style="left: calc(${left}% + 4px);">${task['PIC'] || task['Phụ trách'] || ''}</div>
                             <div class="task-arrow-wrapper" style="left: ${left}%; width: ${width}%;">
                                 <div class="task-arrow-fill ${statusClass}" style="width: ${progressVal}">
                                     <span class="progress-text">${progressVal}</span>
@@ -624,16 +678,23 @@
         }
 
         function renderSWOT() {
-            const filteredSwot = filterData(globalData.swot, true);
+            const filteredSwot = filterData(globalData.swot);
             ['swot-s', 'swot-w', 'swot-o', 'swot-t', 'swot-support'].forEach(id => document.getElementById(id).innerHTML = '');
             filteredSwot.forEach(item => {
-                const p = item['PR'] || '';
+                const p = item['pr'] || item['PR'] || item['province'] || item['Province'] || '';
                 const h = p ? `<span class="province-title">${p}</span>` : '';
-                if (item['S']) document.getElementById('swot-s').innerHTML += `<li>${h}<span class="swot-content-text">${item['S']}</span></li>`;
-                if (item['W']) document.getElementById('swot-w').innerHTML += `<li>${h}<span class="swot-content-text">${item['W']}</span></li>`;
-                if (item['O']) document.getElementById('swot-o').innerHTML += `<li>${h}<span class="swot-content-text">${item['O']}</span></li>`;
-                if (item['T']) document.getElementById('swot-t').innerHTML += `<li>${h}<span class="swot-content-text">${item['T']}</span></li>`;
-                if (item['Support']) document.getElementById('swot-support').innerHTML += `<li>${h}<span class="swot-content-text">${item['Support']}</span></li>`;
+                
+                const sVal = item['s'] || item['S'] || '';
+                const wVal = item['w'] || item['W'] || '';
+                const oVal = item['o'] || item['O'] || '';
+                const tVal = item['t'] || item['T'] || '';
+                const supportVal = item['support'] || item['Support'] || item['SUPPORT'] || '';
+
+                if (sVal) document.getElementById('swot-s').innerHTML += `<li>${h}<span class="swot-content-text">${sVal}</span></li>`;
+                if (wVal) document.getElementById('swot-w').innerHTML += `<li>${h}<span class="swot-content-text">${wVal}</span></li>`;
+                if (oVal) document.getElementById('swot-o').innerHTML += `<li>${h}<span class="swot-content-text">${oVal}</span></li>`;
+                if (tVal) document.getElementById('swot-t').innerHTML += `<li>${h}<span class="swot-content-text">${tVal}</span></li>`;
+                if (supportVal) document.getElementById('swot-support').innerHTML += `<li>${h}<span class="swot-content-text">${supportVal}</span></li>`;
             });
         }
 
@@ -642,13 +703,13 @@
         }
 
         function renderTreeDiagram() {
-            const plan = filterData(globalData.hcPlan, true);
-            const act = filterData(globalData.hcActual, true);
+            const plan = filterData(globalData.hcPlan);
+            const act = filterData(globalData.hcActual);
 
             const createNode = (role, className) => {
                 const planCount = sumRole(plan, role);
                 const actCount = sumRole(act, role);
-                const icons = '👤'.repeat(actCount || 0); // Vòng lặp xuất icon tương ứng với Actual
+                const icons = '👤'.repeat(actCount || 0); 
                 
                 return `
                 <div class="tree-node ${className}">
