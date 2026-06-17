@@ -2,7 +2,7 @@
 // CẤU HÌNH KẾT NỐI GOOGLE SHEETS
 // ==========================================
 const SPREADSHEET_ID = '1Xtwk_Y7UGKNw2YC9c4kblae71mHahzr7GqV-sfiie6E';
-const API_KEY = 'DÁN_API_KEY_CỦA_BẠN_VÀO_ĐÂY'; // <-- Sửa lại dòng này
+const API_KEY = 'AIzaSyC8oIfsPGtSedj73Qky4aasg98xqkrWT5s'; // <-- Sửa lại dòng này
 
 let globalData = {
     gantt: [],
