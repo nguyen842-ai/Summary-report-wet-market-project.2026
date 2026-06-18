@@ -435,7 +435,8 @@
         // Đợi module dbinSales và 12 script điểm danh xong mới chạy
         window.addEventListener('DOMContentLoaded', () => {
             const checkDataInterval = setInterval(() => {
-                if (window.dbinSales && scriptsProcessed === totalScriptsToLoad) {
+                // Bây giờ hệ thống chỉ cần đợi điểm danh đủ 12 lượt file (bất kể có hay không) là chạy
+                if (scriptsProcessed === totalScriptsToLoad) {
                     clearInterval(checkDataInterval);
                     initDashboard();
                 }
