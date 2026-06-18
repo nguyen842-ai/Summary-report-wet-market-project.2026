@@ -955,6 +955,32 @@
         /* ==========================================================================
            3. SƠ ĐỒ NHÂN SỰ (BỘ LỌC TẤT CẢ SẼ SNAPSHOT THÁNG MỚI NHẤT)
            ========================================================================== */
+// Hàm tính tổng số lượng nhân sự theo chức danh
+        function sumRole(dataArray, roleName) {
+            let count = 0;
+            dataArray.forEach(row => {
+                let isMatch = false;
+                
+                // Quét qua các cột trong dòng để tìm xem có đúng chức danh đang xét không (CDM, KAM, KAE, DSR...)
+                if (row._raw) {
+                    for (let i = 0; i < row._raw.length; i++) {
+                        if (row._raw[i] && row._raw[i].toString().trim().toUpperCase() === roleName.toUpperCase()) {
+                            isMatch = true;
+                            break;
+                        }
+                    }
+                }
+                
+                // Nếu tìm thấy chức danh, tiến hành cộng dồn số lượng HC
+                if (isMatch) {
+                    // Lấy giá trị từ cột HC (thường ở index 5) hoặc mặc định đếm mỗi dòng là 1 nhân sự
+                    let hc = row['hc'] || row['HC'] || (row._raw && row._raw[5]) || 1;
+                    count += parseInt(hc) || 1;
+                }
+            });
+            return count;
+        }
+        
         function renderTreeDiagram() {
             const selectedMonth = document.getElementById('filter-month').value;
             const selectedArea = document.getElementById('filter-area').value;
