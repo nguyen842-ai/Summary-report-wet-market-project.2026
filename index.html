@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WET MARKET PROJECT © 2026 TCI All rights reserved</title>
+    <title>Hệ Thống Quản Lý Tiến Độ & Phân Tích SWOT</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="./dbin.js"></script>
     <style>
@@ -461,7 +461,7 @@
         const SPREADSHEET_ID = '1Xtwk_Y7UGKNw2YC9c4kblae71mHahzr7GqV-sfiie6E';
         const API_KEY = 'AIzaSyC8oIfsPGtSedj73Qky4aasg98xqkrWT5s'; 
 
-        let globalData = { gantt: [], swot: [], hcPlan: [], hcActual: [], dhc: [] };
+        let globalData = { gantt: [], swot: [], hcPlan: [], hcActual: [], dhc: [], skuDict: [] };
         let barChartInstance = null, donutChartInstance = null, secBarChartInstance = null, secDonutChartInstance = null;
         let currentLanguage = 'vi';
 
@@ -495,10 +495,6 @@
                 wmActual: "Số lượng chợ có đơn hàng",
                 cusTarget: "Số lượng cửa hàng đã chăm sóc",
                 cusActual: "Số lượng cửa hàng đã lên đơn",
-                skuSongLan: "Song Lân",
-                skuMienTuoi: "Miến Tươi",
-                skuDauXanh: "Miến Đậu Xanh",
-                skuMienDong: "Miến Dong",
                 excelBtn: "XUẤT BÁO CÁO EXCEL"
             },
             en: {
@@ -530,10 +526,6 @@
                 wmActual: "Markets with Orders",
                 cusTarget: "Shops Serviced",
                 cusActual: "Shops with Orders",
-                skuSongLan: "Song Lan",
-                skuMienTuoi: "Fresh Glass Noodles",
-                skuDauXanh: "Mung Bean Noodles",
-                skuMienDong: "Dong Noodles",
                 excelBtn: "EXPORT EXCEL REPORT"
             }
         };
@@ -644,9 +636,25 @@
                 globalData.hcPlan = convertRawToObjects(await fetchSheetTab('Headcount plan'));
                 progressBar.style.width = '80%';
                 globalData.hcActual = convertRawToObjects(await fetchSheetTab('Headcount actual'));
-                progressBar.style.width = '100%';
+                progressBar.style.width = '90%';
                 globalData.dhc = convertRawToObjects(await fetchSheetTab('D HC')); 
                 
+                progressBar.style.width = '100%';
+                try {
+                    let nRaw = await fetchSheetTab('N');
+                    if (nRaw && nRaw.length > 0) {
+                        nRaw.forEach((row, index) => {
+                            if (row[0] && row[1]) {
+                                let en = row[0].trim();
+                                let vi = row[1].trim();
+                                // Bỏ qua tiêu đề nếu có
+                                if (index === 0 && (en.toLowerCase() === 'english' || en.toLowerCase() === 'en' || vi.toLowerCase().includes('việt') || en.toLowerCase().includes('tiếng anh'))) return;
+                                globalData.skuDict.push({ en: en, vi: vi, lowerVi: vi.toLowerCase() });
+                            }
+                        });
+                    }
+                } catch(e) { console.warn("Không tải được Sheet N (Từ điển SKU)"); }
+
                 updateStaticUI();
                 setupFilters();
                 renderDashboard();
@@ -866,6 +874,10 @@
                 return;
             }
 
+            // Tạo các kho chứa tự động (buckets) dựa trên từ điển Sheet N
+            let initialSkuTotals = {};
+            globalData.skuDict.forEach(m => initialSkuTotals[m.vi] = 0);
+
             const aggregation = filteredDbin.reduce((acc, r) => {
                 if (!acc.areaValueGroups[r.ar]) acc.areaValueGroups[r.ar] = { rows: {}, subTotal: 0, subMonths: {} };
                 const pKey = `${r.hq}_${r.Pv}`;
@@ -892,14 +904,15 @@
                 acc.grandTotalQty.months[r.mo] = (acc.grandTotalQty.months[r.mo] || 0) + r.Qty;
                 acc.grandTotalQty.total += r.Qty;
 
+                // TỰ ĐỘNG GOM NHÓM TỪ KHÓA DỰA TRÊN TỪ ĐIỂN SHEET N
                 let skuName = (r.sku || '').toLowerCase();
-                if(skuName.includes("song lân")) acc.skuTotals.songLan += r.s; 
-                else if(skuName.includes("miến đậu xanh")) acc.skuTotals.dauXanh += r.s; 
-                else if(skuName.includes("miến tươi")) acc.skuTotals.mienTuoi += r.s;
-                else if(skuName.includes("miến dong")) acc.skuTotals.mienDong += r.s;
+                let foundMap = globalData.skuDict.find(m => skuName.includes(m.lowerVi));
+                if (foundMap) {
+                    acc.skuTotals[foundMap.vi] += (r.s || 0);
+                }
 
                 return acc;
-            }, { areaValueGroups: {}, chartDataObj: {}, grandTotalValues: { total: 0, months: {} }, areaQtyGroups: {}, grandTotalQty: { total: 0, months: {} }, skuTotals: { songLan: 0, mienTuoi: 0, dauXanh: 0, mienDong: 0 } });
+            }, { areaValueGroups: {}, chartDataObj: {}, grandTotalValues: { total: 0, months: {} }, areaQtyGroups: {}, grandTotalQty: { total: 0, months: {} }, skuTotals: initialSkuTotals });
 
             let valHead = `<th>HQ</th><th>Area</th><th>${i18n[lang].thProv}</th>`;
             availableMonths.forEach(m => {
@@ -952,12 +965,12 @@
                 let grp = aggregation.areaQtyGroups[ar];
                 Object.values(grp.rows).forEach(row => {
                     let displaySku = row.sku;
-                    if (lang === 'en') {
-                        if(row.sku.toLowerCase().includes("song lân")) displaySku = i18n.en.skuSongLan;
-                        else if(row.sku.toLowerCase().includes("miến tươi")) displaySku = i18n.en.skuMienTuoi;
-                        else if(row.sku.toLowerCase().includes("miến đậu xanh")) displaySku = i18n.en.skuDauXanh;
-                        else if(row.sku.toLowerCase().includes("miến dong")) displaySku = i18n.en.skuMienDong;
+                    // TỰ ĐỘNG DỊCH THEO TỪ ĐIỂN SHEET N
+                    let foundMap = globalData.skuDict.find(m => row.sku.toLowerCase().includes(m.lowerVi));
+                    if (foundMap && lang === 'en') {
+                        displaySku = foundMap.en;
                     }
+                    
                     qtyBody += `<tr><td>${row.hq}</td><td>${ar}</td><td>${row.Pv}</td><td style="font-weight:500;">${displaySku}</td>`;
                     availableMonths.forEach(m => qtyBody += `<td class="text-right">${formatQty(row.months[m] || 0)}</td>`);
                     qtyBody += `<td class="text-right" style="font-weight:500; color:#3B8686;">${formatQty(row.total)}</td></tr>`;
@@ -976,13 +989,14 @@
             const ctxDonut = document.getElementById('donutChart').getContext('2d');
             if(donutChartInstance) donutChartInstance.destroy();
             
-            const rData = [aggregation.skuTotals.songLan, aggregation.skuTotals.mienTuoi, aggregation.skuTotals.dauXanh, aggregation.skuTotals.mienDong];
+            // TỰ ĐỘNG BỐC LABEL VÀ DATA CHO DONUT TỪ TỪ ĐIỂN SHEET N
+            const labelsSku = globalData.skuDict.map(m => lang === 'en' ? m.en : m.vi);
+            const rData = globalData.skuDict.map(m => aggregation.skuTotals[m.vi] || 0);
             const tVal = rData.reduce((a, b) => a + b, 0);
-            const labelsSku = [i18n[lang].skuSongLan, i18n[lang].skuMienTuoi, i18n[lang].skuDauXanh, i18n[lang].skuMienDong];
 
             donutChartInstance = new Chart(ctxDonut, {
                 type: 'doughnut', 
-                data: { labels: labelsSku, datasets: [{ data: rData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686', '#A8DBA8'], borderWidth: 2 }] },
+                data: { labels: labelsSku, datasets: [{ data: rData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686', '#A8DBA8', '#FF9F1C', '#D32F2F', '#4A148C', '#009688'], borderWidth: 2 }] },
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
@@ -1009,6 +1023,9 @@
                 return;
             }
 
+            let initialSkuTotals = {};
+            globalData.skuDict.forEach(m => initialSkuTotals[m.vi] = 0);
+
             const aggregation = filteredSec.reduce((acc, r) => {
                 let sVal = parseFloat(r.s) || 0;
                 let qtVal = parseFloat(r.qt) || 0;
@@ -1031,13 +1048,13 @@
                 acc.grandTotalQty.total += qtVal;
 
                 let skuName = (r.sku || '').toLowerCase();
-                if(skuName.includes("song lân")) acc.skuTotals.songLan += sVal; 
-                else if(skuName.includes("miến đậu xanh")) acc.skuTotals.dauXanh += sVal; 
-                else if(skuName.includes("miến tươi")) acc.skuTotals.mienTuoi += sVal;
-                else if(skuName.includes("miến dong")) acc.skuTotals.mienDong += sVal;
+                let foundMap = globalData.skuDict.find(m => skuName.includes(m.lowerVi));
+                if (foundMap) {
+                    acc.skuTotals[foundMap.vi] += sVal;
+                }
 
                 return acc;
-            }, { areaValueGroups: {}, chartDataObj: {}, grandTotalValues: { total: 0, months: {} }, areaQtyGroups: {}, grandTotalQty: { total: 0, months: {} }, skuTotals: { songLan: 0, mienTuoi: 0, dauXanh: 0, mienDong: 0 } });
+            }, { areaValueGroups: {}, chartDataObj: {}, grandTotalValues: { total: 0, months: {} }, areaQtyGroups: {}, grandTotalQty: { total: 0, months: {} }, skuTotals: initialSkuTotals });
 
             let valHead = `<th>HQ</th><th>Area</th>`;
             availableMonths.forEach(m => {
@@ -1085,12 +1102,11 @@
                 let grp = aggregation.areaQtyGroups[ar];
                 Object.values(grp.rows).forEach(row => {
                     let displaySku = row.sku;
-                    if (lang === 'en') {
-                        if(row.sku.toLowerCase().includes("song lân")) displaySku = i18n.en.skuSongLan;
-                        else if(row.sku.toLowerCase().includes("miến tươi")) displaySku = i18n.en.skuMienTuoi;
-                        else if(row.sku.toLowerCase().includes("miến đậu xanh")) displaySku = i18n.en.skuDauXanh;
-                        else if(row.sku.toLowerCase().includes("miến dong")) displaySku = i18n.en.skuMienDong;
+                    let foundMap = globalData.skuDict.find(m => row.sku.toLowerCase().includes(m.lowerVi));
+                    if (foundMap && lang === 'en') {
+                        displaySku = foundMap.en;
                     }
+                    
                     qtyBody += `<tr><td>${row.hq}</td><td>${ar}</td><td style="font-weight:500;">${displaySku}</td>`;
                     availableMonths.forEach(m => qtyBody += `<td class="text-right">${formatQty(row.months[m] || 0)}</td>`);
                     qtyBody += `<td class="text-right" style="font-weight:500; color:#3B8686;">${formatQty(row.total)}</td></tr>`;
@@ -1109,20 +1125,20 @@
             const ctxSecDonut = document.getElementById('sec-donutChart').getContext('2d');
             if(secDonutChartInstance) secDonutChartInstance.destroy();
             
-            const realDonutData = [aggregation.skuTotals.songLan, aggregation.skuTotals.mienTuoi, aggregation.skuTotals.dauXanh, aggregation.skuTotals.mienDong];
-            const totalDonutVal = realDonutData.reduce((a, b) => a + b, 0);
-            const labelsSku = [i18n[lang].skuSongLan, i18n[lang].skuMienTuoi, i18n[lang].skuDauXanh, i18n[lang].skuMienDong];
+            const labelsSku = globalData.skuDict.map(m => lang === 'en' ? m.en : m.vi);
+            const rData = globalData.skuDict.map(m => aggregation.skuTotals[m.vi] || 0);
+            const tVal = rData.reduce((a, b) => a + b, 0);
 
             secDonutChartInstance = new Chart(ctxSecDonut, {
                 type: 'doughnut', 
-                data: { labels: labelsSku, datasets: [{ data: realDonutData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686', '#A8DBA8'], borderWidth: 2 }] },
+                data: { labels: labelsSku, datasets: [{ data: rData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686', '#A8DBA8', '#FF9F1C', '#D32F2F', '#4A148C', '#009688'], borderWidth: 2 }] },
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
                     cutout: '55%', 
                     plugins: { 
                         legend: { position: 'bottom' }, 
-                        tooltip: { callbacks: { label: c => `${c.label}: ${formatCurrency(realDonutData[c.dataIndex])} VND (${totalDonutVal > 0 ? ((realDonutData[c.dataIndex] / totalDonutVal) * 100).toFixed(2) : 0}%)` } } 
+                        tooltip: { callbacks: { label: c => `${c.label}: ${formatCurrency(rData[c.dataIndex])} VND (${tVal > 0 ? ((rData[c.dataIndex] / totalDonutVal) * 100).toFixed(2) : 0}%)` } } 
                     } 
                 }
             });
@@ -1195,9 +1211,6 @@
             document.getElementById('swot-support').innerHTML = swotHtml.support;
         }
 
-        // ==========================================================================
-        // KHÔI PHỤC: TREE DIAGRAM ĐỌC TỪ HEADCOUNT PLAN & ACTUAL 
-        // ==========================================================================
         function sumRole(dataArray, roleName) {
             let count = 0;
             const roleIndexMap = { 'CDM': 3, 'KAM': 4, 'KAE': 5, 'DSR': 6 };
@@ -1273,7 +1286,7 @@
                 </div>`;
         }
 
-     function renderCoverageTables() {
+        function renderCoverageTables() {
             const selectedArea = document.getElementById('filter-area').value;
             const selectedMonth = document.getElementById('filter-month').value;
             const masterData = getAggregatedMasterData();
@@ -1292,7 +1305,6 @@
                 activeMonths = [selectedMonth];
             }
 
-            // BƯỚC 1: XÂY DỰNG TỪ ĐIỂN THEO TỪNG THÁNG CỤ THỂ (kaesByMonth)
             const uniqueDhcMap = new Map();
             globalData.dhc.forEach(row => {
                 if(!row._raw) return;
@@ -1309,7 +1321,6 @@
                 let hcVal = parseInt(row._raw[5]) || 0;
                 
                 if (!uniqueDhcMap.has(key)) {
-                    // Tạo bộ rổ lưu trữ KAE theo tháng
                     let kaesByMonth = {};
                     kaesByMonth[moVN] = new Set(kaeName ? [kaeName] : []);
                     
@@ -1322,7 +1333,6 @@
                 } else {
                     let existing = uniqueDhcMap.get(key);
                     
-                    // Tính HC (Chỉ cộng dồn hiển thị cho tháng mới nhất)
                     if (currentMoNum > existing.maxMoNum) {
                         existing.hc = hcVal;
                         existing.maxMoNum = currentMoNum;
@@ -1330,7 +1340,6 @@
                         existing.hc += hcVal; 
                     }
 
-                    // Lưu KAE vào rổ của ĐÚNG THÁNG ĐÓ
                     if (!existing.kaesByMonth[moVN]) {
                         existing.kaesByMonth[moVN] = new Set();
                     }
@@ -1381,11 +1390,9 @@
                         let isMonthActive = activeMonths.some(am => getVietnameseMonth(am) === mMoVN);
                         
                         if (isMonthActive) {
-                            // BƯỚC 2A: TÍNH TARGET CHUẨN THÁNG - Tra từ điển KAE đúng tháng của Master Data
                             let mKae = (mRow.k || '').trim();
                             let monthKaes = row.kaesByMonth[mMoVN];
                             
-                            // Nếu trong tháng đó KAM ko quản lý KAE này thì bỏ qua
                             if (!monthKaes || !monthKaes.has(mKae)) return;
 
                             let mPr = mRow.pr || mRow.Province || mRow.Pv || '';
@@ -1402,7 +1409,6 @@
                         let sMoVN = getVietnameseMonth((sRow.mo || '').trim());
                         
                         if (actualMByMonth[sMoVN] !== undefined) {
-                            // BƯỚC 2B: TÍNH ACTUAL CHUẨN THÁNG - Tra từ điển KAE đúng tháng của Sales Data
                             let sKae = (sRow.k || '').trim();
                             let monthKaes = row.kaesByMonth[sMoVN];
                             
@@ -1421,7 +1427,6 @@
                 cusRows.push({ data: row, target: targetCC.size, actuals: actualCCByMonth });
             });
 
-            // Giao diện Wet Market
             let wmHead = `<tr><th rowspan="2">HQ</th><th rowspan="2">Area</th><th rowspan="2">${i18n[lang].thProv}</th><th rowspan="2">CDM</th><th rowspan="2">KAM</th><th rowspan="2" class="text-center">HC</th><th rowspan="2" class="text-center">${i18n[lang].wmTarget}</th><th colspan="${activeMonths.length}" class="text-center" style="border-bottom: 1px solid #e0e0e0; background-color: #f1f3f4;">${i18n[lang].wmActual}</th></tr><tr>`;
             activeMonths.forEach(m => {
                 let num = getVietnameseMonth(m);
@@ -1443,7 +1448,6 @@
             wmFoot += `</tr>`;
             document.getElementById('wm-table-body').innerHTML = wmBody + wmFoot;
 
-            // Giao diện Khách hàng (Customer)
             let cusHead = `<tr><th rowspan="2">HQ</th><th rowspan="2">Area</th><th rowspan="2">${i18n[lang].thProv}</th><th rowspan="2">CDM</th><th rowspan="2">KAM</th><th rowspan="2" class="text-center">HC</th><th rowspan="2" class="text-center">${i18n[lang].cusTarget}</th><th colspan="${activeMonths.length}" class="text-center" style="border-bottom: 1px solid #e0e0e0; background-color: #f1f3f4;">${i18n[lang].cusActual}</th></tr><tr>`;
             activeMonths.forEach(m => {
                 let num = getVietnameseMonth(m);
