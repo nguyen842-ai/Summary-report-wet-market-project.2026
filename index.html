@@ -374,10 +374,7 @@
 
     </div>
 
-    <script type="module">
-        import { dbinSales } from './dbin.js';
-        window.dbinSales = dbinSales;
-    </script>
+    <script src="./dbin.js"></script>
 
     <script>
         // ----------------------------------------------------
@@ -564,7 +561,7 @@
             renderSWOT();
             renderTreeDiagram();
             
-            if (typeof window.dbinSales !== 'undefined') renderPrimarySale();
+            if (typeof dbinSales !== 'undefined') renderPrimarySale();
             renderSecondarySale();
             renderCoverageTables(); 
         }
@@ -698,7 +695,7 @@
            3. PRIMARY SALES (KHÔNG LỌC THÁNG)
            ---------------------------------------------------- */
         function renderPrimarySale() {
-            const filteredDbin = filterDataGanttSales(window.dbinSales, true);
+            const filteredDbin = filterDataGanttSales(typeof dbinSales !== 'undefined' ? dbinSales : [], true);
             const monthsSet = new Set();
             filteredDbin.forEach(r => monthsSet.add(r.mo));
             const availableMonths = Array.from(monthsSet).sort();
