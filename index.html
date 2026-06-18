@@ -407,7 +407,7 @@
             return new Intl.NumberFormat('vi-VN').format(num || 0);
         }
 
-        // ĐÂY LÀ HÀM PARSE DATE ĐÃ ĐƯỢC BỔ SUNG ĐỂ SỬA LỖI GANTT CHART
+        // HÀM PARSE DATE ĐÃ ĐƯỢC BỔ SUNG ĐỂ SỬA LỖI GANTT CHART
         function parseDateString(dateStr) {
             if (!dateStr) return null;
             
@@ -454,7 +454,7 @@
             return data.values;
         }
 
-        // Đợi 12 script điểm danh xong mới chạy (đã xóa điều kiện window.dbinSales)
+        // Đợi 12 script điểm danh xong mới chạy
         window.addEventListener('DOMContentLoaded', () => {
             const checkDataInterval = setInterval(() => {
                 if (scriptsProcessed === totalScriptsToLoad) {
@@ -540,6 +540,7 @@
             
             const monthFilter = document.getElementById('filter-month');
             const months = new Set();
+            // Lấy tháng từ các index chuẩn tương ứng
             [{data: globalData.swot, idx: 13}, {data: globalData.hcPlan, idx: 7}, {data: globalData.hcActual, idx: 7}, {data: globalData.dhc, idx: 6}].forEach(sheet => {
                 sheet.data.forEach(r => { if(r._raw && r._raw[sheet.idx]) months.add(r._raw[sheet.idx]); });
             });
@@ -595,13 +596,15 @@
             const tbody = document.getElementById('gantt-tbody');
             const headerDays = document.getElementById('gantt-header-days');
             const firstHeader = document.getElementById('gantt-header-first'); 
-            tbody.innerHTML = '';
             
             const selectedArea = document.getElementById('filter-area').value;
             if (firstHeader) firstHeader.innerText = (selectedArea === 'All') ? 'Area' : 'STT';
 
             let filteredGantt = filterDataGanttSales(globalData.gantt);
-            if (filteredGantt.length === 0) return;
+            if (filteredGantt.length === 0) {
+                tbody.innerHTML = '';
+                return;
+            }
 
             let minDate = null, maxDate = null;
             filteredGantt.forEach(task => {
@@ -639,6 +642,7 @@
             let dayW = (1 / totalDays) * 100;
             let bgGrid = `background-color: #ffffff; background-image: repeating-linear-gradient(to right, transparent, transparent calc(100% - 1px), #e8e8e8 calc(100% - 1px), #e8e8e8 100%); background-size: ${dayW}% 100%;`;
 
+            let tableHtml = '';
             filteredGantt.forEach((task, idx) => {
                 let sObj = parseDateString(task['Start'] || task['start']);
                 let eObj = parseDateString(task['End'] || task['Deadline']);
@@ -651,7 +655,7 @@
                 if (sts.includes('delay')) statusClass = 'status-delay';
                 let fCol = (selectedArea === 'All') ? (task['ar'] || task['AR'] || task['Area'] || task['Khu vực'] || '') : (idx + 1);
 
-                tbody.innerHTML += `
+                tableHtml += `
                     <tr>
                         <td style="text-align: center; font-weight: bold;">${fCol}</td>
                         <td class="col-task">${task['Task'] || task['Tên công việc'] || ''}</td>
@@ -664,6 +668,7 @@
                         </td>
                     </tr>`;
             });
+            tbody.innerHTML = tableHtml;
         }
 
         /* ----------------------------------------------------
@@ -935,6 +940,8 @@
             });
 
             ['swot-s', 'swot-w', 'swot-o', 'swot-t', 'swot-support'].forEach(id => document.getElementById(id).innerHTML = '');
+            let swotHtml = {s:'', w:'', o:'', t:'', support:''};
+            
             fSwot.forEach(item => {
                 const p = item['PR'] || item['Province'] || item['pr'] || item['province'] || '';
                 const h = p ? `<span class="province-title">${p}</span>` : '';
@@ -944,40 +951,55 @@
                 const tVal = item['T'] || item['t'] || '';
                 const supVal = item['Support'] || item['support'] || item['SUPPORT'] || '';
                 
-                if (sVal) document.getElementById('swot-s').innerHTML += `<li>${h}<span class="swot-content-text">${sVal}</span></li>`;
-                if (wVal) document.getElementById('swot-w').innerHTML += `<li>${h}<span class="swot-content-text">${wVal}</span></li>`;
-                if (oVal) document.getElementById('swot-o').innerHTML += `<li>${h}<span class="swot-content-text">${oVal}</span></li>`;
-                if (tVal) document.getElementById('swot-t').innerHTML += `<li>${h}<span class="swot-content-text">${tVal}</span></li>`;
-                if (supVal) document.getElementById('swot-support').innerHTML += `<li>${h}<span class="swot-content-text">${supVal}</span></li>`;
+                if (sVal) swotHtml.s += `<li>${h}<span class="swot-content-text">${sVal}</span></li>`;
+                if (wVal) swotHtml.w += `<li>${h}<span class="swot-content-text">${wVal}</span></li>`;
+                if (oVal) swotHtml.o += `<li>${h}<span class="swot-content-text">${oVal}</span></li>`;
+                if (tVal) swotHtml.t += `<li>${h}<span class="swot-content-text">${tVal}</span></li>`;
+                if (supVal) swotHtml.support += `<li>${h}<span class="swot-content-text">${supVal}</span></li>`;
             });
+
+            document.getElementById('swot-s').innerHTML = swotHtml.s;
+            document.getElementById('swot-w').innerHTML = swotHtml.w;
+            document.getElementById('swot-o').innerHTML = swotHtml.o;
+            document.getElementById('swot-t').innerHTML = swotHtml.t;
+            document.getElementById('swot-support').innerHTML = swotHtml.support;
         }
 
         /* ==========================================================================
            3. SƠ ĐỒ NHÂN SỰ (BỘ LỌC TẤT CẢ SẼ SNAPSHOT THÁNG MỚI NHẤT)
            ========================================================================== */
-// Hàm tính tổng số lượng nhân sự theo chức danh
+        // ĐÃ SỬA HÀM SUM ROLE ÁP DỤNG INDEX CHÍNH XÁC: D=3, E=4, F=5, G=6
         function sumRole(dataArray, roleName) {
             let count = 0;
-            dataArray.forEach(row => {
-                let isMatch = false;
-                
-                // Quét qua các cột trong dòng để tìm xem có đúng chức danh đang xét không (CDM, KAM, KAE, DSR...)
-                if (row._raw) {
-                    for (let i = 0; i < row._raw.length; i++) {
-                        if (row._raw[i] && row._raw[i].toString().trim().toUpperCase() === roleName.toUpperCase()) {
-                            isMatch = true;
-                            break;
+            
+            // Map index ứng với cột bạn cung cấp:
+            const roleIndexMap = {
+                'CDM': 3, // Cột D
+                'KAM': 4, // Cột E
+                'KAE': 5, // Cột F
+                'DSR': 6  // Cột G
+            };
+            
+            const colIndex = roleIndexMap[roleName.toUpperCase()];
+
+            if (colIndex !== undefined) {
+                dataArray.forEach(row => {
+                    if (row._raw && row._raw[colIndex]) {
+                        let cellValue = row._raw[colIndex].toString().trim();
+                        if (cellValue !== '') {
+                            let num = parseInt(cellValue);
+                            // Nếu điền số lượng (như 1, 2, 3), thì sẽ cộng số. 
+                            // Còn nếu bạn chỉ điền tên ("Nguyễn Văn A") thì sẽ đếm là 1.
+                            if (!isNaN(num)) {
+                                count += num;
+                            } else {
+                                count += 1;
+                            }
                         }
                     }
-                }
-                
-                // Nếu tìm thấy chức danh, tiến hành cộng dồn số lượng HC
-                if (isMatch) {
-                    // Lấy giá trị từ cột HC (thường ở index 5) hoặc mặc định đếm mỗi dòng là 1 nhân sự
-                    let hc = row['hc'] || row['HC'] || (row._raw && row._raw[5]) || 1;
-                    count += parseInt(hc) || 1;
-                }
-            });
+                });
+            }
+            
             return count;
         }
         
@@ -991,7 +1013,7 @@
                 let maxMoNum = -1;
                 let maxMoStr = 'All';
                 globalData.hcActual.forEach(item => {
-                    if (item._raw && item._raw[7]) {
+                    if (item._raw && item._raw[7]) { // Index 7 tương ứng cột H (Tháng)
                         let moStr = item._raw[7].trim();
                         let moNum = parseInt(getVietnameseMonth(moStr));
                         if (!isNaN(moNum) && moNum > maxMoNum) {
