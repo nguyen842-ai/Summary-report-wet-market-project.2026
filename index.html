@@ -32,7 +32,7 @@
         }
 
         /* ==========================================================================
-           2. BỐ CỤC TIÊU ĐỀ VÀ BỘ LỌC (50-50)
+           2. BỐ CỤC TIÊU ĐỀ VÀ BỘ LỌC (Box Gradient)
            ========================================================================== */
         .header-section {
             display: flex;
@@ -40,10 +40,21 @@
             align-items: center;
             margin-bottom: 25px;
             gap: 20px;
+            /* Cập nhật Gradient và khung */
+            background: linear-gradient(to right, #0B486B, #CFF09E);
+            padding: 20px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         .header-left { flex: 1; }
-        .header-left h1 { margin-bottom: 0; color: #1a237e; }
+        .header-left h1 { 
+            margin-bottom: 0; 
+            color: #ffffff; /* Trắng để nổi trên nền xanh đậm */
+            font-size: 24px;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
 
         .header-right {
             flex: 1;
@@ -57,7 +68,7 @@
             flex-direction: row;
             align-items: center;
             gap: 10px;
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.9); /* Làm mờ nền filter để hòa hợp gradient */
             padding: 10px 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -65,8 +76,8 @@
 
         .filter-group label {
             font-size: 13px;
-            font-weight: 600;
-            color: #666;
+            font-weight: 700;
+            color: #0B486B;
             text-transform: uppercase;
         }
 
@@ -121,7 +132,7 @@
             flex-direction: column;
         }
 
-        h2 { margin-bottom: 20px; color: #1a237e; }
+        h2 { margin-bottom: 20px; color: #0B486B; text-transform: uppercase; font-size: 18px;}
 
         .table-responsive {
             overflow-x: auto;
@@ -137,7 +148,8 @@
             font-size: 13px; vertical-align: middle;
         }
 
-        th { background-color: #f8f9fa; color: #495057; font-weight: 600; white-space: nowrap; }
+        /* Cập nhật màu Header Table */
+        th { background-color: #3B8686 !important; color: #CFF09E !important; font-weight: 600; white-space: nowrap; }
 
         .col-task { font-weight: 600; color: #0B486B; word-break: break-word; }
         .timeline-cell { position: relative; padding: 0 !important; height: 55px; background-color: #ffffff; }
@@ -210,7 +222,7 @@
 
     <div id="loading-screen">
         <div class="loader-box">
-            <h2 style="margin-bottom: 5px; font-size: 18px;">HỆ THỐNG ĐANG KHỞI TẠO</h2>
+            <h2 style="margin-bottom: 5px; font-size: 18px; color: #1a237e;">HỆ THỐNG ĐANG KHỞI TẠO</h2>
             <div id="loading-status">Đang tải và đồng bộ...</div>
             <div class="progress-bar-container">
                 <div id="main-progress-bar"></div>
@@ -222,7 +234,8 @@
         
         <div class="header-section">
             <div class="header-left">
-                <h1>Báo Cáo Tổng Hợp Dự Án</h1>
+                <h1>BÁO CÁO TỔNG HỢP DỰ ÁN CHỢ TRUYỀN THỐNG - TEAM MIẾN</h1>
+                <p id="desc-text" style="color: #ffffff; margin-top: 8px; font-size: 14px; font-style: italic; opacity: 0.9;"></p>
             </div>
             <div class="header-right">
                 <div class="filter-group">
@@ -246,10 +259,10 @@
                 <table>
                     <thead>
                         <tr>
-                            <th id="gantt-header-first" style="width: 1%; white-space: nowrap; text-align: center;">STT</th>
+                            <th id="gantt-header-first" style="width: 1%; text-align: center;">STT</th>
                             <th style="width: 15%; min-width: 140px;">Đầu việc chính</th>
-                            <th style="width: 1%; white-space: nowrap; text-align: center;">Deadline</th>
-                            <th id="gantt-header-days" style="width: auto; padding: 0; min-width: 500px; background-color: #ffffff;"></th>
+                            <th style="width: 1%; text-align: center;">Deadline</th>
+                            <th id="gantt-header-days" style="width: auto; padding: 0; min-width: 500px;"></th>
                         </tr>
                     </thead>
                     <tbody id="gantt-tbody"></tbody>
@@ -291,7 +304,7 @@
                         <table id="value-table">
                             <thead><tr id="value-table-head"></tr></thead>
                             <tbody id="value-table-body"></tbody>
-                            <tfoot id="value-table-foot" style="background-color: #f8f9fa;"></tfoot>
+                            <tfoot id="value-table-foot"></tfoot>
                         </table>
                     </div>
                 </div>
@@ -308,7 +321,7 @@
                         <table id="sku-table">
                             <thead><tr id="sku-table-head"></tr></thead>
                             <tbody id="sku-table-body"></tbody>
-                            <tfoot id="sku-table-foot" style="background-color: #f8f9fa;"></tfoot>
+                            <tfoot id="sku-table-foot"></tfoot>
                         </table>
                     </div>
                 </div>
@@ -326,7 +339,7 @@
                         <table id="sec-value-table">
                             <thead><tr id="sec-value-table-head"></tr></thead>
                             <tbody id="sec-value-table-body"></tbody>
-                            <tfoot id="sec-value-table-foot" style="background-color: #f8f9fa;"></tfoot>
+                            <tfoot id="sec-value-table-foot"></tfoot>
                         </table>
                     </div>
                 </div>
@@ -343,7 +356,7 @@
                         <table id="sec-sku-table">
                             <thead><tr id="sec-sku-table-head"></tr></thead>
                             <tbody id="sec-sku-table-body"></tbody>
-                            <tfoot id="sec-sku-table-foot" style="background-color: #f8f9fa;"></tfoot>
+                            <tfoot id="sec-sku-table-foot"></tfoot>
                         </table>
                     </div>
                 </div>
@@ -402,38 +415,28 @@
         let secBarChartInstance = null;
         let secDonutChartInstance = null;
 
-        // Định dạng tiền tệ
         function formatCurrency(num) {
             return new Intl.NumberFormat('vi-VN').format(num || 0);
         }
 
-        // HÀM PARSE DATE ĐÃ ĐƯỢC BỔ SUNG ĐỂ SỬA LỖI GANTT CHART
         function parseDateString(dateStr) {
             if (!dateStr) return null;
-            
-            // Xử lý định dạng ngày DD/MM/YYYY chuẩn của sheet Gantt
             let parts = dateStr.toString().trim().split('/');
             if (parts.length === 3) {
                 return new Date(parts[2], parts[1] - 1, parts[0]);
             }
-            
-            // Dự phòng nếu dữ liệu dạng ngày tháng tiêu chuẩn khác
             let parsedDate = new Date(dateStr);
             return isNaN(parsedDate.getTime()) ? null : parsedDate;
         }
 
        function getVietnameseMonth(monthStr) {
             if (!monthStr) return "";
-            
-            // Chuyển toàn bộ dữ liệu về chữ thường để không bị lỗi phân biệt hoa/thường
             const cleanStr = monthStr.toString().trim().toLowerCase();
-            
             const months = {
                 "jan": "1", "feb": "2", "mar": "3", "apr": "4",
                 "may": "5", "jun": "6", "jul": "7", "aug": "8",
                 "sep": "9", "oct": "10", "nov": "11", "dec": "12"
             };
-            
             return months[cleanStr] || monthStr; 
         }
 
@@ -454,7 +457,6 @@
             return data.values;
         }
 
-        // Đợi 12 script điểm danh xong mới chạy
         window.addEventListener('DOMContentLoaded', () => {
             const checkDataInterval = setInterval(() => {
                 if (scriptsProcessed === totalScriptsToLoad) {
@@ -471,6 +473,14 @@
             const statusText = document.getElementById('loading-status');
 
             try {
+                // Thêm: Lấy mô tả từ Sheet D ô A1
+                try {
+                    let dSheet = await fetchSheetTab('D');
+                    if (dSheet && dSheet.length > 0 && dSheet[0].length > 0) {
+                        document.getElementById('desc-text').innerText = dSheet[0][0];
+                    }
+                } catch(e) { console.warn("Không tải được Sheet D"); }
+
                 progressBar.style.width = '20%';
                 globalData.gantt = convertRawToObjects(await fetchSheetTab('Gantt'));
                 progressBar.style.width = '40%';
@@ -497,7 +507,6 @@
             }
         }
 
-        // --- CÁC HÀM GOM DỮ LIỆU TỰ ĐỘNG TỪ FILE JS TRONG BỘ NHỚ ---
         function getAggregatedSecondarySales() {
             let combinedData = [];
             if (typeof dbSalesM1 !== 'undefined') combinedData = combinedData.concat(dbSalesM1);
@@ -540,7 +549,6 @@
             
             const monthFilter = document.getElementById('filter-month');
             const months = new Set();
-            // Lấy tháng từ các index chuẩn tương ứng
             [{data: globalData.swot, idx: 13}, {data: globalData.hcPlan, idx: 7}, {data: globalData.hcActual, idx: 7}, {data: globalData.dhc, idx: 6}].forEach(sheet => {
                 sheet.data.forEach(r => { if(r._raw && r._raw[sheet.idx]) months.add(r._raw[sheet.idx]); });
             });
@@ -552,30 +560,12 @@
             monthFilter.addEventListener('change', renderDashboard);
         }
 
-        // Lọc KHÔNG TÁC ĐỘNG bởi Tháng (Gantt, Primary, Secondary)
         function filterDataGanttSales(dataArray, dataIsDbin = false) {
             if (!dataArray || !Array.isArray(dataArray)) return [];
             const selectedArea = document.getElementById('filter-area').value;
             return dataArray.filter(item => {
                 let areaVal = dataIsDbin ? (item.ar || '') : (item['ar'] || item['AR'] || item['Area'] || item['Khu vực'] || '');
                 return (selectedArea === 'All') || (areaVal.trim().toLowerCase() === selectedArea.trim().toLowerCase());
-            });
-        }
-
-        // Lọc BỊ TÁC ĐỘNG bởi Tháng (SWOT, HC, Coverage)
-        function filterDataSwotHc(dataArray, rawMonthIndex) {
-            if (!dataArray || !Array.isArray(dataArray)) return [];
-            const selectedArea = document.getElementById('filter-area').value;
-            const selectedMonth = document.getElementById('filter-month').value;
-
-            return dataArray.filter(item => {
-                let areaVal = item['ar'] || item['AR'] || item['Area'] || item['Khu vực'] || (item._raw && item._raw[1]) || '';
-                let moVal = (item._raw && item._raw[rawMonthIndex]) ? item._raw[rawMonthIndex] : '';
-
-                if (selectedArea !== 'All' && areaVal.trim().toLowerCase() !== selectedArea.trim().toLowerCase()) return false;
-                if (selectedMonth !== 'All' && getVietnameseMonth(moVal.trim()) !== getVietnameseMonth(selectedMonth.trim())) return false;
-                
-                return true;
             });
         }
 
@@ -589,9 +579,6 @@
             renderCoverageTables(); 
         }
 
-        /* ----------------------------------------------------
-           1. GANTT CHART (KHÔNG LỌC THÁNG)
-           ---------------------------------------------------- */
         function renderGanttChart() {
             const tbody = document.getElementById('gantt-tbody');
             const headerDays = document.getElementById('gantt-header-days');
@@ -635,8 +622,8 @@
             months.push({ label: currentMonthLabel, count: currentMonthDays });
             daysHtml += '</div>';
 
-            let monthHtml = '<div style="display: flex; width: 100%; border-bottom: 1px solid #e0e0e0; background-color: #f8f9fa;">';
-            months.forEach(m => monthHtml += `<div style="flex: ${m.count}; text-align: center; font-size: 11px; font-weight: bold; color: #1a237e; padding: 5px 0; border-right: 1px solid #e0e0e0;">${m.label}</div>`);
+            let monthHtml = '<div style="display: flex; width: 100%; border-bottom: 1px solid #e0e0e0; background-color: #3B8686;">';
+            months.forEach(m => monthHtml += `<div style="flex: ${m.count}; text-align: center; font-size: 11px; font-weight: bold; color: #CFF09E; padding: 5px 0; border-right: 1px solid #e0e0e0;">${m.label}</div>`);
             headerDays.innerHTML = monthHtml + '</div>' + daysHtml;
 
             let dayW = (1 / totalDays) * 100;
@@ -719,17 +706,20 @@
                 Object.values(grp.rows).forEach(row => {
                     valBody += `<tr><td>${row.hq}</td><td>${ar}</td><td>${row.Pv}</td>`;
                     availableMonths.forEach(m => valBody += `<td class="text-right">${formatCurrency(row.months[m] || 0)}</td>`);
-                    valBody += `<td class="text-right" style="color:#0B486B; font-weight:500;">${formatCurrency(row.total)}</td></tr>`;
+                    // Cột Total Data được thay đổi nền #CFF09E và text #0B486B
+                    valBody += `<td class="text-right" style="background-color: #CFF09E; color:#0B486B; font-weight:bold;">${formatCurrency(row.total)}</td></tr>`;
                 });
-                valBody += `<tr style="background-color: #e3f2fd;"><td colspan="3" class="text-right" style="font-weight:bold; color:#0B486B;">TỔNG ${ar.toUpperCase()}</td>`;
+                // Hàng tổng khu vực
+                valBody += `<tr style="background-color: #CFF09E;"><td colspan="3" class="text-right" style="font-weight:bold; color:#0B486B;">TỔNG ${ar.toUpperCase()}</td>`;
                 availableMonths.forEach(m => valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.subMonths[m] || 0)}</td>`);
                 valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.subTotal)}</td></tr>`;
             });
             document.getElementById('value-table-body').innerHTML = valBody;
 
-            let valFoot = `<tr><td colspan="3" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
-            availableMonths.forEach(m => valFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${formatCurrency(grandTotalValues.months[m] || 0)}</td>`);
-            valFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${formatCurrency(grandTotalValues.total)}</td></tr>`;
+            // Hàng TỔNG CỘNG cuối bảng
+            let valFoot = `<tr style="background-color: #CFF09E;"><td colspan="3" style="text-align:right; color:#0B486B;"><strong>TỔNG CỘNG</strong></td>`;
+            availableMonths.forEach(m => valFoot += `<td class="text-right" style="color:#0B486B; font-weight:bold;">${formatCurrency(grandTotalValues.months[m] || 0)}</td>`);
+            valFoot += `<td class="text-right" style="color:#0B486B; font-weight:bold; font-size:14px;">${formatCurrency(grandTotalValues.total)}</td></tr>`;
             document.getElementById('value-table-foot').innerHTML = valFoot;
 
             const uniqProvinces = Object.keys(chartDataObj);
@@ -765,29 +755,40 @@
                 Object.values(grp.rows).forEach(row => {
                     qtyBody += `<tr><td>${row.hq}</td><td>${ar}</td><td>${row.Pv}</td><td style="font-weight:500;">${row.sku}</td>`;
                     availableMonths.forEach(m => qtyBody += `<td class="text-right">${(row.months[m] || 0) > 0 ? (row.months[m]).toFixed(2) : '-'}</td>`);
-                    qtyBody += `<td class="text-right" style="font-weight:500; color:#3B8686;">${row.total.toFixed(2)}</td></tr>`;
+                    qtyBody += `<td class="text-right" style="background-color: #CFF09E; color:#0B486B; font-weight:bold;">${row.total.toFixed(2)}</td></tr>`;
                 });
-                qtyBody += `<tr style="background-color: #e0f2f1;"><td colspan="4" class="text-right" style="font-weight:bold; color:#3B8686;">TỔNG ${ar.toUpperCase()}</td>`;
-                availableMonths.forEach(m => qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${(grp.subMonths[m] || 0).toFixed(2)}</td>`);
-                qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${grp.subTotal.toFixed(2)}</td></tr>`;
+                qtyBody += `<tr style="background-color: #CFF09E;"><td colspan="4" class="text-right" style="font-weight:bold; color:#0B486B;">TỔNG ${ar.toUpperCase()}</td>`;
+                availableMonths.forEach(m => qtyBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${(grp.subMonths[m] || 0).toFixed(2)}</td>`);
+                qtyBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${grp.subTotal.toFixed(2)}</td></tr>`;
             });
             document.getElementById('sku-table-body').innerHTML = qtyBody;
 
-            let skuFoot = `<tr><td colspan="4" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
-            availableMonths.forEach(m => skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${(grandTotalQty.months[m] || 0).toFixed(2)}</td>`);
-            skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${grandTotalQty.total.toFixed(2)}</td></tr>`;
+            let skuFoot = `<tr style="background-color: #CFF09E;"><td colspan="4" style="text-align:right; color:#0B486B;"><strong>TỔNG CỘNG</strong></td>`;
+            availableMonths.forEach(m => skuFoot += `<td class="text-right" style="color:#0B486B; font-weight:bold;">${(grandTotalQty.months[m] || 0).toFixed(2)}</td>`);
+            skuFoot += `<td class="text-right" style="color:#0B486B; font-weight:bold; font-size:14px;">${grandTotalQty.total.toFixed(2)}</td></tr>`;
             document.getElementById('sku-table-foot').innerHTML = skuFoot;
 
             const ctxDonut = document.getElementById('donutChart').getContext('2d');
             if(donutChartInstance) donutChartInstance.destroy();
+            
+            // Xóa bỏ thuật toán vData và offsets làm méo mó biểu đồ
             const rData = [valSongLan, valMienTuoi, valMienDauXanh];
             const tVal = rData.reduce((a, b) => a + b, 0);
-            const vData = rData.map(v => (v > 0 && v/tVal < 0.05) ? tVal*0.05 : v);
-            const offsets = vData.map((v, i) => (rData[i] > 0 && rData[i]/tVal < 0.15) ? 30 : 0);
 
             donutChartInstance = new Chart(ctxDonut, {
-                type: 'doughnut', data: { labels: ['Song Lân', 'Miến Tươi', 'Miến Đậu Xanh'], datasets: [{ data: vData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686'], borderWidth: 2, hoverOffset: 15, offset: offsets }] },
-                options: { responsive: true, maintainAspectRatio: false, layout: { padding: 30 }, cutout: '55%', plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: c => `${c.chart.data.labels[c.dataIndex]}: ${formatCurrency(rData[c.dataIndex])} VND (${((rData[c.dataIndex]/tVal)*100).toFixed(2)}%)` } } } }
+                type: 'doughnut', 
+                data: { 
+                    labels: ['Song Lân', 'Miến Tươi', 'Miến Đậu Xanh'], 
+                    datasets: [{ 
+                        data: rData, 
+                        backgroundColor: ['#0B486B', '#79BD9A', '#3B8686'], 
+                        borderWidth: 2 
+                    }] 
+                },
+                options: { 
+                    responsive: true, maintainAspectRatio: false, layout: { padding: 10 }, cutout: '55%', 
+                    plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: c => `${c.chart.data.labels[c.dataIndex]}: ${formatCurrency(rData[c.dataIndex])} VND (${((rData[c.dataIndex]/tVal)*100).toFixed(2)}%)` } } } 
+                }
             });
         }
 
@@ -834,15 +835,15 @@
             let valBody = '';
             Object.keys(areaValueGroups).sort().forEach(ar => {
                 let grp = areaValueGroups[ar];
-                valBody += `<tr style="background-color: #e3f2fd;"><td style="font-weight:bold; color:#0B486B;">${grp.hq}</td><td style="font-weight:bold; color:#0B486B;">TỔNG ${ar.toUpperCase()}</td>`;
+                valBody += `<tr style="background-color: #CFF09E;"><td style="font-weight:bold; color:#0B486B;">${grp.hq}</td><td style="font-weight:bold; color:#0B486B;">TỔNG ${ar.toUpperCase()}</td>`;
                 availableMonths.forEach(m => valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.months[m] || 0)}</td>`);
-                valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.total)}</td></tr>`;
+                valBody += `<td class="text-right" style="background-color: #CFF09E; color:#0B486B; font-weight:bold;">${formatCurrency(grp.total)}</td></tr>`;
             });
             document.getElementById('sec-value-table-body').innerHTML = valBody;
 
-            let valFoot = `<tr><td colspan="2" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
-            availableMonths.forEach(m => valFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${formatCurrency(grandTotalValues.months[m] || 0)}</td>`);
-            valFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${formatCurrency(grandTotalValues.total)}</td></tr>`;
+            let valFoot = `<tr style="background-color: #CFF09E;"><td colspan="2" style="text-align:right; color:#0B486B;"><strong>TỔNG CỘNG</strong></td>`;
+            availableMonths.forEach(m => valFoot += `<td class="text-right" style="color:#0B486B; font-weight:bold;">${formatCurrency(grandTotalValues.months[m] || 0)}</td>`);
+            valFoot += `<td class="text-right" style="color:#0B486B; font-weight:bold; font-size:14px;">${formatCurrency(grandTotalValues.total)}</td></tr>`;
             document.getElementById('sec-value-table-foot').innerHTML = valFoot;
 
             const uniqAreas = Object.keys(chartDataObj);
@@ -879,40 +880,45 @@
                 Object.values(grp.rows).forEach(row => {
                     qtyBody += `<tr><td>${row.hq}</td><td>${ar}</td><td style="font-weight:500;">${row.sku}</td>`;
                     availableMonths.forEach(m => qtyBody += `<td class="text-right">${(row.months[m] || 0) > 0 ? (row.months[m]).toFixed(2) : '-'}</td>`);
-                    qtyBody += `<td class="text-right" style="font-weight:500; color:#3B8686;">${row.total.toFixed(2)}</td></tr>`;
+                    qtyBody += `<td class="text-right" style="background-color: #CFF09E; color:#0B486B; font-weight:bold;">${row.total.toFixed(2)}</td></tr>`;
                 });
-                qtyBody += `<tr style="background-color: #e0f2f1;"><td colspan="3" class="text-right" style="font-weight:bold; color:#3B8686;">TỔNG ${ar.toUpperCase()}</td>`;
-                availableMonths.forEach(m => qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${(grp.subMonths[m] || 0).toFixed(2)}</td>`);
-                qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${grp.subTotal.toFixed(2)}</td></tr>`;
+                qtyBody += `<tr style="background-color: #CFF09E;"><td colspan="3" class="text-right" style="font-weight:bold; color:#0B486B;">TỔNG ${ar.toUpperCase()}</td>`;
+                availableMonths.forEach(m => qtyBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${(grp.subMonths[m] || 0).toFixed(2)}</td>`);
+                qtyBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${grp.subTotal.toFixed(2)}</td></tr>`;
             });
             document.getElementById('sec-sku-table-body').innerHTML = qtyBody;
 
-            let skuFoot = `<tr><td colspan="3" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
-            availableMonths.forEach(m => skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${(grandTotalQty.months[m] || 0).toFixed(2)}</td>`);
-            skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${grandTotalQty.total.toFixed(2)}</td></tr>`;
+            let skuFoot = `<tr style="background-color: #CFF09E;"><td colspan="3" style="text-align:right; color:#0B486B;"><strong>TỔNG CỘNG</strong></td>`;
+            availableMonths.forEach(m => skuFoot += `<td class="text-right" style="color:#0B486B; font-weight:bold;">${(grandTotalQty.months[m] || 0).toFixed(2)}</td>`);
+            skuFoot += `<td class="text-right" style="color:#0B486B; font-weight:bold; font-size:14px;">${grandTotalQty.total.toFixed(2)}</td></tr>`;
             document.getElementById('sec-sku-table-foot').innerHTML = skuFoot;
 
             const ctxSecDonut = document.getElementById('sec-donutChart').getContext('2d');
             if(secDonutChartInstance) secDonutChartInstance.destroy();
             const realDonutData = [valSongLan, valMienTuoi, valMienDauXanh];
             const totalDonutVal = realDonutData.reduce((a, b) => a + b, 0);
-            const visualDonutData = realDonutData.map(val => { if (val === 0) return 0; let pct = val / totalDonutVal; return pct < 0.05 ? totalDonutVal * 0.05 : val; });
-            const offsetArr = visualDonutData.map((v, i) => (realDonutData[i] > 0 && (realDonutData[i] / totalDonutVal) < 0.15) ? 30 : 0);
 
             secDonutChartInstance = new Chart(ctxSecDonut, {
-                type: 'doughnut', data: { labels: ['Song Lân', 'Miến Tươi', 'Miến Đậu Xanh'], datasets: [{ data: visualDonutData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686'], borderWidth: 2, hoverOffset: 15, offset: offsetArr }] },
-                options: { responsive: true, maintainAspectRatio: false, layout: { padding: 30 }, cutout: '55%', plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: function(c) { let idx = c.dataIndex; let realValue = realDonutData[idx]; return `${c.chart.data.labels[idx]}: ${formatCurrency(realValue)} VND (${((realValue / totalDonutVal) * 100).toFixed(2)}%)`; } } } } }
+                type: 'doughnut', 
+                data: { 
+                    labels: ['Song Lân', 'Miến Tươi', 'Miến Đậu Xanh'], 
+                    datasets: [{ 
+                        data: realDonutData, 
+                        backgroundColor: ['#0B486B', '#79BD9A', '#3B8686'], 
+                        borderWidth: 2
+                    }] 
+                },
+                options: { 
+                    responsive: true, maintainAspectRatio: false, layout: { padding: 10 }, cutout: '55%', 
+                    plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: function(c) { let idx = c.dataIndex; let realValue = realDonutData[idx]; return `${c.chart.data.labels[idx]}: ${formatCurrency(realValue)} VND (${((realValue / totalDonutVal) * 100).toFixed(2)}%)`; } } } } 
+                }
             });
         }
 
-    /* ==========================================================================
-           2. RENDER SWOT (BỘ LỌC TẤT CẢ SẼ SNAPSHOT THÁNG MỚI NHẤT)
-           ========================================================================== */
         function renderSWOT() {
             const selectedMonth = document.getElementById('filter-month').value;
             const selectedArea = document.getElementById('filter-area').value;
             
-            // Tìm tháng mới nhất nếu bộ lọc chọn "Tất cả"
             let targetMonth = selectedMonth;
             if (selectedMonth === 'All' && globalData.swot.length > 0) {
                 let maxMoNum = -1;
@@ -965,19 +971,13 @@
             document.getElementById('swot-support').innerHTML = swotHtml.support;
         }
 
-        /* ==========================================================================
-           3. SƠ ĐỒ NHÂN SỰ (BỘ LỌC TẤT CẢ SẼ SNAPSHOT THÁNG MỚI NHẤT)
-           ========================================================================== */
-        // ĐÃ SỬA HÀM SUM ROLE ÁP DỤNG INDEX CHÍNH XÁC: D=3, E=4, F=5, G=6
         function sumRole(dataArray, roleName) {
             let count = 0;
-            
-            // Map index ứng với cột bạn cung cấp:
             const roleIndexMap = {
-                'CDM': 3, // Cột D
-                'KAM': 4, // Cột E
-                'KAE': 5, // Cột F
-                'DSR': 6  // Cột G
+                'CDM': 3, 
+                'KAM': 4, 
+                'KAE': 5, 
+                'DSR': 6  
             };
             
             const colIndex = roleIndexMap[roleName.toUpperCase()];
@@ -988,8 +988,6 @@
                         let cellValue = row._raw[colIndex].toString().trim();
                         if (cellValue !== '') {
                             let num = parseInt(cellValue);
-                            // Nếu điền số lượng (như 1, 2, 3), thì sẽ cộng số. 
-                            // Còn nếu bạn chỉ điền tên ("Nguyễn Văn A") thì sẽ đếm là 1.
                             if (!isNaN(num)) {
                                 count += num;
                             } else {
@@ -1007,13 +1005,12 @@
             const selectedMonth = document.getElementById('filter-month').value;
             const selectedArea = document.getElementById('filter-area').value;
             
-            // Tìm tháng mới nhất nếu bộ lọc chọn "Tất cả"
             let targetMonth = selectedMonth;
             if (selectedMonth === 'All' && globalData.hcActual.length > 0) {
                 let maxMoNum = -1;
                 let maxMoStr = 'All';
                 globalData.hcActual.forEach(item => {
-                    if (item._raw && item._raw[7]) { // Index 7 tương ứng cột H (Tháng)
+                    if (item._raw && item._raw[7]) { 
                         let moStr = item._raw[7].trim();
                         let moNum = parseInt(getVietnameseMonth(moStr));
                         if (!isNaN(moNum) && moNum > maxMoNum) {
@@ -1061,19 +1058,17 @@
         }
 
         /* ==========================================================================
-           5. COVERAGE TABLES (KHÔNG BỊ ẢNH HƯỞNG BỞI LỌC THÁNG - ẨN CỘT TRỐNG - HÀNG TỔNG TRÊN ĐẦU)
+           5. COVERAGE TABLES
            ========================================================================== */
         function renderCoverageTables() {
             const selectedArea = document.getElementById('filter-area').value;
             const masterData = getAggregatedMasterData();
             const salesData = getAggregatedSecondarySales();
 
-            // 1. Thu thập tất cả các tháng xuất hiện trong dữ liệu Sales để làm cột dọc
             const salesMonthsSet = new Set();
             salesData.forEach(r => { if(r.mo) salesMonthsSet.add(r.mo.trim()); });
             const allMonths = Array.from(salesMonthsSet).sort((a,b) => parseInt(getVietnameseMonth(a)) - parseInt(getVietnameseMonth(b)));
 
-            // 2. Nhóm và làm sạch dữ liệu D HC (Chỉ lọc theo Khu vực, loại bỏ trùng lặp dòng)
             const uniqueDhcMap = new Map();
             globalData.dhc.forEach(row => {
                 if(!row._raw) return;
@@ -1109,7 +1104,6 @@
                 return;
             }
 
-            // 3. Khởi tạo các biến lưu trữ tính toán để quét kiểm tra cột ẩn/hiện và tính Hàng Tổng
             let wmRows = [];
             let cusRows = [];
             let globalActualsM = {}; 
@@ -1123,14 +1117,12 @@
                 globalActualsCC[m] = new Set();
             });
 
-            // Tiến hành tính toán dữ liệu chi tiết cho từng dòng dựa trên cấu trúc HC
             filteredDhc.forEach(row => {
                 globalHC += (parseInt(row.hc) || 0);
                 
                 let targetM = new Set();
                 let targetCC = new Set();
                 
-                // Đếm tổng số lượng Target từ DB Master
                 masterData.forEach(mRow => {
                     let mMo = (mRow.mo || '').trim();
                     if (mRow.hq === row.hq && mRow.ar === row.ar && getVietnameseMonth(mMo) === getVietnameseMonth(row.mo)) {
@@ -1146,7 +1138,6 @@
                 let monthlyActCC = {};
                 allMonths.forEach(m => { monthlyActM[m] = new Set(); monthlyActCC[m] = new Set(); });
 
-                // Phân bổ và đếm số lượng thực tế từng tháng từ DB Sales
                 salesData.forEach(sRow => {
                     if (sRow.hq === row.hq && sRow.ar === row.ar) {
                         let sMo = (sRow.mo || '').trim();
@@ -1164,11 +1155,9 @@
                 cusRows.push({ data: row, target: targetCC.size, monthly: monthlyActCC });
             });
 
-            // 4. LỌC BỎ CỘT KHÔNG CÓ DATA: Chỉ giữ lại các tháng có dữ liệu thực tế lớn hơn 0
             const activeMonthsWM = allMonths.filter(m => globalActualsM[m].size > 0);
             const activeMonthsCus = allMonths.filter(m => globalActualsCC[m].size > 0);
 
-            // 5. Xây dựng tiêu đề Header cho 2 bảng
             let wmHead = `<th>HQ</th><th>Area</th><th>Province (PR)</th><th>CDM</th><th>KAM</th><th class="text-center">HC</th><th class="text-center">Target</th>`;
             activeMonthsWM.forEach(m => wmHead += `<th class="text-center">Tháng ${getVietnameseMonth(m)}</th>`);
             document.getElementById('wm-table-head').innerHTML = `<tr>${wmHead}</tr>`;
@@ -1177,38 +1166,37 @@
             activeMonthsCus.forEach(m => cusHead += `<th class="text-center">Tháng ${getVietnameseMonth(m)}</th>`);
             document.getElementById('cus-table-head').innerHTML = `<tr>${cusHead}</tr>`;
 
-            // 6. ĐỔ DỮ LIỆU VÀO BODY - ĐƯA HÀNG TỔNG LÊN TRÊN ĐẦU TIÊN
-            // --- Bảng 1: Wet Market ---
-            let wmBody = `<tr style="background-color: #f1f3f4; font-weight: bold; border-bottom: 2px solid #b0bec5;">
-                <td colspan="5" class="text-right" style="color: #1a237e;">SỐ LƯỢNG CHỢ ĐÃ COVER (TỔNG ĐỘC LẬP)</td>
-                <td class="text-center" style="color: #1a237e;">${globalHC}</td>
-                <td class="text-center" style="color: #1a237e;">${globalTargetM.size}</td>`;
-            activeMonthsWM.forEach(m => { wmBody += `<td class="text-center" style="color: #d32f2f; font-size:14px;">${globalActualsM[m].size}</td>`; });
+            // Màu tổng Wet Market đã áp dụng #CFF09E và #0B486B
+            let wmBody = `<tr style="background-color: #CFF09E; font-weight: bold; border-bottom: 2px solid #b0bec5;">
+                <td colspan="5" class="text-right" style="color: #0B486B;">TỔNG</td>
+                <td class="text-center" style="color: #0B486B;">${globalHC}</td>
+                <td class="text-center" style="color: #0B486B;">${globalTargetM.size}</td>`;
+            activeMonthsWM.forEach(m => { wmBody += `<td class="text-center" style="color: #0B486B; font-size:14px;">${globalActualsM[m].size}</td>`; });
             wmBody += `</tr>`;
 
             wmRows.forEach(row => {
                 wmBody += `<tr>
                     <td>${row.data.hq}</td><td>${row.data.ar}</td><td>${row.data.pr}</td><td>${row.data.cdm}</td><td>${row.data.kam}</td>
                     <td class="text-center">${row.data.hc}</td>
-                    <td class="text-center" style="font-weight:bold; color:#0B486B;">${row.target}</td>`;
+                    <td class="text-center" style="background-color: #CFF09E; color:#0B486B; font-weight:bold;">${row.target}</td>`;
                 activeMonthsWM.forEach(m => { wmBody += `<td class="text-center" style="color:#3B8686;">${row.monthly[m].size || '-'}</td>`; });
                 wmBody += `</tr>`;
             });
             document.getElementById('wm-table-body').innerHTML = wmBody;
 
-            // --- Bảng 2: Customer Coverage ---
-            let cusBody = `<tr style="background-color: #f1f3f4; font-weight: bold; border-bottom: 2px solid #b0bec5;">
-                <td colspan="5" class="text-right" style="color: #1a237e;">SỐ LƯỢNG KHÁCH HÀNG ĐÃ COVER (TỔNG ĐỘC LẬP)</td>
-                <td class="text-center" style="color: #1a237e;">${globalHC}</td>
-                <td class="text-center" style="color: #1a237e;">${globalTargetCC.size}</td>`;
-            activeMonthsCus.forEach(m => {  cusBody += `<td class="text-center" style="color: #d32f2f; font-size:14px;">${globalActualsCC[m].size}</td>`; });
+            // Màu tổng Customer Coverage
+            let cusBody = `<tr style="background-color: #CFF09E; font-weight: bold; border-bottom: 2px solid #b0bec5;">
+                <td colspan="5" class="text-right" style="color: #0B486B;">TỔNG</td>
+                <td class="text-center" style="color: #0B486B;">${globalHC}</td>
+                <td class="text-center" style="color: #0B486B;">${globalTargetCC.size}</td>`;
+            activeMonthsCus.forEach(m => {  cusBody += `<td class="text-center" style="color: #0B486B; font-size:14px;">${globalActualsCC[m].size}</td>`; });
             cusBody += `</tr>`;
 
             cusRows.forEach(row => {
                 cusBody += `<tr>
                     <td>${row.data.hq}</td><td>${row.data.ar}</td><td>${row.data.pr}</td><td>${row.data.cdm}</td><td>${row.data.kam}</td>
                     <td class="text-center">${row.data.hc}</td>
-                    <td class="text-center" style="font-weight:bold; color:#0B486B;">${row.target}</td>`;
+                    <td class="text-center" style="background-color: #CFF09E; color:#0B486B; font-weight:bold;">${row.target}</td>`;
                 activeMonthsCus.forEach(m => { cusBody += `<td class="text-center" style="color:#3B8686;">${row.monthly[m].size || '-'}</td>`; });
                 cusBody += `</tr>`;
             });
