@@ -6,6 +6,8 @@
     <title>Hệ Thống Quản Lý Tiến Độ & Phân Tích SWOT</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <script src="./dbin.js"></script>
+
     <style>
         /* ==========================================================================
            1. CẤU HÌNH GIAO DIỆN CHUNG (CSS RESET & BASE)
@@ -374,8 +376,6 @@
 
     </div>
 
-    <script src="./dbin.js"></script>
-
     <script>
         // ----------------------------------------------------
         // BỘ AUTO-LOADER: TỰ ĐỘNG TẢI CÁC FILE M1 ĐẾN M12
@@ -402,8 +402,24 @@
         let secBarChartInstance = null;
         let secDonutChartInstance = null;
 
+        // Định dạng tiền tệ
         function formatCurrency(num) {
             return new Intl.NumberFormat('vi-VN').format(num || 0);
+        }
+
+        // ĐÂY LÀ HÀM PARSE DATE ĐÃ ĐƯỢC BỔ SUNG ĐỂ SỬA LỖI GANTT CHART
+        function parseDateString(dateStr) {
+            if (!dateStr) return null;
+            
+            // Xử lý định dạng ngày DD/MM/YYYY chuẩn của sheet Gantt
+            let parts = dateStr.toString().trim().split('/');
+            if (parts.length === 3) {
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            
+            // Dự phòng nếu dữ liệu dạng ngày tháng tiêu chuẩn khác
+            let parsedDate = new Date(dateStr);
+            return isNaN(parsedDate.getTime()) ? null : parsedDate;
         }
 
         function getVietnameseMonth(monthStr) {
@@ -432,10 +448,9 @@
             return data.values;
         }
 
-        // Đợi module dbinSales và 12 script điểm danh xong mới chạy
+        // Đợi 12 script điểm danh xong mới chạy (đã xóa điều kiện window.dbinSales)
         window.addEventListener('DOMContentLoaded', () => {
             const checkDataInterval = setInterval(() => {
-                // Bây giờ hệ thống chỉ cần đợi điểm danh đủ 12 lượt file (bất kể có hay không) là chạy
                 if (scriptsProcessed === totalScriptsToLoad) {
                     clearInterval(checkDataInterval);
                     initDashboard();
