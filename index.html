@@ -32,7 +32,7 @@
         }
 
         /* ==========================================================================
-           2. BỐ CỤC TIÊU ĐỀ VÀ BỘ LỌC (Box Gradient)
+           2. BỐ CỤC TIÊU ĐỀ VÀ BỘ LỌC (Box Gradient - ĐƯỢC GIỮ LẠI)
            ========================================================================== */
         .header-section {
             display: flex;
@@ -40,7 +40,6 @@
             align-items: center;
             margin-bottom: 25px;
             gap: 20px;
-            /* Cập nhật Gradient và khung */
             background: linear-gradient(to right, #0B486B, #CFF09E);
             padding: 20px 25px;
             border-radius: 8px;
@@ -50,7 +49,7 @@
         .header-left { flex: 1; }
         .header-left h1 { 
             margin-bottom: 0; 
-            color: #ffffff; /* Trắng để nổi trên nền xanh đậm */
+            color: #ffffff; 
             font-size: 24px;
             text-transform: uppercase;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
@@ -68,7 +67,7 @@
             flex-direction: row;
             align-items: center;
             gap: 10px;
-            background: rgba(255, 255, 255, 0.9); /* Làm mờ nền filter để hòa hợp gradient */
+            background: rgba(255, 255, 255, 0.9);
             padding: 10px 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -119,7 +118,7 @@
         #loading-status { font-size: 14px; color: #666; margin-top: 10px; }
 
         /* ==========================================================================
-           4. BẢNG BIỂU CHUNG (TABLE STYLES)
+           4. BẢNG BIỂU CHUNG (TABLE STYLES - TRẢ VỀ CŨ)
            ========================================================================== */
         .card {
             background: #ffffff;
@@ -132,7 +131,7 @@
             flex-direction: column;
         }
 
-        h2 { margin-bottom: 20px; color: #0B486B; text-transform: uppercase; font-size: 18px;}
+        h2 { margin-bottom: 20px; color: #1a237e; } /* Đã trả về xanh đậm cũ */
 
         .table-responsive {
             overflow-x: auto;
@@ -148,8 +147,8 @@
             font-size: 13px; vertical-align: middle;
         }
 
-        /* Cập nhật màu Header Table */
-        th { background-color: #3B8686 !important; color: #CFF09E !important; font-weight: 600; white-space: nowrap; }
+        /* Đã trả về nền xám nhạt cũ */
+        th { background-color: #f8f9fa; color: #495057; font-weight: 600; white-space: nowrap; }
 
         .col-task { font-weight: 600; color: #0B486B; word-break: break-word; }
         .timeline-cell { position: relative; padding: 0 !important; height: 55px; background-color: #ffffff; }
@@ -259,10 +258,10 @@
                 <table>
                     <thead>
                         <tr>
-                            <th id="gantt-header-first" style="width: 1%; text-align: center;">STT</th>
+                            <th id="gantt-header-first" style="width: 1%; white-space: nowrap; text-align: center;">STT</th>
                             <th style="width: 15%; min-width: 140px;">Đầu việc chính</th>
-                            <th style="width: 1%; text-align: center;">Deadline</th>
-                            <th id="gantt-header-days" style="width: auto; padding: 0; min-width: 500px;"></th>
+                            <th style="width: 1%; white-space: nowrap; text-align: center;">Deadline</th>
+                            <th id="gantt-header-days" style="width: auto; padding: 0; min-width: 500px; background-color: #ffffff;"></th>
                         </tr>
                     </thead>
                     <tbody id="gantt-tbody"></tbody>
@@ -304,7 +303,7 @@
                         <table id="value-table">
                             <thead><tr id="value-table-head"></tr></thead>
                             <tbody id="value-table-body"></tbody>
-                            <tfoot id="value-table-foot"></tfoot>
+                            <tfoot id="value-table-foot" style="background-color: #f8f9fa;"></tfoot>
                         </table>
                     </div>
                 </div>
@@ -321,7 +320,7 @@
                         <table id="sku-table">
                             <thead><tr id="sku-table-head"></tr></thead>
                             <tbody id="sku-table-body"></tbody>
-                            <tfoot id="sku-table-foot"></tfoot>
+                            <tfoot id="sku-table-foot" style="background-color: #f8f9fa;"></tfoot>
                         </table>
                     </div>
                 </div>
@@ -339,7 +338,7 @@
                         <table id="sec-value-table">
                             <thead><tr id="sec-value-table-head"></tr></thead>
                             <tbody id="sec-value-table-body"></tbody>
-                            <tfoot id="sec-value-table-foot"></tfoot>
+                            <tfoot id="sec-value-table-foot" style="background-color: #f8f9fa;"></tfoot>
                         </table>
                     </div>
                 </div>
@@ -356,7 +355,7 @@
                         <table id="sec-sku-table">
                             <thead><tr id="sec-sku-table-head"></tr></thead>
                             <tbody id="sec-sku-table-body"></tbody>
-                            <tfoot id="sec-sku-table-foot"></tfoot>
+                            <tfoot id="sec-sku-table-foot" style="background-color: #f8f9fa;"></tfoot>
                         </table>
                     </div>
                 </div>
@@ -473,7 +472,7 @@
             const statusText = document.getElementById('loading-status');
 
             try {
-                // Thêm: Lấy mô tả từ Sheet D ô A1
+                // Tải mô tả từ Sheet D ô A1
                 try {
                     let dSheet = await fetchSheetTab('D');
                     if (dSheet && dSheet.length > 0 && dSheet[0].length > 0) {
@@ -622,8 +621,8 @@
             months.push({ label: currentMonthLabel, count: currentMonthDays });
             daysHtml += '</div>';
 
-            let monthHtml = '<div style="display: flex; width: 100%; border-bottom: 1px solid #e0e0e0; background-color: #3B8686;">';
-            months.forEach(m => monthHtml += `<div style="flex: ${m.count}; text-align: center; font-size: 11px; font-weight: bold; color: #CFF09E; padding: 5px 0; border-right: 1px solid #e0e0e0;">${m.label}</div>`);
+            let monthHtml = '<div style="display: flex; width: 100%; border-bottom: 1px solid #e0e0e0; background-color: #f8f9fa;">';
+            months.forEach(m => monthHtml += `<div style="flex: ${m.count}; text-align: center; font-size: 11px; font-weight: bold; color: #1a237e; padding: 5px 0; border-right: 1px solid #e0e0e0;">${m.label}</div>`);
             headerDays.innerHTML = monthHtml + '</div>' + daysHtml;
 
             let dayW = (1 / totalDays) * 100;
@@ -706,20 +705,17 @@
                 Object.values(grp.rows).forEach(row => {
                     valBody += `<tr><td>${row.hq}</td><td>${ar}</td><td>${row.Pv}</td>`;
                     availableMonths.forEach(m => valBody += `<td class="text-right">${formatCurrency(row.months[m] || 0)}</td>`);
-                    // Cột Total Data được thay đổi nền #CFF09E và text #0B486B
-                    valBody += `<td class="text-right" style="background-color: #CFF09E; color:#0B486B; font-weight:bold;">${formatCurrency(row.total)}</td></tr>`;
+                    valBody += `<td class="text-right" style="color:#0B486B; font-weight:500;">${formatCurrency(row.total)}</td></tr>`;
                 });
-                // Hàng tổng khu vực
-                valBody += `<tr style="background-color: #CFF09E;"><td colspan="3" class="text-right" style="font-weight:bold; color:#0B486B;">TỔNG ${ar.toUpperCase()}</td>`;
+                valBody += `<tr style="background-color: #e3f2fd;"><td colspan="3" class="text-right" style="font-weight:bold; color:#0B486B;">TỔNG ${ar.toUpperCase()}</td>`;
                 availableMonths.forEach(m => valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.subMonths[m] || 0)}</td>`);
                 valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.subTotal)}</td></tr>`;
             });
             document.getElementById('value-table-body').innerHTML = valBody;
 
-            // Hàng TỔNG CỘNG cuối bảng
-            let valFoot = `<tr style="background-color: #CFF09E;"><td colspan="3" style="text-align:right; color:#0B486B;"><strong>TỔNG CỘNG</strong></td>`;
-            availableMonths.forEach(m => valFoot += `<td class="text-right" style="color:#0B486B; font-weight:bold;">${formatCurrency(grandTotalValues.months[m] || 0)}</td>`);
-            valFoot += `<td class="text-right" style="color:#0B486B; font-weight:bold; font-size:14px;">${formatCurrency(grandTotalValues.total)}</td></tr>`;
+            let valFoot = `<tr><td colspan="3" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
+            availableMonths.forEach(m => valFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${formatCurrency(grandTotalValues.months[m] || 0)}</td>`);
+            valFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${formatCurrency(grandTotalValues.total)}</td></tr>`;
             document.getElementById('value-table-foot').innerHTML = valFoot;
 
             const uniqProvinces = Object.keys(chartDataObj);
@@ -755,40 +751,29 @@
                 Object.values(grp.rows).forEach(row => {
                     qtyBody += `<tr><td>${row.hq}</td><td>${ar}</td><td>${row.Pv}</td><td style="font-weight:500;">${row.sku}</td>`;
                     availableMonths.forEach(m => qtyBody += `<td class="text-right">${(row.months[m] || 0) > 0 ? (row.months[m]).toFixed(2) : '-'}</td>`);
-                    qtyBody += `<td class="text-right" style="background-color: #CFF09E; color:#0B486B; font-weight:bold;">${row.total.toFixed(2)}</td></tr>`;
+                    qtyBody += `<td class="text-right" style="font-weight:500; color:#3B8686;">${row.total.toFixed(2)}</td></tr>`;
                 });
-                qtyBody += `<tr style="background-color: #CFF09E;"><td colspan="4" class="text-right" style="font-weight:bold; color:#0B486B;">TỔNG ${ar.toUpperCase()}</td>`;
-                availableMonths.forEach(m => qtyBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${(grp.subMonths[m] || 0).toFixed(2)}</td>`);
-                qtyBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${grp.subTotal.toFixed(2)}</td></tr>`;
+                qtyBody += `<tr style="background-color: #e0f2f1;"><td colspan="4" class="text-right" style="font-weight:bold; color:#3B8686;">TỔNG ${ar.toUpperCase()}</td>`;
+                availableMonths.forEach(m => qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${(grp.subMonths[m] || 0).toFixed(2)}</td>`);
+                qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${grp.subTotal.toFixed(2)}</td></tr>`;
             });
             document.getElementById('sku-table-body').innerHTML = qtyBody;
 
-            let skuFoot = `<tr style="background-color: #CFF09E;"><td colspan="4" style="text-align:right; color:#0B486B;"><strong>TỔNG CỘNG</strong></td>`;
-            availableMonths.forEach(m => skuFoot += `<td class="text-right" style="color:#0B486B; font-weight:bold;">${(grandTotalQty.months[m] || 0).toFixed(2)}</td>`);
-            skuFoot += `<td class="text-right" style="color:#0B486B; font-weight:bold; font-size:14px;">${grandTotalQty.total.toFixed(2)}</td></tr>`;
+            let skuFoot = `<tr><td colspan="4" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
+            availableMonths.forEach(m => skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${(grandTotalQty.months[m] || 0).toFixed(2)}</td>`);
+            skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${grandTotalQty.total.toFixed(2)}</td></tr>`;
             document.getElementById('sku-table-foot').innerHTML = skuFoot;
 
             const ctxDonut = document.getElementById('donutChart').getContext('2d');
             if(donutChartInstance) donutChartInstance.destroy();
-            
-            // Xóa bỏ thuật toán vData và offsets làm méo mó biểu đồ
             const rData = [valSongLan, valMienTuoi, valMienDauXanh];
             const tVal = rData.reduce((a, b) => a + b, 0);
+            const vData = rData.map(v => (v > 0 && v/tVal < 0.05) ? tVal*0.05 : v);
+            const offsets = vData.map((v, i) => (rData[i] > 0 && rData[i]/tVal < 0.15) ? 30 : 0);
 
             donutChartInstance = new Chart(ctxDonut, {
-                type: 'doughnut', 
-                data: { 
-                    labels: ['Song Lân', 'Miến Tươi', 'Miến Đậu Xanh'], 
-                    datasets: [{ 
-                        data: rData, 
-                        backgroundColor: ['#0B486B', '#79BD9A', '#3B8686'], 
-                        borderWidth: 2 
-                    }] 
-                },
-                options: { 
-                    responsive: true, maintainAspectRatio: false, layout: { padding: 10 }, cutout: '55%', 
-                    plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: c => `${c.chart.data.labels[c.dataIndex]}: ${formatCurrency(rData[c.dataIndex])} VND (${((rData[c.dataIndex]/tVal)*100).toFixed(2)}%)` } } } 
-                }
+                type: 'doughnut', data: { labels: ['Song Lân', 'Miến Tươi', 'Miến Đậu Xanh'], datasets: [{ data: vData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686'], borderWidth: 2, hoverOffset: 15, offset: offsets }] },
+                options: { responsive: true, maintainAspectRatio: false, layout: { padding: 30 }, cutout: '55%', plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: c => `${c.chart.data.labels[c.dataIndex]}: ${formatCurrency(rData[c.dataIndex])} VND (${((rData[c.dataIndex]/tVal)*100).toFixed(2)}%)` } } } }
             });
         }
 
@@ -835,15 +820,15 @@
             let valBody = '';
             Object.keys(areaValueGroups).sort().forEach(ar => {
                 let grp = areaValueGroups[ar];
-                valBody += `<tr style="background-color: #CFF09E;"><td style="font-weight:bold; color:#0B486B;">${grp.hq}</td><td style="font-weight:bold; color:#0B486B;">TỔNG ${ar.toUpperCase()}</td>`;
+                valBody += `<tr style="background-color: #e3f2fd;"><td style="font-weight:bold; color:#0B486B;">${grp.hq}</td><td style="font-weight:bold; color:#0B486B;">TỔNG ${ar.toUpperCase()}</td>`;
                 availableMonths.forEach(m => valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.months[m] || 0)}</td>`);
-                valBody += `<td class="text-right" style="background-color: #CFF09E; color:#0B486B; font-weight:bold;">${formatCurrency(grp.total)}</td></tr>`;
+                valBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${formatCurrency(grp.total)}</td></tr>`;
             });
             document.getElementById('sec-value-table-body').innerHTML = valBody;
 
-            let valFoot = `<tr style="background-color: #CFF09E;"><td colspan="2" style="text-align:right; color:#0B486B;"><strong>TỔNG CỘNG</strong></td>`;
-            availableMonths.forEach(m => valFoot += `<td class="text-right" style="color:#0B486B; font-weight:bold;">${formatCurrency(grandTotalValues.months[m] || 0)}</td>`);
-            valFoot += `<td class="text-right" style="color:#0B486B; font-weight:bold; font-size:14px;">${formatCurrency(grandTotalValues.total)}</td></tr>`;
+            let valFoot = `<tr><td colspan="2" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
+            availableMonths.forEach(m => valFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${formatCurrency(grandTotalValues.months[m] || 0)}</td>`);
+            valFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${formatCurrency(grandTotalValues.total)}</td></tr>`;
             document.getElementById('sec-value-table-foot').innerHTML = valFoot;
 
             const uniqAreas = Object.keys(chartDataObj);
@@ -880,38 +865,29 @@
                 Object.values(grp.rows).forEach(row => {
                     qtyBody += `<tr><td>${row.hq}</td><td>${ar}</td><td style="font-weight:500;">${row.sku}</td>`;
                     availableMonths.forEach(m => qtyBody += `<td class="text-right">${(row.months[m] || 0) > 0 ? (row.months[m]).toFixed(2) : '-'}</td>`);
-                    qtyBody += `<td class="text-right" style="background-color: #CFF09E; color:#0B486B; font-weight:bold;">${row.total.toFixed(2)}</td></tr>`;
+                    qtyBody += `<td class="text-right" style="font-weight:500; color:#3B8686;">${row.total.toFixed(2)}</td></tr>`;
                 });
-                qtyBody += `<tr style="background-color: #CFF09E;"><td colspan="3" class="text-right" style="font-weight:bold; color:#0B486B;">TỔNG ${ar.toUpperCase()}</td>`;
-                availableMonths.forEach(m => qtyBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${(grp.subMonths[m] || 0).toFixed(2)}</td>`);
-                qtyBody += `<td class="text-right" style="font-weight:bold; color:#0B486B;">${grp.subTotal.toFixed(2)}</td></tr>`;
+                qtyBody += `<tr style="background-color: #e0f2f1;"><td colspan="3" class="text-right" style="font-weight:bold; color:#3B8686;">TỔNG ${ar.toUpperCase()}</td>`;
+                availableMonths.forEach(m => qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${(grp.subMonths[m] || 0).toFixed(2)}</td>`);
+                qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${grp.subTotal.toFixed(2)}</td></tr>`;
             });
             document.getElementById('sec-sku-table-body').innerHTML = qtyBody;
 
-            let skuFoot = `<tr style="background-color: #CFF09E;"><td colspan="3" style="text-align:right; color:#0B486B;"><strong>TỔNG CỘNG</strong></td>`;
-            availableMonths.forEach(m => skuFoot += `<td class="text-right" style="color:#0B486B; font-weight:bold;">${(grandTotalQty.months[m] || 0).toFixed(2)}</td>`);
-            skuFoot += `<td class="text-right" style="color:#0B486B; font-weight:bold; font-size:14px;">${grandTotalQty.total.toFixed(2)}</td></tr>`;
+            let skuFoot = `<tr><td colspan="3" style="text-align:right;"><strong>TỔNG CỘNG</strong></td>`;
+            availableMonths.forEach(m => skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${(grandTotalQty.months[m] || 0).toFixed(2)}</td>`);
+            skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${grandTotalQty.total.toFixed(2)}</td></tr>`;
             document.getElementById('sec-sku-table-foot').innerHTML = skuFoot;
 
             const ctxSecDonut = document.getElementById('sec-donutChart').getContext('2d');
             if(secDonutChartInstance) secDonutChartInstance.destroy();
             const realDonutData = [valSongLan, valMienTuoi, valMienDauXanh];
             const totalDonutVal = realDonutData.reduce((a, b) => a + b, 0);
+            const visualDonutData = realDonutData.map(val => { if (val === 0) return 0; let pct = val / totalDonutVal; return pct < 0.05 ? totalDonutVal * 0.05 : val; });
+            const offsetArr = visualDonutData.map((v, i) => (realDonutData[i] > 0 && (realDonutData[i] / totalDonutVal) < 0.15) ? 30 : 0);
 
             secDonutChartInstance = new Chart(ctxSecDonut, {
-                type: 'doughnut', 
-                data: { 
-                    labels: ['Song Lân', 'Miến Tươi', 'Miến Đậu Xanh'], 
-                    datasets: [{ 
-                        data: realDonutData, 
-                        backgroundColor: ['#0B486B', '#79BD9A', '#3B8686'], 
-                        borderWidth: 2
-                    }] 
-                },
-                options: { 
-                    responsive: true, maintainAspectRatio: false, layout: { padding: 10 }, cutout: '55%', 
-                    plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: function(c) { let idx = c.dataIndex; let realValue = realDonutData[idx]; return `${c.chart.data.labels[idx]}: ${formatCurrency(realValue)} VND (${((realValue / totalDonutVal) * 100).toFixed(2)}%)`; } } } } 
-                }
+                type: 'doughnut', data: { labels: ['Song Lân', 'Miến Tươi', 'Miến Đậu Xanh'], datasets: [{ data: visualDonutData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686'], borderWidth: 2, hoverOffset: 15, offset: offsetArr }] },
+                options: { responsive: true, maintainAspectRatio: false, layout: { padding: 30 }, cutout: '55%', plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: function(c) { let idx = c.dataIndex; let realValue = realDonutData[idx]; return `${c.chart.data.labels[idx]}: ${formatCurrency(realValue)} VND (${((realValue / totalDonutVal) * 100).toFixed(2)}%)`; } } } } }
             });
         }
 
@@ -1166,37 +1142,35 @@
             activeMonthsCus.forEach(m => cusHead += `<th class="text-center">Tháng ${getVietnameseMonth(m)}</th>`);
             document.getElementById('cus-table-head').innerHTML = `<tr>${cusHead}</tr>`;
 
-            // Màu tổng Wet Market đã áp dụng #CFF09E và #0B486B
-            let wmBody = `<tr style="background-color: #CFF09E; font-weight: bold; border-bottom: 2px solid #b0bec5;">
-                <td colspan="5" class="text-right" style="color: #0B486B;">TỔNG</td>
-                <td class="text-center" style="color: #0B486B;">${globalHC}</td>
-                <td class="text-center" style="color: #0B486B;">${globalTargetM.size}</td>`;
-            activeMonthsWM.forEach(m => { wmBody += `<td class="text-center" style="color: #0B486B; font-size:14px;">${globalActualsM[m].size}</td>`; });
+            let wmBody = `<tr style="background-color: #f1f3f4; font-weight: bold; border-bottom: 2px solid #b0bec5;">
+                <td colspan="5" class="text-right" style="color: #1a237e;">SỐ LƯỢNG CHỢ ĐÃ COVER (TỔNG ĐỘC LẬP)</td>
+                <td class="text-center" style="color: #1a237e;">${globalHC}</td>
+                <td class="text-center" style="color: #1a237e;">${globalTargetM.size}</td>`;
+            activeMonthsWM.forEach(m => { wmBody += `<td class="text-center" style="color: #d32f2f; font-size:14px;">${globalActualsM[m].size}</td>`; });
             wmBody += `</tr>`;
 
             wmRows.forEach(row => {
                 wmBody += `<tr>
                     <td>${row.data.hq}</td><td>${row.data.ar}</td><td>${row.data.pr}</td><td>${row.data.cdm}</td><td>${row.data.kam}</td>
                     <td class="text-center">${row.data.hc}</td>
-                    <td class="text-center" style="background-color: #CFF09E; color:#0B486B; font-weight:bold;">${row.target}</td>`;
+                    <td class="text-center" style="font-weight:bold; color:#0B486B;">${row.target}</td>`;
                 activeMonthsWM.forEach(m => { wmBody += `<td class="text-center" style="color:#3B8686;">${row.monthly[m].size || '-'}</td>`; });
                 wmBody += `</tr>`;
             });
             document.getElementById('wm-table-body').innerHTML = wmBody;
 
-            // Màu tổng Customer Coverage
-            let cusBody = `<tr style="background-color: #CFF09E; font-weight: bold; border-bottom: 2px solid #b0bec5;">
-                <td colspan="5" class="text-right" style="color: #0B486B;">TỔNG</td>
-                <td class="text-center" style="color: #0B486B;">${globalHC}</td>
-                <td class="text-center" style="color: #0B486B;">${globalTargetCC.size}</td>`;
-            activeMonthsCus.forEach(m => {  cusBody += `<td class="text-center" style="color: #0B486B; font-size:14px;">${globalActualsCC[m].size}</td>`; });
+            let cusBody = `<tr style="background-color: #f1f3f4; font-weight: bold; border-bottom: 2px solid #b0bec5;">
+                <td colspan="5" class="text-right" style="color: #1a237e;">SỐ LƯỢNG KHÁCH HÀNG ĐÃ COVER (TỔNG ĐỘC LẬP)</td>
+                <td class="text-center" style="color: #1a237e;">${globalHC}</td>
+                <td class="text-center" style="color: #1a237e;">${globalTargetCC.size}</td>`;
+            activeMonthsCus.forEach(m => {  cusBody += `<td class="text-center" style="color: #d32f2f; font-size:14px;">${globalActualsCC[m].size}</td>`; });
             cusBody += `</tr>`;
 
             cusRows.forEach(row => {
                 cusBody += `<tr>
                     <td>${row.data.hq}</td><td>${row.data.ar}</td><td>${row.data.pr}</td><td>${row.data.cdm}</td><td>${row.data.kam}</td>
                     <td class="text-center">${row.data.hc}</td>
-                    <td class="text-center" style="background-color: #CFF09E; color:#0B486B; font-weight:bold;">${row.target}</td>`;
+                    <td class="text-center" style="font-weight:bold; color:#0B486B;">${row.target}</td>`;
                 activeMonthsCus.forEach(m => { cusBody += `<td class="text-center" style="color:#3B8686;">${row.monthly[m].size || '-'}</td>`; });
                 cusBody += `</tr>`;
             });
