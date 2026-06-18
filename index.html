@@ -131,7 +131,7 @@
             flex-direction: column;
         }
 
-        h2 { margin-bottom: 20px; color: #1a237e; } /* Đã trả về xanh đậm cũ */
+        h2 { margin-bottom: 20px; color: #1a237e; }
 
         .table-responsive {
             overflow-x: auto;
@@ -147,7 +147,6 @@
             font-size: 13px; vertical-align: middle;
         }
 
-        /* Đã trả về nền xám nhạt cũ */
         th { background-color: #f8f9fa; color: #495057; font-weight: 600; white-space: nowrap; }
 
         .col-task { font-weight: 600; color: #0B486B; word-break: break-word; }
@@ -726,7 +725,11 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, ticks: { callback: val => new Intl.NumberFormat('vi-VN', {notation: 'compact'}).format(val) } } } }
             });
 
-            const areaQtyGroups = {}; let valSongLan = 0, valMienTuoi = 0, valMienDauXanh = 0; let grandTotalQty = { total: 0, months: {} };
+            // Bổ sung logic Miến Dong
+            const areaQtyGroups = {}; 
+            let valSongLan = 0, valMienTuoi = 0, valMienDauXanh = 0, valMienDong = 0; 
+            let grandTotalQty = { total: 0, months: {} };
+            
             filteredDbin.forEach(r => {
                 if (!areaQtyGroups[r.ar]) areaQtyGroups[r.ar] = { rows: {}, subTotal: 0, subMonths: {} };
                 const skuKey = `${r.hq}_${r.Pv}_${r.sku}`;
@@ -737,7 +740,13 @@
                 areaQtyGroups[r.ar].subTotal += r.Qty;
                 grandTotalQty.months[r.mo] = (grandTotalQty.months[r.mo] || 0) + r.Qty;
                 grandTotalQty.total += r.Qty;
-                if(r.sku.includes("Song Lân")) valSongLan += r.s; else if(r.sku.includes("Miến đậu xanh")) valMienDauXanh += r.s; else if(r.sku.includes("Miến tươi")) valMienTuoi += r.s;
+                
+                // Phân loại đếm SKU
+                let skuName = (r.sku || '').toLowerCase();
+                if(skuName.includes("song lân")) valSongLan += r.s; 
+                else if(skuName.includes("miến đậu xanh")) valMienDauXanh += r.s; 
+                else if(skuName.includes("miến tươi")) valMienTuoi += r.s;
+                else if(skuName.includes("miến dong")) valMienDong += r.s;
             });
 
             let qtyHead = `<th>HQ</th><th>Area</th><th>Province (PR)</th><th>SKU</th>`;
@@ -766,13 +775,23 @@
 
             const ctxDonut = document.getElementById('donutChart').getContext('2d');
             if(donutChartInstance) donutChartInstance.destroy();
-            const rData = [valSongLan, valMienTuoi, valMienDauXanh];
+            
+            // Render Donut Chart với hiệu ứng phóng to cũ
+            const rData = [valSongLan, valMienTuoi, valMienDauXanh, valMienDong];
             const tVal = rData.reduce((a, b) => a + b, 0);
             const vData = rData.map(v => (v > 0 && v/tVal < 0.05) ? tVal*0.05 : v);
             const offsets = vData.map((v, i) => (rData[i] > 0 && rData[i]/tVal < 0.15) ? 30 : 0);
 
             donutChartInstance = new Chart(ctxDonut, {
-                type: 'doughnut', data: { labels: ['Song Lân', 'Miến Tươi', 'Miến Đậu Xanh'], datasets: [{ data: vData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686'], borderWidth: 2, hoverOffset: 15, offset: offsets }] },
+                type: 'doughnut', 
+                data: { 
+                    labels: ['Song Lân', 'Miến Tươi', 'Miến Đậu Xanh', 'Miến Dong'], 
+                    datasets: [{ 
+                        data: vData, 
+                        backgroundColor: ['#0B486B', '#79BD9A', '#3B8686', '#A8DBA8'], 
+                        borderWidth: 2, hoverOffset: 15, offset: offsets 
+                    }] 
+                },
                 options: { responsive: true, maintainAspectRatio: false, layout: { padding: 30 }, cutout: '55%', plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: c => `${c.chart.data.labels[c.dataIndex]}: ${formatCurrency(rData[c.dataIndex])} VND (${((rData[c.dataIndex]/tVal)*100).toFixed(2)}%)` } } } }
             });
         }
@@ -839,7 +858,11 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, ticks: { callback: val => new Intl.NumberFormat('vi-VN', {notation: 'compact'}).format(val) } } } }
             });
 
-            const areaQtyGroups = {}; let valSongLan = 0, valMienTuoi = 0, valMienDauXanh = 0; let grandTotalQty = { total: 0, months: {} };
+            // Bổ sung logic Miến Dong
+            const areaQtyGroups = {}; 
+            let valSongLan = 0, valMienTuoi = 0, valMienDauXanh = 0, valMienDong = 0; 
+            let grandTotalQty = { total: 0, months: {} };
+            
             filteredSec.forEach(r => {
                 let sVal = parseFloat(r.s) || 0; let qtVal = parseFloat(r.qt) || 0;
                 if (!areaQtyGroups[r.ar]) areaQtyGroups[r.ar] = { rows: {}, subTotal: 0, subMonths: {} };
@@ -851,7 +874,13 @@
                 areaQtyGroups[r.ar].subTotal += qtVal;
                 grandTotalQty.months[r.mo] = (grandTotalQty.months[r.mo] || 0) + qtVal;
                 grandTotalQty.total += qtVal;
-                if(r.sku.includes("Song Lân")) valSongLan += sVal; else if(r.sku.includes("Miến đậu xanh")) valMienDauXanh += sVal; else if(r.sku.includes("Miến tươi")) valMienTuoi += sVal;
+                
+                // Phân loại đếm SKU
+                let skuName = (r.sku || '').toLowerCase();
+                if(skuName.includes("song lân")) valSongLan += sVal; 
+                else if(skuName.includes("miến đậu xanh")) valMienDauXanh += sVal; 
+                else if(skuName.includes("miến tươi")) valMienTuoi += sVal;
+                else if(skuName.includes("miến dong")) valMienDong += sVal;
             });
 
             let qtyHead = `<th>HQ</th><th>Area</th><th>SKU</th>`;
@@ -880,13 +909,15 @@
 
             const ctxSecDonut = document.getElementById('sec-donutChart').getContext('2d');
             if(secDonutChartInstance) secDonutChartInstance.destroy();
-            const realDonutData = [valSongLan, valMienTuoi, valMienDauXanh];
+            
+            // Render Donut Chart với hiệu ứng phóng to cũ
+            const realDonutData = [valSongLan, valMienTuoi, valMienDauXanh, valMienDong];
             const totalDonutVal = realDonutData.reduce((a, b) => a + b, 0);
             const visualDonutData = realDonutData.map(val => { if (val === 0) return 0; let pct = val / totalDonutVal; return pct < 0.05 ? totalDonutVal * 0.05 : val; });
             const offsetArr = visualDonutData.map((v, i) => (realDonutData[i] > 0 && (realDonutData[i] / totalDonutVal) < 0.15) ? 30 : 0);
 
             secDonutChartInstance = new Chart(ctxSecDonut, {
-                type: 'doughnut', data: { labels: ['Song Lân', 'Miến Tươi', 'Miến Đậu Xanh'], datasets: [{ data: visualDonutData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686'], borderWidth: 2, hoverOffset: 15, offset: offsetArr }] },
+                type: 'doughnut', data: { labels: ['Song Lân', 'Miến Tươi', 'Miến Đậu Xanh', 'Miến Dong'], datasets: [{ data: visualDonutData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686', '#A8DBA8'], borderWidth: 2, hoverOffset: 15, offset: offsetArr }] },
                 options: { responsive: true, maintainAspectRatio: false, layout: { padding: 30 }, cutout: '55%', plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: function(c) { let idx = c.dataIndex; let realValue = realDonutData[idx]; return `${c.chart.data.labels[idx]}: ${formatCurrency(realValue)} VND (${((realValue / totalDonutVal) * 100).toFixed(2)}%)`; } } } } }
             });
         }
