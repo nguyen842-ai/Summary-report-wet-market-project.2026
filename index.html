@@ -693,7 +693,7 @@
                 chartDataObj[r.Pv] = (chartDataObj[r.Pv] || 0) + r.s;
             });
 
-            let valHead = `<th>HQ</th><th>Area</th><th>Province (PR)</th>`;
+            let valHead = `<th>HQ</th><th>Area</th><th>Tỉnh thành</th>`;
             availableMonths.forEach(m => valHead += `<th class="text-right">Tháng ${getVietnameseMonth(m)}</th>`);
             valHead += `<th class="text-right">Total Value</th>`;
             document.getElementById('value-table-head').innerHTML = `<tr>${valHead}</tr>`;
@@ -748,7 +748,7 @@
                 else if(skuName.includes("miến dong")) valMienDong += r.s;
             });
 
-            let qtyHead = `<th>HQ</th><th>Area</th><th>Province (PR)</th><th>SKU</th>`;
+            let qtyHead = `<th>HQ</th><th>Area</th><th>Tỉnh thành</th><th>SKU</th>`;
             availableMonths.forEach(m => qtyHead += `<th class="text-right">Tháng ${getVietnameseMonth(m)}</th>`);
             qtyHead += `<th class="text-right">Tổng (Thùng)</th>`;
             document.getElementById('sku-table-head').innerHTML = `<tr>${qtyHead}</tr>`;
@@ -1131,11 +1131,11 @@
 
             // Xử lý giao diện khi không có dữ liệu
             if(filteredDhc.length === 0) {
-                let emptyWMHead = `<tr><th rowspan="2">HQ</th><th rowspan="2">Area</th><th rowspan="2">Province (PR)</th><th rowspan="2">CDM</th><th rowspan="2">KAM</th><th rowspan="2" class="text-center">HC</th><th rowspan="2" class="text-center">Số lượng chợ đã chăm sóc</th><th colspan="${activeMonths.length}" class="text-center" style="border-bottom: 1px solid #e0e0e0;">Số lượng chợ có đơn hàng</th></tr><tr>`;
+                let emptyWMHead = `<tr><th rowspan="2">HQ</th><th rowspan="2">Area</th><th rowspan="2">Tỉnh thành</th><th rowspan="2">CDM</th><th rowspan="2">KAM</th><th rowspan="2" class="text-center">HC</th><th rowspan="2" class="text-center">Số lượng chợ đã chăm sóc</th><th colspan="${activeMonths.length}" class="text-center" style="border-bottom: 1px solid #e0e0e0;">Số lượng chợ có đơn hàng</th></tr><tr>`;
                 activeMonths.forEach(m => { emptyWMHead += `<th class="text-center">Tháng ${getVietnameseMonth(m)}</th>`; });
                 emptyWMHead += `</tr>`;
                 
-                let emptyCusHead = `<tr><th rowspan="2">HQ</th><th rowspan="2">Area</th><th rowspan="2">Province (PR)</th><th rowspan="2">CDM</th><th rowspan="2">KAM</th><th rowspan="2" class="text-center">HC</th><th rowspan="2" class="text-center">Số lượng cửa hàng đã chăm sóc</th><th colspan="${activeMonths.length}" class="text-center" style="border-bottom: 1px solid #e0e0e0;">Số lượng cửa hàng đã lên đơn</th></tr><tr>`;
+                let emptyCusHead = `<tr><th rowspan="2">HQ</th><th rowspan="2">Area</th><th rowspan="2">Tỉnh thành</th><th rowspan="2">CDM</th><th rowspan="2">KAM</th><th rowspan="2" class="text-center">HC</th><th rowspan="2" class="text-center">Số lượng cửa hàng đã chăm sóc</th><th colspan="${activeMonths.length}" class="text-center" style="border-bottom: 1px solid #e0e0e0;">Số lượng cửa hàng đã lên đơn</th></tr><tr>`;
                 activeMonths.forEach(m => { emptyCusHead += `<th class="text-center">Tháng ${getVietnameseMonth(m)}</th>`; });
                 emptyCusHead += `</tr>`;
                 
@@ -1216,7 +1216,7 @@
             // ==================== RENDER GIAO DIỆN WET MARKET ====================
             let wmHead = `
                 <tr>
-                    <th rowspan="2">HQ</th><th rowspan="2">Area</th><th rowspan="2">Province (PR)</th>
+                    <th rowspan="2">HQ</th><th rowspan="2">Area</th><th rowspan="2">Tỉnh thành</th>
                     <th rowspan="2">CDM</th><th rowspan="2">KAM</th><th rowspan="2" class="text-center">HC</th>
                     <th rowspan="2" class="text-center">Số lượng chợ đã chăm sóc</th>
                     <th colspan="${activeMonths.length}" class="text-center" style="border-bottom: 1px solid #e0e0e0; background-color: #f1f3f4;">Số lượng chợ có đơn hàng</th>
@@ -1258,7 +1258,7 @@
             // ==================== RENDER GIAO DIỆN CUSTOMER ====================
             let cusHead = `
                 <tr>
-                    <th rowspan="2">HQ</th><th rowspan="2">Area</th><th rowspan="2">Province (PR)</th>
+                    <th rowspan="2">HQ</th><th rowspan="2">Area</th><th rowspan="2">Tỉnh thành</th>
                     <th rowspan="2">CDM</th><th rowspan="2">KAM</th><th rowspan="2" class="text-center">HC</th>
                     <th rowspan="2" class="text-center">Số lượng cửa hàng đã chăm sóc</th>
                     <th colspan="${activeMonths.length}" class="text-center" style="border-bottom: 1px solid #e0e0e0; background-color: #f1f3f4;">Số lượng cửa hàng đã lên đơn</th>
