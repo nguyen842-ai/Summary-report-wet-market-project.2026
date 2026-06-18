@@ -725,7 +725,7 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, ticks: { callback: val => new Intl.NumberFormat('vi-VN', {notation: 'compact'}).format(val) } } } }
             });
 
-            // Bổ sung logic Miến Dong
+            // Logic đếm SKU
             const areaQtyGroups = {}; 
             let valSongLan = 0, valMienTuoi = 0, valMienDauXanh = 0, valMienDong = 0; 
             let grandTotalQty = { total: 0, months: {} };
@@ -741,7 +741,6 @@
                 grandTotalQty.months[r.mo] = (grandTotalQty.months[r.mo] || 0) + r.Qty;
                 grandTotalQty.total += r.Qty;
                 
-                // Phân loại đếm SKU
                 let skuName = (r.sku || '').toLowerCase();
                 if(skuName.includes("song lân")) valSongLan += r.s; 
                 else if(skuName.includes("miến đậu xanh")) valMienDauXanh += r.s; 
@@ -776,7 +775,6 @@
             const ctxDonut = document.getElementById('donutChart').getContext('2d');
             if(donutChartInstance) donutChartInstance.destroy();
             
-            // Tăng kích thước Donut Chart bằng cách giảm padding và offset
             const rData = [valSongLan, valMienTuoi, valMienDauXanh, valMienDong];
             const tVal = rData.reduce((a, b) => a + b, 0);
             const vData = rData.map(v => (v > 0 && v/tVal < 0.05) ? tVal*0.05 : v);
@@ -801,7 +799,15 @@
            ---------------------------------------------------- */
         function renderSecondarySale() {
             const allSecSales = getAggregatedSecondarySales();
-            const filteredSec = filterDataGanttSales(allSecSales, true);
+            let filteredSec = filterDataGanttSales(allSecSales, true);
+            
+            // --- LỌC BỎ CÁC MẶT HÀNG LIÊN QUAN ĐẾN "CÁ" ---
+            filteredSec = filteredSec.filter(r => {
+                let skuName = (r.sku || '').toLowerCase();
+                return !skuName.includes("cá");
+            });
+            // ----------------------------------------------
+
             const monthsSet = new Set();
             filteredSec.forEach(r => monthsSet.add(r.mo));
             const availableMonths = Array.from(monthsSet).sort();
@@ -858,7 +864,6 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, ticks: { callback: val => new Intl.NumberFormat('vi-VN', {notation: 'compact'}).format(val) } } } }
             });
 
-            // Bổ sung logic Miến Dong
             const areaQtyGroups = {}; 
             let valSongLan = 0, valMienTuoi = 0, valMienDauXanh = 0, valMienDong = 0; 
             let grandTotalQty = { total: 0, months: {} };
@@ -875,7 +880,6 @@
                 grandTotalQty.months[r.mo] = (grandTotalQty.months[r.mo] || 0) + qtVal;
                 grandTotalQty.total += qtVal;
                 
-                // Phân loại đếm SKU
                 let skuName = (r.sku || '').toLowerCase();
                 if(skuName.includes("song lân")) valSongLan += sVal; 
                 else if(skuName.includes("miến đậu xanh")) valMienDauXanh += sVal; 
@@ -910,7 +914,6 @@
             const ctxSecDonut = document.getElementById('sec-donutChart').getContext('2d');
             if(secDonutChartInstance) secDonutChartInstance.destroy();
             
-            // Tăng kích thước Donut Chart bằng cách giảm padding và offset
             const realDonutData = [valSongLan, valMienTuoi, valMienDauXanh, valMienDong];
             const totalDonutVal = realDonutData.reduce((a, b) => a + b, 0);
             const visualDonutData = realDonutData.map(val => { if (val === 0) return 0; let pct = val / totalDonutVal; return pct < 0.05 ? totalDonutVal * 0.05 : val; });
