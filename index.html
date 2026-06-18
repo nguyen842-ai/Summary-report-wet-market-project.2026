@@ -1273,7 +1273,7 @@
                 </div>`;
         }
 
-        function renderCoverageTables() {
+     function renderCoverageTables() {
             const selectedArea = document.getElementById('filter-area').value;
             const selectedMonth = document.getElementById('filter-month').value;
             const masterData = getAggregatedMasterData();
@@ -1292,7 +1292,7 @@
                 activeMonths = [selectedMonth];
             }
 
-            // BƯỚC 1: XÂY DỰNG TỪ ĐIỂN VÀ GOM NHÓM TỪ BẢNG D HC (KIỂM SOÁT CỘT F)
+            // BƯỚC 1: XÂY DỰNG TỪ ĐIỂN THEO TỪNG THÁNG CỤ THỂ (kaesByMonth)
             const uniqueDhcMap = new Map();
             globalData.dhc.forEach(row => {
                 if(!row._raw) return;
@@ -1304,27 +1304,37 @@
                 if (selectedMonth !== 'All' && getVietnameseMonth(mo.trim()) !== getVietnameseMonth(selectedMonth)) return;
                 
                 let key = `${row._raw[0] || ''}_${ar}_${row._raw[2] || ''}_${row._raw[3] || ''}_${row._raw[4] || ''}`;
-                let currentMoNum = parseInt(getVietnameseMonth(mo.trim())) || 0;
-                let hcVal = parseInt(row._raw[5]) || 0; // Lấy HC từ cột F
+                let moVN = getVietnameseMonth(mo.trim());
+                let currentMoNum = parseInt(moVN) || 0;
+                let hcVal = parseInt(row._raw[5]) || 0;
                 
                 if (!uniqueDhcMap.has(key)) {
+                    // Tạo bộ rổ lưu trữ KAE theo tháng
+                    let kaesByMonth = {};
+                    kaesByMonth[moVN] = new Set(kaeName ? [kaeName] : []);
+                    
                     uniqueDhcMap.set(key, { 
                         hq: row._raw[0]||'', ar, pr: row._raw[2]||'', cdm: row._raw[3]||'', kam: row._raw[4]||'', 
                         hc: hcVal, 
                         maxMoNum: currentMoNum, 
-                        kaes: new Set(kaeName ? [kaeName] : []) 
+                        kaesByMonth: kaesByMonth
                     });
                 } else {
                     let existing = uniqueDhcMap.get(key);
                     
+                    // Tính HC (Chỉ cộng dồn hiển thị cho tháng mới nhất)
                     if (currentMoNum > existing.maxMoNum) {
                         existing.hc = hcVal;
                         existing.maxMoNum = currentMoNum;
-                        existing.kaes = new Set(kaeName ? [kaeName] : []); // Reset rổ KAE cho tháng mới nhất
                     } else if (currentMoNum === existing.maxMoNum) {
-                        existing.hc += hcVal; // CỘNG DỒN HC NẾU CÙNG KAM TRONG 1 THÁNG
-                        if (kaeName) existing.kaes.add(kaeName); 
+                        existing.hc += hcVal; 
                     }
+
+                    // Lưu KAE vào rổ của ĐÚNG THÁNG ĐÓ
+                    if (!existing.kaesByMonth[moVN]) {
+                        existing.kaesByMonth[moVN] = new Set();
+                    }
+                    if (kaeName) existing.kaesByMonth[moVN].add(kaeName);
                 }
             });
             const filteredDhc = Array.from(uniqueDhcMap.values());
@@ -1366,26 +1376,38 @@
                 });
 
                 masterData.forEach(mRow => {
-                    let mMoVN = getVietnameseMonth((mRow.mo || '').trim());
-                    let isMonthActive = activeMonths.some(am => getVietnameseMonth(am) === mMoVN);
-                    
-                    if (isMonthActive && mRow.hq === row.hq && mRow.ar === row.ar) {
-                        let mPr = mRow.pr || mRow.Province || mRow.Pv || '';
-                        if (!mPr || mPr === row.pr) {
-                            if(mRow.m) { targetM.add(mRow.m); globalTargetM.add(mRow.m); }
-                            if(mRow.cc) { targetCC.add(mRow.cc); globalTargetCC.add(mRow.cc); }
+                    if (mRow.hq === row.hq && mRow.ar === row.ar) {
+                        let mMoVN = getVietnameseMonth((mRow.mo || '').trim());
+                        let isMonthActive = activeMonths.some(am => getVietnameseMonth(am) === mMoVN);
+                        
+                        if (isMonthActive) {
+                            // BƯỚC 2A: TÍNH TARGET CHUẨN THÁNG - Tra từ điển KAE đúng tháng của Master Data
+                            let mKae = (mRow.k || '').trim();
+                            let monthKaes = row.kaesByMonth[mMoVN];
+                            
+                            // Nếu trong tháng đó KAM ko quản lý KAE này thì bỏ qua
+                            if (!monthKaes || !monthKaes.has(mKae)) return;
+
+                            let mPr = mRow.pr || mRow.Province || mRow.Pv || '';
+                            if (!mPr || mPr === row.pr) {
+                                if(mRow.m) { targetM.add(mRow.m); globalTargetM.add(mRow.m); }
+                                if(mRow.cc) { targetCC.add(mRow.cc); globalTargetCC.add(mRow.cc); }
+                            }
                         }
                     }
                 });
 
                 salesData.forEach(sRow => {
                     if (sRow.hq === row.hq && sRow.ar === row.ar) {
-                        // BƯỚC 2: TRA TỪ ĐIỂN MÃ KAE TRƯỚC KHI TÍNH CỘT ACTUAL
-                        let sKae = (sRow.k || '').trim();
-                        if (row.kaes.size > 0 && !row.kaes.has(sKae)) return; 
-                        
                         let sMoVN = getVietnameseMonth((sRow.mo || '').trim());
+                        
                         if (actualMByMonth[sMoVN] !== undefined) {
+                            // BƯỚC 2B: TÍNH ACTUAL CHUẨN THÁNG - Tra từ điển KAE đúng tháng của Sales Data
+                            let sKae = (sRow.k || '').trim();
+                            let monthKaes = row.kaesByMonth[sMoVN];
+                            
+                            if (!monthKaes || !monthKaes.has(sKae)) return;
+
                             let sPr = sRow.pr || sRow.Province || sRow.Pv || '';
                             if (!sPr || sPr === row.pr) {
                                 if(sRow.m) { actualMByMonth[sMoVN].add(sRow.m); globalActualsMByMonth[sMoVN].add(sRow.m); }
@@ -1399,6 +1421,7 @@
                 cusRows.push({ data: row, target: targetCC.size, actuals: actualCCByMonth });
             });
 
+            // Giao diện Wet Market
             let wmHead = `<tr><th rowspan="2">HQ</th><th rowspan="2">Area</th><th rowspan="2">${i18n[lang].thProv}</th><th rowspan="2">CDM</th><th rowspan="2">KAM</th><th rowspan="2" class="text-center">HC</th><th rowspan="2" class="text-center">${i18n[lang].wmTarget}</th><th colspan="${activeMonths.length}" class="text-center" style="border-bottom: 1px solid #e0e0e0; background-color: #f1f3f4;">${i18n[lang].wmActual}</th></tr><tr>`;
             activeMonths.forEach(m => {
                 let num = getVietnameseMonth(m);
@@ -1415,11 +1438,12 @@
                 wmBody += `</tr>`;
             });
 
-            let wmFoot = `<tr style="background-color: #f8f9fa; border-top: 2px solid #b0bec5; font-weight: bold;"><td colspan="5" class="text-right" style="color:#e53935;">TOTAL</td><td class="text-center" style="color:#e53935; font-size:14px;">${globalHC}</td><td class="text-center" style="color:#e53935; font-size:14px;">${globalTargetM.size}</td>`;
+            let wmFoot = `<tr style="background-color: #f8f9fa; border-top: 2px solid #b0bec5; font-weight: bold;"><td colspan="5" class="text-right" style="color:#e53935;">${i18n[lang].total}</td><td class="text-center" style="color:#e53935; font-size:14px;">${globalHC}</td><td class="text-center" style="color:#e53935; font-size:14px;">${globalTargetM.size}</td>`;
             activeMonths.forEach(m => wmFoot += `<td class="text-center" style="color:#e53935; font-size:14px;">${globalActualsMByMonth[getVietnameseMonth(m)].size}</td>`);
             wmFoot += `</tr>`;
             document.getElementById('wm-table-body').innerHTML = wmBody + wmFoot;
 
+            // Giao diện Khách hàng (Customer)
             let cusHead = `<tr><th rowspan="2">HQ</th><th rowspan="2">Area</th><th rowspan="2">${i18n[lang].thProv}</th><th rowspan="2">CDM</th><th rowspan="2">KAM</th><th rowspan="2" class="text-center">HC</th><th rowspan="2" class="text-center">${i18n[lang].cusTarget}</th><th colspan="${activeMonths.length}" class="text-center" style="border-bottom: 1px solid #e0e0e0; background-color: #f1f3f4;">${i18n[lang].cusActual}</th></tr><tr>`;
             activeMonths.forEach(m => {
                 let num = getVietnameseMonth(m);
@@ -1436,7 +1460,7 @@
                 cusBody += `</tr>`;
             });
 
-            let cusFoot = `<tr style="background-color: #f8f9fa; border-top: 2px solid #b0bec5; font-weight: bold;"><td colspan="5" class="text-right" style="color:#e53935;">TOTAL</td><td class="text-center" style="color:#e53935; font-size:14px;">${globalHC}</td><td class="text-center" style="color:#e53935; font-size:14px;">${globalTargetCC.size}</td>`;
+            let cusFoot = `<tr style="background-color: #f8f9fa; border-top: 2px solid #b0bec5; font-weight: bold;"><td colspan="5" class="text-right" style="color:#e53935;">${i18n[lang].total}</td><td class="text-center" style="color:#e53935; font-size:14px;">${globalHC}</td><td class="text-center" style="color:#e53935; font-size:14px;">${globalTargetCC.size}</td>`;
             activeMonths.forEach(m => cusFoot += `<td class="text-center" style="color:#e53935; font-size:14px;">${globalActualsCCByMonth[getVietnameseMonth(m)].size}</td>`);
             cusFoot += `</tr>`;
             document.getElementById('cus-table-body').innerHTML = cusBody + cusFoot;
