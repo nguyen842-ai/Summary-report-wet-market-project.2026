@@ -15,7 +15,8 @@ const dbinSales = [
 {hq: "1.South",ar: "4. Eastern",Pv: "Đồng Nai" ,sku: "Miến đậu xanh Song Long 200g",mo: "May",Qty: 20,s:22597120 },
 {hq: "1.South",ar: "4. Eastern",Pv: "Đồng Nai" ,sku: "Miến tươi Song Long 1kg",mo: "May",Qty: 230,s:58269120 },
 {hq: "1.South",ar: "4. Eastern",Pv: "Đồng Nai" ,sku: "Miến tươi Song Long 3kg",mo: "May",Qty: 56,s:28619136 },
-{hq: "2.North",ar: "1. Ha Noi",Pv: "Hà Nội" ,sku: "Miến đậu xanh Song Long 200g",mo: "Jun",Qty: 4,s:4519424 },
+
+ {hq: "2.North",ar: "1. Ha Noi",Pv: "Hà Nội" ,sku: "Miến đậu xanh Song Long 200g",mo: "Jun",Qty: 4,s:4519424 },
 {hq: "2.North",ar: "1. Ha Noi",Pv: "Hà Nội" ,sku: "Miến đậu xanh Song Long 500g",mo: "Jun",Qty: 4,s:4367599.6 },
 {hq: "2.North",ar: "1. Ha Noi",Pv: "Hà Nội" ,sku: "Miến tươi Song Long 1kg",mo: "Jun",Qty: 370,s:89831560 },
 {hq: "2.North",ar: "1. Ha Noi",Pv: "Hà Nội" ,sku: "Miến tươi Song Long 3kg",mo: "Jun",Qty: 173,s:84728826 },
@@ -24,7 +25,7 @@ const dbinSales = [
 {hq: "1.South",ar: "4. Eastern",Pv: "Đồng Nai" ,sku: "Miến đậu xanh Song Long 200g",mo: "Jun",Qty: 5,s:5649280 },
 {hq: "1.South",ar: "4. Eastern",Pv: "Đồng Nai" ,sku: "Miến tươi Song Long 1kg",mo: "Jun",Qty: 110,s:27867840 },
 {hq: "1.South",ar: "4. Eastern",Pv: "Đồng Nai" ,sku: "Miến tươi Song Long 3kg",mo: "Jun",Qty: 64,s:32707584 },
-{hq: "1.South",ar: "4. Eastern",Pv: "TP.Hồ Chí Minh" ,sku: "Miến đậu xanh Song Long 200g",mo: "Jun",Qty: 9,s:10168704 },
+{hq: "1.South",ar: "1. HCMC",Pv: "TP.Hồ Chí Minh" ,sku: "Miến đậu xanh Song Long 200g",mo: "Jun",Qty: 9,s:10168704 },
 {hq: "1.South",ar: "1. HCMC",Pv: "TP.Hồ Chí Minh" ,sku: "Miến dong Song Long 480g ",mo: "Jun",Qty: 5,s:5400850 },
 {hq: "1.South",ar: "1. HCMC",Pv: "TP.Hồ Chí Minh" ,sku: "Miến đậu xanh Song Long 200g",mo: "Jun",Qty: 204,s:229325824 },
 {hq: "1.South",ar: "1. HCMC",Pv: "TP.Hồ Chí Minh" ,sku: "Miến đậu xanh Song Long 80g",mo: "Jun",Qty: 51,s:1990488.5 },
@@ -34,5 +35,6 @@ const dbinSales = [
 {hq: "1.South",ar: "1. HCMC",Pv: "TP.Hồ Chí Minh" ,sku: "Miến tươi Song Long 450g",mo: "Jun",Qty: 18,s:7534800 },
 {hq: "1.South",ar: "1. HCMC",Pv: "TP.Hồ Chí Minh" ,sku: "Miến tươi Song Lân 500g",mo: "Jun",Qty: 10,s:5203179.345 },
 {hq: "1.South",ar: "2. North Mekong",Pv: "Tiền Giang" ,sku: "Miến đậu xanh Song Long 200g",mo: "Jun",Qty: 7,s:7908992 },
+
 
 ];
