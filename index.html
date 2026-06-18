@@ -776,11 +776,11 @@
             const ctxDonut = document.getElementById('donutChart').getContext('2d');
             if(donutChartInstance) donutChartInstance.destroy();
             
-            // Render Donut Chart với hiệu ứng phóng to cũ
+            // Tăng kích thước Donut Chart bằng cách giảm padding và offset
             const rData = [valSongLan, valMienTuoi, valMienDauXanh, valMienDong];
             const tVal = rData.reduce((a, b) => a + b, 0);
             const vData = rData.map(v => (v > 0 && v/tVal < 0.05) ? tVal*0.05 : v);
-            const offsets = vData.map((v, i) => (rData[i] > 0 && rData[i]/tVal < 0.15) ? 30 : 0);
+            const offsets = vData.map((v, i) => (rData[i] > 0 && rData[i]/tVal < 0.15) ? 15 : 0);
 
             donutChartInstance = new Chart(ctxDonut, {
                 type: 'doughnut', 
@@ -789,10 +789,10 @@
                     datasets: [{ 
                         data: vData, 
                         backgroundColor: ['#0B486B', '#79BD9A', '#3B8686', '#A8DBA8'], 
-                        borderWidth: 2, hoverOffset: 15, offset: offsets 
+                        borderWidth: 2, hoverOffset: 10, offset: offsets 
                     }] 
                 },
-                options: { responsive: true, maintainAspectRatio: false, layout: { padding: 30 }, cutout: '55%', plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: c => `${c.chart.data.labels[c.dataIndex]}: ${formatCurrency(rData[c.dataIndex])} VND (${((rData[c.dataIndex]/tVal)*100).toFixed(2)}%)` } } } }
+                options: { responsive: true, maintainAspectRatio: false, layout: { padding: 10 }, cutout: '55%', plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: c => `${c.chart.data.labels[c.dataIndex]}: ${formatCurrency(rData[c.dataIndex])} VND (${((rData[c.dataIndex]/tVal)*100).toFixed(2)}%)` } } } }
             });
         }
 
@@ -910,15 +910,15 @@
             const ctxSecDonut = document.getElementById('sec-donutChart').getContext('2d');
             if(secDonutChartInstance) secDonutChartInstance.destroy();
             
-            // Render Donut Chart với hiệu ứng phóng to cũ
+            // Tăng kích thước Donut Chart bằng cách giảm padding và offset
             const realDonutData = [valSongLan, valMienTuoi, valMienDauXanh, valMienDong];
             const totalDonutVal = realDonutData.reduce((a, b) => a + b, 0);
             const visualDonutData = realDonutData.map(val => { if (val === 0) return 0; let pct = val / totalDonutVal; return pct < 0.05 ? totalDonutVal * 0.05 : val; });
-            const offsetArr = visualDonutData.map((v, i) => (realDonutData[i] > 0 && (realDonutData[i] / totalDonutVal) < 0.15) ? 30 : 0);
+            const offsetArr = visualDonutData.map((v, i) => (realDonutData[i] > 0 && (realDonutData[i] / totalDonutVal) < 0.15) ? 15 : 0);
 
             secDonutChartInstance = new Chart(ctxSecDonut, {
-                type: 'doughnut', data: { labels: ['Song Lân', 'Miến Tươi', 'Miến Đậu Xanh', 'Miến Dong'], datasets: [{ data: visualDonutData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686', '#A8DBA8'], borderWidth: 2, hoverOffset: 15, offset: offsetArr }] },
-                options: { responsive: true, maintainAspectRatio: false, layout: { padding: 30 }, cutout: '55%', plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: function(c) { let idx = c.dataIndex; let realValue = realDonutData[idx]; return `${c.chart.data.labels[idx]}: ${formatCurrency(realValue)} VND (${((realValue / totalDonutVal) * 100).toFixed(2)}%)`; } } } } }
+                type: 'doughnut', data: { labels: ['Song Lân', 'Miến Tươi', 'Miến Đậu Xanh', 'Miến Dong'], datasets: [{ data: visualDonutData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686', '#A8DBA8'], borderWidth: 2, hoverOffset: 10, offset: offsetArr }] },
+                options: { responsive: true, maintainAspectRatio: false, layout: { padding: 10 }, cutout: '55%', plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: function(c) { let idx = c.dataIndex; let realValue = realDonutData[idx]; return `${c.chart.data.labels[idx]}: ${formatCurrency(realValue)} VND (${((realValue / totalDonutVal) * 100).toFixed(2)}%)`; } } } } }
             });
         }
 
