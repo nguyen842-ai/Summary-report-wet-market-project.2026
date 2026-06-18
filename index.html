@@ -558,12 +558,10 @@
             renderDashboard();
         }
 
-        // CHUẨN HÓA SỐ HỆ QUỐC TẾ (en-US): chấm cho thập phân, phẩy cho hàng nghìn
         function formatCurrency(num) {
             return new Intl.NumberFormat('en-US').format(num || 0);
         }
 
-        // Định dạng số lượng thùng SKU giữ 2 chữ số thập phân
         function formatQty(num) {
             if (!num || num === 0) return '-';
             return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
@@ -686,7 +684,6 @@
             document.getElementById('lbl-excel-btn').innerText = text.excelBtn;
         }
 
-        // BỐC DỮ LIỆU TƯỜNG MINH TRÁNH LỖI PHẠM VI (SCOPE) CỦA LET/CONST
         function getAggregatedSecondarySales() {
             let combinedData = [];
             if (typeof dbSalesM1 !== 'undefined') combinedData = combinedData.concat(dbSalesM1);
@@ -1198,6 +1195,9 @@
             document.getElementById('swot-support').innerHTML = swotHtml.support;
         }
 
+        // ==========================================================================
+        // KHÔI PHỤC: TREE DIAGRAM ĐỌC TỪ HEADCOUNT PLAN & ACTUAL 
+        // ==========================================================================
         function sumRole(dataArray, roleName) {
             let count = 0;
             const roleIndexMap = { 'CDM': 3, 'KAM': 4, 'KAE': 5, 'DSR': 6 };
@@ -1292,25 +1292,38 @@
                 activeMonths = [selectedMonth];
             }
 
+            // BƯỚC 1: XÂY DỰNG TỪ ĐIỂN VÀ GOM NHÓM TỪ BẢNG D HC (KIỂM SOÁT CỘT F)
             const uniqueDhcMap = new Map();
             globalData.dhc.forEach(row => {
                 if(!row._raw) return;
                 let ar = row._raw[1] || '';
                 let mo = row._raw[6] || '';
+                let kaeName = (row._raw[7] || '').trim(); 
                 
                 if (selectedArea !== 'All' && ar.trim().toLowerCase() !== selectedArea.trim().toLowerCase()) return;
                 if (selectedMonth !== 'All' && getVietnameseMonth(mo.trim()) !== getVietnameseMonth(selectedMonth)) return;
                 
                 let key = `${row._raw[0] || ''}_${ar}_${row._raw[2] || ''}_${row._raw[3] || ''}_${row._raw[4] || ''}`;
                 let currentMoNum = parseInt(getVietnameseMonth(mo.trim())) || 0;
+                let hcVal = parseInt(row._raw[5]) || 0; // Lấy HC từ cột F
                 
                 if (!uniqueDhcMap.has(key)) {
-                    uniqueDhcMap.set(key, { hq: row._raw[0]||'', ar, pr: row._raw[2]||'', cdm: row._raw[3]||'', kam: row._raw[4]||'', hc: parseInt(row._raw[5])||0, maxMoNum: currentMoNum });
+                    uniqueDhcMap.set(key, { 
+                        hq: row._raw[0]||'', ar, pr: row._raw[2]||'', cdm: row._raw[3]||'', kam: row._raw[4]||'', 
+                        hc: hcVal, 
+                        maxMoNum: currentMoNum, 
+                        kaes: new Set(kaeName ? [kaeName] : []) 
+                    });
                 } else {
                     let existing = uniqueDhcMap.get(key);
+                    
                     if (currentMoNum > existing.maxMoNum) {
-                        existing.hc = parseInt(row._raw[5]) || 0;
+                        existing.hc = hcVal;
                         existing.maxMoNum = currentMoNum;
+                        existing.kaes = new Set(kaeName ? [kaeName] : []); // Reset rổ KAE cho tháng mới nhất
+                    } else if (currentMoNum === existing.maxMoNum) {
+                        existing.hc += hcVal; // CỘNG DỒN HC NẾU CÙNG KAM TRONG 1 THÁNG
+                        if (kaeName) existing.kaes.add(kaeName); 
                     }
                 }
             });
@@ -1367,6 +1380,10 @@
 
                 salesData.forEach(sRow => {
                     if (sRow.hq === row.hq && sRow.ar === row.ar) {
+                        // BƯỚC 2: TRA TỪ ĐIỂN MÃ KAE TRƯỚC KHI TÍNH CỘT ACTUAL
+                        let sKae = (sRow.k || '').trim();
+                        if (row.kaes.size > 0 && !row.kaes.has(sKae)) return; 
+                        
                         let sMoVN = getVietnameseMonth((sRow.mo || '').trim());
                         if (actualMByMonth[sMoVN] !== undefined) {
                             let sPr = sRow.pr || sRow.Province || sRow.Pv || '';
@@ -1382,7 +1399,6 @@
                 cusRows.push({ data: row, target: targetCC.size, actuals: actualCCByMonth });
             });
 
-            // Giao diện Wet Market
             let wmHead = `<tr><th rowspan="2">HQ</th><th rowspan="2">Area</th><th rowspan="2">${i18n[lang].thProv}</th><th rowspan="2">CDM</th><th rowspan="2">KAM</th><th rowspan="2" class="text-center">HC</th><th rowspan="2" class="text-center">${i18n[lang].wmTarget}</th><th colspan="${activeMonths.length}" class="text-center" style="border-bottom: 1px solid #e0e0e0; background-color: #f1f3f4;">${i18n[lang].wmActual}</th></tr><tr>`;
             activeMonths.forEach(m => {
                 let num = getVietnameseMonth(m);
@@ -1404,7 +1420,6 @@
             wmFoot += `</tr>`;
             document.getElementById('wm-table-body').innerHTML = wmBody + wmFoot;
 
-            // Giao diện Khách hàng (Customer)
             let cusHead = `<tr><th rowspan="2">HQ</th><th rowspan="2">Area</th><th rowspan="2">${i18n[lang].thProv}</th><th rowspan="2">CDM</th><th rowspan="2">KAM</th><th rowspan="2" class="text-center">HC</th><th rowspan="2" class="text-center">${i18n[lang].cusTarget}</th><th colspan="${activeMonths.length}" class="text-center" style="border-bottom: 1px solid #e0e0e0; background-color: #f1f3f4;">${i18n[lang].cusActual}</th></tr><tr>`;
             activeMonths.forEach(m => {
                 let num = getVietnameseMonth(m);
@@ -1427,9 +1442,6 @@
             document.getElementById('cus-table-body').innerHTML = cusBody + cusFoot;
         }
 
-        // ==========================================================================
-        // 6. XUẤT EXCEL BẰNG HTML BLOB (GIỮ NGUYÊN ĐỊNH DẠNG BẢNG - BỎ QUA BIỂU ĐỒ)
-        // ==========================================================================
         function exportToExcel() {
             const tablesToExport = [
                 { id: 'table-gantt-data', name: 'Project_Gantt_Progress' },
@@ -1463,7 +1475,6 @@
                 if (tableElement) {
                     const cloneTable = tableElement.cloneNode(true);
                     
-                    // Đặc thù bảng Gantt: Cắt bỏ cột thanh đồ họa màu mè (cột thứ 4 index 3)
                     if (target.id === 'table-gantt-data') {
                         const rows = cloneTable.querySelectorAll('tr');
                         rows.forEach(row => {
@@ -1473,10 +1484,8 @@
                         });
                     }
 
-                    // Tên bảng
                     let tableName = target.name.replace(/_/g, ' ');
                     excelContent += `<h2>${tableName}</h2>`;
-                    // Nhúng HTML của bảng đã cắt gọt vào
                     excelContent += cloneTable.outerHTML;
                     excelContent += `<br/>`;
                 }
@@ -1484,7 +1493,6 @@
 
             excelContent += `</body></html>`;
             
-            // Đóng gói thành định dạng `.xls`
             const blob = new Blob([excelContent], { type: 'application/vnd.ms-excel' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
