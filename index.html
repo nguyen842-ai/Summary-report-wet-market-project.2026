@@ -941,24 +941,39 @@
             });
         }
 
-        /* ----------------------------------------------------
-           5. COVERAGE TABLES (BỊ LỌC THÁNG)
+      /* ----------------------------------------------------
+           5. COVERAGE TABLES (CHỈ HIỂN THỊ THÁNG ĐƯỢC CHỌN HOẶC MỚI NHẤT)
            ---------------------------------------------------- */
         function renderCoverageTables() {
-            // Lọc dữ liệu D HC (Sheet cột G là Tháng -> index 6)
-            const filteredDhc = filterDataSwotHc(globalData.dhc, 6);
+            const selectedMonth = document.getElementById('filter-month').value;
             
             const masterData = getAggregatedMasterData();
             const salesData = getAggregatedSecondarySales();
 
-            // Lấy tất cả các tháng hiện có trong data Sales
+            // Lấy danh sách các tháng hiện có trong data Sales
             const salesMonthsSet = new Set();
-            salesData.forEach(r => { if(r.mo) salesMonthsSet.add(r.mo); });
+            salesData.forEach(r => { if(r.mo) salesMonthsSet.add(r.mo.trim().toLowerCase()); });
             const availableMonths = Array.from(salesMonthsSet).sort((a,b) => parseInt(getVietnameseMonth(a)) - parseInt(getVietnameseMonth(b)));
 
-            // Header 2 bảng
-            let headHtml = `<th>HQ</th><th>Area</th><th>Province (PR)</th><th>CDM</th><th>KAM</th><th class="text-center">HC</th><th class="text-center">Target</th>`;
-            availableMonths.forEach(m => headHtml += `<th class="text-center">Act. Tháng ${getVietnameseMonth(m)}</th>`);
+            // Xác định tháng sẽ hiển thị (nếu là 'All' thì lấy tháng lớn nhất/mới nhất)
+            let activeMonthStr = selectedMonth;
+            if (selectedMonth === 'All') {
+                if (availableMonths.length === 0) return; // Nếu chưa có data thì dừng
+                activeMonthStr = availableMonths[availableMonths.length - 1]; 
+            } else {
+                activeMonthStr = selectedMonth.trim().toLowerCase();
+            }
+
+            // Lọc dữ liệu D HC: Giữ lại đúng dòng của tháng cần hiển thị
+            let rawDhc = filterDataSwotHc(globalData.dhc, 6);
+            let filteredDhc = rawDhc.filter(row => {
+                let rowMo = (row._raw[6] || '').trim().toLowerCase();
+                return getVietnameseMonth(rowMo) === getVietnameseMonth(activeMonthStr);
+            });
+
+            // Header 2 bảng (Chỉ hiển thị 1 cột Target và 1 cột Actual của tháng active)
+            let monthName = getVietnameseMonth(activeMonthStr);
+            let headHtml = `<th>HQ</th><th>Area</th><th>Province (PR)</th><th>CDM</th><th>KAM</th><th class="text-center">HC</th><th class="text-center">Target (Tháng ${monthName})</th><th class="text-center">Act. Tháng ${monthName}</th>`;
             
             document.getElementById('wm-table-head').innerHTML = `<tr>${headHtml}</tr>`;
             document.getElementById('cus-table-head').innerHTML = `<tr>${headHtml}</tr>`;
@@ -967,7 +982,7 @@
             let cusBody = '';
 
             if(filteredDhc.length === 0) {
-                let emptyRow = `<tr><td colspan="${7 + availableMonths.length}" class="text-center" style="color:#999; padding:20px;">Không có dữ liệu</td></tr>`;
+                let emptyRow = `<tr><td colspan="8" class="text-center" style="color:#999; padding:20px;">Không có dữ liệu HC cho Tháng ${monthName}</td></tr>`;
                 document.getElementById('wm-table-body').innerHTML = emptyRow;
                 document.getElementById('cus-table-body').innerHTML = emptyRow;
                 return;
@@ -984,8 +999,11 @@
 
                 let targetM = new Set();
                 let targetCC = new Set();
+                
+                // Đếm Target từ Master Data theo tháng đang xét
                 masterData.forEach(mRow => {
-                    if (mRow.hq === hq && mRow.ar === ar && mRow.mo === rowMo) {
+                    let mMo = (mRow.mo || '').trim().toLowerCase();
+                    if (mRow.hq === hq && mRow.ar === ar && getVietnameseMonth(mMo) === getVietnameseMonth(rowMo)) {
                         let mPr = mRow.pr || mRow.Province || mRow.Pv || '';
                         if (!mPr || mPr === pr) {
                             if(mRow.m) targetM.add(mRow.m);
@@ -994,30 +1012,32 @@
                     }
                 });
 
-                let actualsM = {}; let actualsCC = {};
-                availableMonths.forEach(colMo => { actualsM[colMo] = new Set(); actualsCC[colMo] = new Set(); });
+                let actualsM = new Set(); 
+                let actualsCC = new Set();
 
+                // Đếm Actual từ Sales Data theo tháng đang xét
                 salesData.forEach(sRow => {
-                    if (sRow.hq === hq && sRow.ar === ar && availableMonths.includes(sRow.mo)) {
+                    let sMo = (sRow.mo || '').trim().toLowerCase();
+                    if (sRow.hq === hq && sRow.ar === ar && getVietnameseMonth(sMo) === getVietnameseMonth(rowMo)) {
                         let sPr = sRow.pr || sRow.Province || sRow.Pv || '';
                         if (!sPr || sPr === pr) {
-                            if(sRow.m) actualsM[sRow.mo].add(sRow.m);
-                            if(sRow.cc) actualsCC[sRow.mo].add(sRow.cc);
+                            if(sRow.m) actualsM.add(sRow.m);
+                            if(sRow.cc) actualsCC.add(sRow.cc);
                         }
                     }
                 });
 
                 wmBody += `<tr>
-                    <td>${hq}</td><td>${ar}</td><td>${pr}</td><td>${cdm}</td><td>${kam}</td><td class="text-center font-weight-bold">${hc}</td>
-                    <td class="text-center" style="font-weight:bold; color:#0B486B;">${targetM.size}</td>`;
-                availableMonths.forEach(colMo => { wmBody += `<td class="text-center" style="color:#3B8686; font-weight:500;">${actualsM[colMo].size}</td>`; });
-                wmBody += `</tr>`;
+                    <td>${hq}</td><td>${ar}</td><td>${pr}</td><td>${cdm}</td><td>${kam}</td><td class="text-center" style="font-weight:bold;">${hc}</td>
+                    <td class="text-center" style="font-weight:bold; color:#0B486B;">${targetM.size}</td>
+                    <td class="text-center" style="color:#3B8686; font-weight:bold;">${actualsM.size}</td>
+                    </tr>`;
 
                 cusBody += `<tr>
-                    <td>${hq}</td><td>${ar}</td><td>${pr}</td><td>${cdm}</td><td>${kam}</td><td class="text-center font-weight-bold">${hc}</td>
-                    <td class="text-center" style="font-weight:bold; color:#0B486B;">${targetCC.size}</td>`;
-                availableMonths.forEach(colMo => { cusBody += `<td class="text-center" style="color:#3B8686; font-weight:500;">${actualsCC[colMo].size}</td>`; });
-                cusBody += `</tr>`;
+                    <td>${hq}</td><td>${ar}</td><td>${pr}</td><td>${cdm}</td><td>${kam}</td><td class="text-center" style="font-weight:bold;">${hc}</td>
+                    <td class="text-center" style="font-weight:bold; color:#0B486B;">${targetCC.size}</td>
+                    <td class="text-center" style="color:#3B8686; font-weight:bold;">${actualsCC.size}</td>
+                    </tr>`;
             });
 
             document.getElementById('wm-table-body').innerHTML = wmBody;
