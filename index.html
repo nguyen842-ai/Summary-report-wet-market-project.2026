@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ Thống Quản Lý Tiến Độ & Phân Tích SWOT</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="./dbin.js"></script>
     <style>
         /* ==========================================================================
@@ -67,7 +66,6 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
 
-        /* CSS Cho 2 hộp nút chuyển ngôn ngữ VI/EN nhỏ sát tiêu đề */
         .lang-switcher {
             display: inline-flex;
             gap: 4px;
@@ -134,7 +132,6 @@
             color: #333;
         }
 
-        /* Nút xuất file Excel */
         .btn-excel {
             background-color: #1f7244;
             color: #ffffff;
@@ -466,11 +463,8 @@
 
         let globalData = { gantt: [], swot: [], hcPlan: [], hcActual: [], dhc: [] };
         let barChartInstance = null, donutChartInstance = null, secBarChartInstance = null, secDonutChartInstance = null;
-        let currentLanguage = 'vi'; // Khởi tạo ngôn ngữ mặc định
+        let currentLanguage = 'vi';
 
-        // ==========================================================================
-        // BỘ TỪ ĐIỂN DỊCH GIAO DIỆN CỐ ĐỊNH (CẬP NHẬT: LOẠI BỎ CHỮ "MONTH" Ở BẢN EN)
-        // ==========================================================================
         const i18n = {
             vi: {
                 loadTitle: "HỆ THỐNG ĐANG KHỞI TẠO",
@@ -515,7 +509,7 @@
                 lblArea: "Reporting Area:",
                 allMonth: "All Months",
                 allArea: "All Areas",
-                monthPrefix: "", // ĐÃ BỎ CHỮ "MONTH" THEO YÊU CẦU
+                monthPrefix: "",
                 titleGantt: "Project Gantt Chart",
                 thTask: "Main Tasks",
                 thDeadline: "Deadline",
@@ -553,7 +547,6 @@
             return currentLanguage;
         }
 
-        // Xử lý sự kiện khi bấm nút VI hoặc EN nhỏ sát tiêu đề
         function switchLanguage(lang) {
             currentLanguage = lang;
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
@@ -561,12 +554,19 @@
             if(lang === 'en') document.getElementById('btn-lang-en').classList.add('active');
             
             updateStaticUI();
-            setupFilters(); // Cập nhật lại danh sách tháng trong dropdown lọc
+            setupFilters(); 
             renderDashboard();
         }
 
+        // CHUẨN HÓA SỐ HỆ QUỐC TẾ (en-US): chấm cho thập phân, phẩy cho hàng nghìn
         function formatCurrency(num) {
-            return new Intl.NumberFormat('vi-VN').format(num || 0);
+            return new Intl.NumberFormat('en-US').format(num || 0);
+        }
+
+        // Định dạng số lượng thùng SKU giữ 2 chữ số thập phân
+        function formatQty(num) {
+            if (!num || num === 0) return '-';
+            return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
         }
 
         function parseDateString(dateStr) {
@@ -686,19 +686,38 @@
             document.getElementById('lbl-excel-btn').innerText = text.excelBtn;
         }
 
+        // BỐC DỮ LIỆU TƯỜNG MINH TRÁNH LỖI PHẠM VI (SCOPE) CỦA LET/CONST
         function getAggregatedSecondarySales() {
             let combinedData = [];
-            for (let i = 1; i <= 12; i++) {
-                if (typeof window[`dbSalesM${i}`] !== 'undefined') combinedData = combinedData.concat(window[`dbSalesM${i}`]);
-            }
+            if (typeof dbSalesM1 !== 'undefined') combinedData = combinedData.concat(dbSalesM1);
+            if (typeof dbSalesM2 !== 'undefined') combinedData = combinedData.concat(dbSalesM2);
+            if (typeof dbSalesM3 !== 'undefined') combinedData = combinedData.concat(dbSalesM3);
+            if (typeof dbSalesM4 !== 'undefined') combinedData = combinedData.concat(dbSalesM4);
+            if (typeof dbSalesM5 !== 'undefined') combinedData = combinedData.concat(dbSalesM5);
+            if (typeof dbSalesM6 !== 'undefined') combinedData = combinedData.concat(dbSalesM6);
+            if (typeof dbSalesM7 !== 'undefined') combinedData = combinedData.concat(dbSalesM7);
+            if (typeof dbSalesM8 !== 'undefined') combinedData = combinedData.concat(dbSalesM8);
+            if (typeof dbSalesM9 !== 'undefined') combinedData = combinedData.concat(dbSalesM9);
+            if (typeof dbSalesM10 !== 'undefined') combinedData = combinedData.concat(dbSalesM10);
+            if (typeof dbSalesM11 !== 'undefined') combinedData = combinedData.concat(dbSalesM11);
+            if (typeof dbSalesM12 !== 'undefined') combinedData = combinedData.concat(dbSalesM12);
             return combinedData;
         }
 
         function getAggregatedMasterData() {
             let combinedData = [];
-            for (let i = 1; i <= 12; i++) {
-                if (typeof window[`dbMasterM${i}`] !== 'undefined') combinedData = combinedData.concat(window[`dbMasterM${i}`]);
-            }
+            if (typeof dbMasterM1 !== 'undefined') combinedData = combinedData.concat(dbMasterM1);
+            if (typeof dbMasterM2 !== 'undefined') combinedData = combinedData.concat(dbMasterM2);
+            if (typeof dbMasterM3 !== 'undefined') combinedData = combinedData.concat(dbMasterM3);
+            if (typeof dbMasterM4 !== 'undefined') combinedData = combinedData.concat(dbMasterM4);
+            if (typeof dbMasterM5 !== 'undefined') combinedData = combinedData.concat(dbMasterM5);
+            if (typeof dbMasterM6 !== 'undefined') combinedData = combinedData.concat(dbMasterM6);
+            if (typeof dbMasterM7 !== 'undefined') combinedData = combinedData.concat(dbMasterM7);
+            if (typeof dbMasterM8 !== 'undefined') combinedData = combinedData.concat(dbMasterM8);
+            if (typeof dbMasterM9 !== 'undefined') combinedData = combinedData.concat(dbMasterM9);
+            if (typeof dbMasterM10 !== 'undefined') combinedData = combinedData.concat(dbMasterM10);
+            if (typeof dbMasterM11 !== 'undefined') combinedData = combinedData.concat(dbMasterM11);
+            if (typeof dbMasterM12 !== 'undefined') combinedData = combinedData.concat(dbMasterM12);
             return combinedData;
         }
 
@@ -724,7 +743,6 @@
             });
             monthFilter.value = savedMonth;
 
-            // Xóa đăng ký cũ tránh lặp sự kiện
             areaFilter.removeEventListener('change', renderDashboard);
             monthFilter.removeEventListener('change', renderDashboard);
             areaFilter.addEventListener('change', renderDashboard);
@@ -920,7 +938,7 @@
             barChartInstance = new Chart(ctxBar, {
                 type: 'bar', 
                 data: { labels: uniqProvinces, datasets: [{ label: i18n[lang].chartVal, data: uniqProvinces.map(p => aggregation.chartDataObj[p]), backgroundColor: '#0B486B', borderRadius: 4 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, ticks: { callback: val => new Intl.NumberFormat('vi-VN', {notation: 'compact'}).format(val) } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, ticks: { callback: val => new Intl.NumberFormat('en-US', {notation: 'compact'}).format(val) } } } }
             });
 
             let qtyHead = `<th>HQ</th><th>Area</th><th>${i18n[lang].thProv}</th><th>SKU</th>`;
@@ -944,18 +962,18 @@
                         else if(row.sku.toLowerCase().includes("miến dong")) displaySku = i18n.en.skuMienDong;
                     }
                     qtyBody += `<tr><td>${row.hq}</td><td>${ar}</td><td>${row.Pv}</td><td style="font-weight:500;">${displaySku}</td>`;
-                    availableMonths.forEach(m => qtyBody += `<td class="text-right">${(row.months[m] || 0) > 0 ? (row.months[m]).toFixed(2) : '-'}</td>`);
-                    qtyBody += `<td class="text-right" style="font-weight:500; color:#3B8686;">${row.total.toFixed(2)}</td></tr>`;
+                    availableMonths.forEach(m => qtyBody += `<td class="text-right">${formatQty(row.months[m] || 0)}</td>`);
+                    qtyBody += `<td class="text-right" style="font-weight:500; color:#3B8686;">${formatQty(row.total)}</td></tr>`;
                 });
                 qtyBody += `<tr style="background-color: #e0f2f1;"><td colspan="4" class="text-right" style="font-weight:bold; color:#3B8686;">${i18n[lang].subtotal}${ar.toUpperCase()}</td>`;
-                availableMonths.forEach(m => qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${(grp.subMonths[m] || 0).toFixed(2)}</td>`);
-                qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${grp.subTotal.toFixed(2)}</td></tr>`;
+                availableMonths.forEach(m => qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${formatQty(grp.subMonths[m] || 0)}</td>`);
+                qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${formatQty(grp.subTotal)}</td></tr>`;
             });
             document.getElementById('sku-table-body').innerHTML = qtyBody;
 
             let skuFoot = `<tr><td colspan="4" style="text-align:right;"><strong>${i18n[lang].total}</strong></td>`;
-            availableMonths.forEach(m => skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${(aggregation.grandTotalQty.months[m] || 0).toFixed(2)}</td>`);
-            skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${aggregation.grandTotalQty.total.toFixed(2)}</td></tr>`;
+            availableMonths.forEach(m => skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${formatQty(aggregation.grandTotalQty.months[m] || 0)}</td>`);
+            skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${formatQty(aggregation.grandTotalQty.total)}</td></tr>`;
             document.getElementById('sku-table-foot').innerHTML = skuFoot;
 
             const ctxDonut = document.getElementById('donutChart').getContext('2d');
@@ -1053,7 +1071,7 @@
             secBarChartInstance = new Chart(ctxSecBar, {
                 type: 'bar', 
                 data: { labels: uniqAreas, datasets: [{ label: i18n[lang].chartSecVal, data: uniqAreas.map(a => aggregation.chartDataObj[a]), backgroundColor: '#0B486B', borderRadius: 4 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, ticks: { callback: val => new Intl.NumberFormat('vi-VN', {notation: 'compact'}).format(val) } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, ticks: { callback: val => new Intl.NumberFormat('en-US', {notation: 'compact'}).format(val) } } } }
             });
 
             let qtyHead = `<th>HQ</th><th>Area</th><th>SKU</th>`;
@@ -1077,18 +1095,18 @@
                         else if(row.sku.toLowerCase().includes("miến dong")) displaySku = i18n.en.skuMienDong;
                     }
                     qtyBody += `<tr><td>${row.hq}</td><td>${ar}</td><td style="font-weight:500;">${displaySku}</td>`;
-                    availableMonths.forEach(m => qtyBody += `<td class="text-right">${(row.months[m] || 0) > 0 ? (row.months[m]).toFixed(2) : '-'}</td>`);
-                    qtyBody += `<td class="text-right" style="font-weight:500; color:#3B8686;">${row.total.toFixed(2)}</td></tr>`;
+                    availableMonths.forEach(m => qtyBody += `<td class="text-right">${formatQty(row.months[m] || 0)}</td>`);
+                    qtyBody += `<td class="text-right" style="font-weight:500; color:#3B8686;">${formatQty(row.total)}</td></tr>`;
                 });
                 qtyBody += `<tr style="background-color: #e0f2f1;"><td colspan="3" class="text-right" style="font-weight:bold; color:#3B8686;">${i18n[lang].subtotal}${ar.toUpperCase()}</td>`;
-                availableMonths.forEach(m => qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${(grp.subMonths[m] || 0).toFixed(2)}</td>`);
-                qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${grp.subTotal.toFixed(2)}</td></tr>`;
+                availableMonths.forEach(m => qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${formatQty(grp.subMonths[m] || 0)}</td>`);
+                qtyBody += `<td class="text-right" style="font-weight:bold; color:#3B8686;">${formatQty(grp.subTotal)}</td></tr>`;
             });
             document.getElementById('sec-sku-table-body').innerHTML = qtyBody;
 
             let skuFoot = `<tr><td colspan="3" style="text-align:right;"><strong>${i18n[lang].total}</strong></td>`;
-            availableMonths.forEach(m => skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${(aggregation.grandTotalQty.months[m] || 0).toFixed(2)}</td>`);
-            skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${aggregation.grandTotalQty.total.toFixed(2)}</td></tr>`;
+            availableMonths.forEach(m => skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold;">${formatQty(aggregation.grandTotalQty.months[m] || 0)}</td>`);
+            skuFoot += `<td class="text-right" style="color:#e53935; font-weight:bold; font-size:14px;">${formatQty(aggregation.grandTotalQty.total)}</td></tr>`;
             document.getElementById('sec-sku-table-foot').innerHTML = skuFoot;
 
             const ctxSecDonut = document.getElementById('sec-donutChart').getContext('2d');
@@ -1410,49 +1428,71 @@
         }
 
         // ==========================================================================
-        // 6. CHỨC NĂNG XUẤT EXCEL BÁO CÁO CÁC BẢNG BIỂU (TỰ ĐỘNG BỎ BIỂU ĐỒ)
+        // 6. XUẤT EXCEL BẰNG HTML BLOB (GIỮ NGUYÊN ĐỊNH DẠNG BẢNG - BỎ QUA BIỂU ĐỒ)
         // ==========================================================================
         function exportToExcel() {
-            // Khởi tạo một Workbook Excel trống
-            const wb = XLSX.utils.book_new();
-            
-            // Khai báo danh sách bảng biểu, ID HTML mục tiêu và tên Sheet Excel tương ứng
             const tablesToExport = [
-                { id: 'table-gantt-data', name: 'Project Gantt Progress' },
-                { id: 'tbl-primary-sales', name: 'Primary Sales Value' },
-                { id: 'tbl-primary-sku', name: 'Primary Sales Volume SKU' },
-                { id: 'tbl-secondary-sales', name: 'Secondary Sales Value' },
-                { id: 'tbl-secondary-sku', name: 'Secondary Sales Volume SKU' },
-                { id: 'tbl-coverage-wm', name: 'Wet Market Coverage' },
-                { id: 'tbl-coverage-cus', name: 'Customer Coverage' }
+                { id: 'table-gantt-data', name: 'Project_Gantt_Progress' },
+                { id: 'tbl-primary-sales', name: 'Primary_Sales_Value' },
+                { id: 'tbl-primary-sku', name: 'Primary_Sales_SKU' },
+                { id: 'tbl-secondary-sales', name: 'Secondary_Sales_Value' },
+                { id: 'tbl-secondary-sku', name: 'Secondary_Sales_SKU' },
+                { id: 'tbl-coverage-wm', name: 'Wet_Market_Coverage' },
+                { id: 'tbl-coverage-cus', name: 'Customer_Coverage' }
             ];
+
+            let excelContent = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office"
+                  xmlns:x="urn:schemas-microsoft-com:office:excel"
+                  xmlns="http://www.w3.org/TR/REC-html40">
+            <head>
+                <meta charset="utf-8">
+                <style>
+                    table { border-collapse: collapse; width: 100%; margin-bottom: 30px; font-family: 'Segoe UI', Arial, sans-serif; }
+                    th, td { border: 1px solid #c0c0c0; padding: 6px 10px; font-size: 13px; text-align: left; vertical-align: middle; white-space: nowrap; }
+                    th { background-color: #f0f2f5; color: #1a237e; font-weight: bold; text-align: center; }
+                    .text-right { text-align: right; }
+                    .text-center { text-align: center; }
+                    h2 { color: #0B486B; font-family: 'Segoe UI', Arial, sans-serif; font-size: 18px; margin-top: 20px; text-transform: uppercase; }
+                </style>
+            </head>
+            <body>`;
 
             tablesToExport.forEach(target => {
                 const tableElement = document.getElementById(target.id);
                 if (tableElement) {
-                    // Sao chép tạm phần tử bảng để xử lý cắt bỏ cột hoặc định dạng phức tạp
                     const cloneTable = tableElement.cloneNode(true);
                     
-                    // Đặc thù bảng Gantt: Cắt bỏ cột tiến độ thanh đồ họa phức tạp (Cột thứ 4)
+                    // Đặc thù bảng Gantt: Cắt bỏ cột thanh đồ họa màu mè (cột thứ 4 index 3)
                     if (target.id === 'table-gantt-data') {
                         const rows = cloneTable.querySelectorAll('tr');
                         rows.forEach(row => {
                             if (row.cells.length >= 4) {
-                                row.deleteCell(3); // Xóa ô Timeline đồ họa để dữ liệu Excel gọn gàng
+                                row.deleteCell(3); 
                             }
                         });
                     }
 
-                    // Chuyển đổi mã HTML bảng sang định dạng dữ liệu Sheet của thư viện
-                    const ws = XLSX.utils.table_to_sheet(cloneTable, { raw: false });
-                    
-                    // Đưa dữ liệu trang tính này vào Workbook chung
-                    XLSX.utils.book_append_sheet(wb, ws, target.name);
+                    // Tên bảng
+                    let tableName = target.name.replace(/_/g, ' ');
+                    excelContent += `<h2>${tableName}</h2>`;
+                    // Nhúng HTML của bảng đã cắt gọt vào
+                    excelContent += cloneTable.outerHTML;
+                    excelContent += `<br/>`;
                 }
             });
 
-            // Xuất file dữ liệu nhị phân Excel ra máy người dùng
-            XLSX.writeFile(wb, 'Bao_Cao_Tong_Hop_Du_An.xlsx');
+            excelContent += `</body></html>`;
+            
+            // Đóng gói thành định dạng `.xls`
+            const blob = new Blob([excelContent], { type: 'application/vnd.ms-excel' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Bao_Cao_Tong_Hop_Du_An.xls';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
     </script>
 </body>
