@@ -6,9 +6,6 @@
     <title>Hệ Thống Quản Lý Tiến Độ & Phân Tích SWOT</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script src="./dbin.js"></script>
-    <script src="./dataM5.js"></script>
-    <script src="./dataM6.js"></script>
     <style>
         /* ==========================================================================
            1. CẤU HÌNH GIAO DIỆN CHUNG (CSS RESET & BASE)
@@ -377,11 +374,30 @@
 
     </div>
 
+    <script type="module">
+        import { dbinSales } from './dbin.js';
+        window.dbinSales = dbinSales;
+    </script>
+
     <script>
+        // ----------------------------------------------------
+        // BỘ AUTO-LOADER: TỰ ĐỘNG TẢI CÁC FILE M1 ĐẾN M12
+        // Bỏ qua lỗi 404 nếu file chưa được up
+        // ----------------------------------------------------
+        let scriptsProcessed = 0;
+        const totalScriptsToLoad = 12;
+
+        for (let i = 1; i <= totalScriptsToLoad; i++) {
+            let script = document.createElement('script');
+            script.src = `./dataM${i}.js`;
+            script.onload = () => { scriptsProcessed++; };
+            script.onerror = () => { scriptsProcessed++; }; 
+            document.head.appendChild(script);
+        }
+
         const SPREADSHEET_ID = '1Xtwk_Y7UGKNw2YC9c4kblae71mHahzr7GqV-sfiie6E';
         const API_KEY = 'AIzaSyC8oIfsPGtSedj73Qky4aasg98xqkrWT5s'; 
 
-        // Khai báo globalData có thêm dHC
         let globalData = { gantt: [], swot: [], hcPlan: [], hcActual: [], dhc: [] };
         
         let barChartInstance = null;
@@ -402,7 +418,6 @@
             return months[monthStr] || monthStr; 
         }
 
-        // Tùy chỉnh hàm convert để giữ lại mảng thô (giúp truy xuất theo cột chính xác 100%)
         function convertRawToObjects(rawValues) {
             if (!rawValues || rawValues.length === 0) return [];
             const headers = rawValues[0];
@@ -420,6 +435,16 @@
             return data.values;
         }
 
+        // Đợi module dbinSales và 12 script điểm danh xong mới chạy
+        window.addEventListener('DOMContentLoaded', () => {
+            const checkDataInterval = setInterval(() => {
+                if (window.dbinSales && scriptsProcessed === totalScriptsToLoad) {
+                    clearInterval(checkDataInterval);
+                    initDashboard();
+                }
+            }, 100);
+        });
+
         async function initDashboard() {
             const progressBar = document.getElementById('main-progress-bar');
             const loadScreen = document.getElementById('loading-screen');
@@ -436,7 +461,7 @@
                 progressBar.style.width = '80%';
                 globalData.hcActual = convertRawToObjects(await fetchSheetTab('Headcount actual'));
                 progressBar.style.width = '100%';
-                globalData.dhc = convertRawToObjects(await fetchSheetTab('D HC')); // Lấy data sheet mới
+                globalData.dhc = convertRawToObjects(await fetchSheetTab('D HC')); 
                 
                 setupFilters();
                 renderDashboard();
@@ -449,11 +474,11 @@
                     }, 500);
                 }, 600);
             } catch (error) {
-                statusText.innerText = 'LỖI: ' + error.message;
+                statusText.innerText = 'LỖI GOOGLE SHEETS: ' + error.message;
             }
         }
 
-        // --- CÁC HÀM GOM DỮ LIỆU TỰ ĐỘNG ---
+        // --- CÁC HÀM GOM DỮ LIỆU TỰ ĐỘNG TỪ FILE JS TRONG BỘ NHỚ ---
         function getAggregatedSecondarySales() {
             let combinedData = [];
             if (typeof dbSalesM1 !== 'undefined') combinedData = combinedData.concat(dbSalesM1);
@@ -489,16 +514,13 @@
         }
 
         function setupFilters() {
-            // Setup Bộ Lọc Area
             const areaFilter = document.getElementById('filter-area');
             const areas = [...new Set(globalData.gantt.map(item => item['ar'] || item['AR'] || item['Area'] || item['Khu vực']).filter(x => x))];
             areaFilter.innerHTML = '<option value="All">Tất cả khu vực</option>';
             areas.forEach(area => { areaFilter.innerHTML += `<option value="${area}">${area}</option>`; });
             
-            // Setup Bộ Lọc Tháng
             const monthFilter = document.getElementById('filter-month');
             const months = new Set();
-            // Lấy tháng từ các index bạn yêu cầu: Swot(13), HC Plan(7), HC Actual(7), D HC(6)
             [{data: globalData.swot, idx: 13}, {data: globalData.hcPlan, idx: 7}, {data: globalData.hcActual, idx: 7}, {data: globalData.dhc, idx: 6}].forEach(sheet => {
                 sheet.data.forEach(r => { if(r._raw && r._raw[sheet.idx]) months.add(r._raw[sheet.idx]); });
             });
@@ -510,7 +532,7 @@
             monthFilter.addEventListener('change', renderDashboard);
         }
 
-        // Lọc KHÔNG TÁC ĐỘNG bởi Tháng (Dùng cho Gantt, Primary, Secondary)
+        // Lọc KHÔNG TÁC ĐỘNG bởi Tháng (Gantt, Primary, Secondary)
         function filterDataGanttSales(dataArray, dataIsDbin = false) {
             if (!dataArray || !Array.isArray(dataArray)) return [];
             const selectedArea = document.getElementById('filter-area').value;
@@ -520,16 +542,14 @@
             });
         }
 
-        // Lọc BỊ TÁC ĐỘNG bởi Tháng (Dùng cho SWOT, HC, Coverage)
+        // Lọc BỊ TÁC ĐỘNG bởi Tháng (SWOT, HC, Coverage)
         function filterDataSwotHc(dataArray, rawMonthIndex) {
             if (!dataArray || !Array.isArray(dataArray)) return [];
             const selectedArea = document.getElementById('filter-area').value;
             const selectedMonth = document.getElementById('filter-month').value;
 
             return dataArray.filter(item => {
-                // Lấy Khu vực (Area) linh hoạt kể cả sheet D HC (cột B - index 1)
                 let areaVal = item['ar'] || item['AR'] || item['Area'] || item['Khu vực'] || (item._raw && item._raw[1]) || '';
-                // Lấy Tháng theo index bạn quy định
                 let moVal = (item._raw && item._raw[rawMonthIndex]) ? item._raw[rawMonthIndex] : '';
 
                 if (selectedArea !== 'All' && areaVal.trim().toLowerCase() !== selectedArea.trim().toLowerCase()) return false;
@@ -544,13 +564,13 @@
             renderSWOT();
             renderTreeDiagram();
             
-            if (typeof dbinSales !== 'undefined') renderPrimarySale();
+            if (typeof window.dbinSales !== 'undefined') renderPrimarySale();
             renderSecondarySale();
-            renderCoverageTables(); // Render 2 bảng mới
+            renderCoverageTables(); 
         }
 
         /* ----------------------------------------------------
-           1. GANTT CHART (KHÔNG BỊ LỌC THÁNG)
+           1. GANTT CHART (KHÔNG LỌC THÁNG)
            ---------------------------------------------------- */
         function renderGanttChart() {
             const tbody = document.getElementById('gantt-tbody');
@@ -631,7 +651,7 @@
            2. SWOT & HC TREE (BỊ LỌC THÁNG)
            ---------------------------------------------------- */
         function renderSWOT() {
-            const fSwot = filterDataSwotHc(globalData.swot, 13); // SWOT tháng cột N
+            const fSwot = filterDataSwotHc(globalData.swot, 13);
             ['swot-s', 'swot-w', 'swot-o', 'swot-t', 'swot-support'].forEach(id => document.getElementById(id).innerHTML = '');
             fSwot.forEach(item => {
                 const p = item['PR'] || item['Province'] || item['pr'] || item['province'] || '';
@@ -653,8 +673,8 @@
         function sumRole(data, role) { return data.reduce((s, i) => s + (parseInt(i[role] || i[role.toLowerCase()] || 0)), 0); }
 
         function renderTreeDiagram() {
-            const plan = filterDataSwotHc(globalData.hcPlan, 7);   // HC plan tháng cột H
-            const act = filterDataSwotHc(globalData.hcActual, 7); // HC actual tháng cột H
+            const plan = filterDataSwotHc(globalData.hcPlan, 7); 
+            const act = filterDataSwotHc(globalData.hcActual, 7); 
             const createNode = (role, className) => {
                 const pC = sumRole(plan, role); const aC = sumRole(act, role);
                 return `<div class="tree-node ${className}">
@@ -675,10 +695,10 @@
         }
 
         /* ----------------------------------------------------
-           3. PRIMARY SALES (KHÔNG BỊ LỌC THÁNG)
+           3. PRIMARY SALES (KHÔNG LỌC THÁNG)
            ---------------------------------------------------- */
         function renderPrimarySale() {
-            const filteredDbin = filterDataGanttSales(dbinSales, true);
+            const filteredDbin = filterDataGanttSales(window.dbinSales, true);
             const monthsSet = new Set();
             filteredDbin.forEach(r => monthsSet.add(r.mo));
             const availableMonths = Array.from(monthsSet).sort();
@@ -795,7 +815,7 @@
         }
 
         /* ----------------------------------------------------
-           4. SECONDARY SALES (KHÔNG BỊ LỌC THÁNG)
+           4. SECONDARY SALES (KHÔNG LỌC THÁNG)
            ---------------------------------------------------- */
         function renderSecondarySale() {
             const allSecSales = getAggregatedSecondarySales();
@@ -918,23 +938,23 @@
             const masterData = getAggregatedMasterData();
             const salesData = getAggregatedSecondarySales();
 
-            // Tìm các tháng hiện có trong data Sales để tạo cột Actual động
+            // Lấy tất cả các tháng hiện có trong data Sales
             const salesMonthsSet = new Set();
             salesData.forEach(r => { if(r.mo) salesMonthsSet.add(r.mo); });
             const availableMonths = Array.from(salesMonthsSet).sort((a,b) => parseInt(getVietnameseMonth(a)) - parseInt(getVietnameseMonth(b)));
 
-            // Tạo Header cho 2 bảng
-            let headHtml = `<th>HQ</th><th>Area</th><th>Province (PR)</th><th>CDM</th><th>KAM</th><th class="text-center">HC</th><th class="text-center">Target Market</th>`;
+            // Header 2 bảng
+            let headHtml = `<th>HQ</th><th>Area</th><th>Province (PR)</th><th>CDM</th><th>KAM</th><th class="text-center">HC</th><th class="text-center">Target</th>`;
             availableMonths.forEach(m => headHtml += `<th class="text-center">Act. Tháng ${getVietnameseMonth(m)}</th>`);
             
             document.getElementById('wm-table-head').innerHTML = `<tr>${headHtml}</tr>`;
-            document.getElementById('cus-table-head').innerHTML = `<tr>${headHtml.replace('Target Market', 'Target Customer')}</tr>`;
+            document.getElementById('cus-table-head').innerHTML = `<tr>${headHtml}</tr>`;
 
             let wmBody = '';
             let cusBody = '';
 
             if(filteredDhc.length === 0) {
-                let emptyRow = `<tr><td colspan="${7 + availableMonths.length}" class="text-center" style="color:#999; padding:20px;">Không có dữ liệu (Vui lòng kiểm tra lại bộ lọc)</td></tr>`;
+                let emptyRow = `<tr><td colspan="${7 + availableMonths.length}" class="text-center" style="color:#999; padding:20px;">Không có dữ liệu</td></tr>`;
                 document.getElementById('wm-table-body').innerHTML = emptyRow;
                 document.getElementById('cus-table-body').innerHTML = emptyRow;
                 return;
@@ -947,9 +967,8 @@
                 let cdm = row._raw[3] || '';
                 let kam = row._raw[4] || '';
                 let hc = row._raw[5] || '';
-                let rowMo = row._raw[6] || ''; // Tháng quy định của dòng này để đếm Target
+                let rowMo = row._raw[6] || ''; 
 
-                // 1. Tính TARGET (Khớp HQ, Area, và Month = rowMo)
                 let targetM = new Set();
                 let targetCC = new Set();
                 masterData.forEach(mRow => {
@@ -962,7 +981,6 @@
                     }
                 });
 
-                // 2. Tính ACTUALS rải đều theo các cột Tháng hiện có (khớp HQ, Area)
                 let actualsM = {}; let actualsCC = {};
                 availableMonths.forEach(colMo => { actualsM[colMo] = new Set(); actualsCC[colMo] = new Set(); });
 
@@ -976,14 +994,12 @@
                     }
                 });
 
-                // Build Dòng Bảng Wet Market
                 wmBody += `<tr>
                     <td>${hq}</td><td>${ar}</td><td>${pr}</td><td>${cdm}</td><td>${kam}</td><td class="text-center font-weight-bold">${hc}</td>
                     <td class="text-center" style="font-weight:bold; color:#0B486B;">${targetM.size}</td>`;
                 availableMonths.forEach(colMo => { wmBody += `<td class="text-center" style="color:#3B8686; font-weight:500;">${actualsM[colMo].size}</td>`; });
                 wmBody += `</tr>`;
 
-                // Build Dòng Bảng Customer
                 cusBody += `<tr>
                     <td>${hq}</td><td>${ar}</td><td>${pr}</td><td>${cdm}</td><td>${kam}</td><td class="text-center font-weight-bold">${hc}</td>
                     <td class="text-center" style="font-weight:bold; color:#0B486B;">${targetCC.size}</td>`;
