@@ -640,6 +640,7 @@
                 globalData.dhc = convertRawToObjects(await fetchSheetTab('D HC')); 
                 
                 progressBar.style.width = '100%';
+                // Đọc Sheet N (Bảng từ điển)
                 try {
                     let nRaw = await fetchSheetTab('N');
                     if (nRaw && nRaw.length > 0) {
@@ -647,13 +648,13 @@
                             if (row[0] && row[1]) {
                                 let en = row[0].trim();
                                 let vi = row[1].trim();
-                                // Bỏ qua tiêu đề nếu có
+                                // Lọc bỏ tiêu đề cột
                                 if (index === 0 && (en.toLowerCase() === 'english' || en.toLowerCase() === 'en' || vi.toLowerCase().includes('việt') || en.toLowerCase().includes('tiếng anh'))) return;
                                 globalData.skuDict.push({ en: en, vi: vi, lowerVi: vi.toLowerCase() });
                             }
                         });
                     }
-                } catch(e) { console.warn("Không tải được Sheet N (Từ điển SKU)"); }
+                } catch(e) { console.warn("Không tải được Sheet N (Từ điển)"); }
 
                 updateStaticUI();
                 setupFilters();
@@ -690,6 +691,23 @@
             document.getElementById('title-cov-wm').innerText = text.titleCovWm;
             document.getElementById('title-cov-cus').innerText = text.titleCovCus;
             document.getElementById('lbl-excel-btn').innerText = text.excelBtn;
+        }
+
+        // HÀM TRA CỨU TỪ ĐIỂN TỪ SHEET N
+        function getDictTranslation(keyword) {
+            let keywordLower = keyword.toLowerCase();
+            let found = globalData.skuDict.find(m => m.lowerVi === keywordLower);
+            if (!found) found = globalData.skuDict.find(m => m.lowerVi.includes(keywordLower) || keywordLower.includes(m.lowerVi));
+            
+            if (found) return getLang() === 'en' ? found.en : found.vi;
+            
+            if (getLang() === 'en') {
+                if (keyword === "Song Lân") return "Song Lan";
+                if (keyword === "Miến Tươi") return "Fresh Glass Noodles";
+                if (keyword === "Miến Đậu Xanh") return "Mung Bean Noodles";
+                if (keyword === "Miến Dong") return "Dong Noodles";
+            }
+            return keyword;
         }
 
         function getAggregatedSecondarySales() {
@@ -874,10 +892,6 @@
                 return;
             }
 
-            // Tạo các kho chứa tự động (buckets) dựa trên từ điển Sheet N
-            let initialSkuTotals = {};
-            globalData.skuDict.forEach(m => initialSkuTotals[m.vi] = 0);
-
             const aggregation = filteredDbin.reduce((acc, r) => {
                 if (!acc.areaValueGroups[r.ar]) acc.areaValueGroups[r.ar] = { rows: {}, subTotal: 0, subMonths: {} };
                 const pKey = `${r.hq}_${r.Pv}`;
@@ -904,15 +918,15 @@
                 acc.grandTotalQty.months[r.mo] = (acc.grandTotalQty.months[r.mo] || 0) + r.Qty;
                 acc.grandTotalQty.total += r.Qty;
 
-                // TỰ ĐỘNG GOM NHÓM TỪ KHÓA DỰA TRÊN TỪ ĐIỂN SHEET N
+                // GOM NGÀNH LỚN CHO BIỂU ĐỒ DONUT THEO 4 KEYWORD CỐ ĐỊNH
                 let skuName = (r.sku || '').toLowerCase();
-                let foundMap = globalData.skuDict.find(m => skuName.includes(m.lowerVi));
-                if (foundMap) {
-                    acc.skuTotals[foundMap.vi] += (r.s || 0);
-                }
+                if(skuName.includes("song lân")) acc.skuTotals.songLan += r.s; 
+                else if(skuName.includes("miến đậu xanh")) acc.skuTotals.dauXanh += r.s; 
+                else if(skuName.includes("miến tươi")) acc.skuTotals.mienTuoi += r.s;
+                else if(skuName.includes("miến dong")) acc.skuTotals.mienDong += r.s;
 
                 return acc;
-            }, { areaValueGroups: {}, chartDataObj: {}, grandTotalValues: { total: 0, months: {} }, areaQtyGroups: {}, grandTotalQty: { total: 0, months: {} }, skuTotals: initialSkuTotals });
+            }, { areaValueGroups: {}, chartDataObj: {}, grandTotalValues: { total: 0, months: {} }, areaQtyGroups: {}, grandTotalQty: { total: 0, months: {} }, skuTotals: { songLan: 0, mienTuoi: 0, dauXanh: 0, mienDong: 0 } });
 
             let valHead = `<th>HQ</th><th>Area</th><th>${i18n[lang].thProv}</th>`;
             availableMonths.forEach(m => {
@@ -964,12 +978,8 @@
             Object.keys(aggregation.areaQtyGroups).sort().forEach(ar => {
                 let grp = aggregation.areaQtyGroups[ar];
                 Object.values(grp.rows).forEach(row => {
-                    let displaySku = row.sku;
-                    // TỰ ĐỘNG DỊCH THEO TỪ ĐIỂN SHEET N
-                    let foundMap = globalData.skuDict.find(m => row.sku.toLowerCase().includes(m.lowerVi));
-                    if (foundMap && lang === 'en') {
-                        displaySku = foundMap.en;
-                    }
+                    // DỊCH TÊN CHI TIẾT TỪ SHEET N
+                    let displaySku = getDictTranslation(row.sku);
                     
                     qtyBody += `<tr><td>${row.hq}</td><td>${ar}</td><td>${row.Pv}</td><td style="font-weight:500;">${displaySku}</td>`;
                     availableMonths.forEach(m => qtyBody += `<td class="text-right">${formatQty(row.months[m] || 0)}</td>`);
@@ -989,14 +999,19 @@
             const ctxDonut = document.getElementById('donutChart').getContext('2d');
             if(donutChartInstance) donutChartInstance.destroy();
             
-            // TỰ ĐỘNG BỐC LABEL VÀ DATA CHO DONUT TỪ TỪ ĐIỂN SHEET N
-            const labelsSku = globalData.skuDict.map(m => lang === 'en' ? m.en : m.vi);
-            const rData = globalData.skuDict.map(m => aggregation.skuTotals[m.vi] || 0);
+            // LẤY LABEL CHO DONUT TỪ BỘ TỪ ĐIỂN
+            const labelsSku = [
+                getDictTranslation("Song Lân"), 
+                getDictTranslation("Miến Tươi"), 
+                getDictTranslation("Miến Đậu Xanh"), 
+                getDictTranslation("Miến Dong")
+            ];
+            const rData = [aggregation.skuTotals.songLan, aggregation.skuTotals.mienTuoi, aggregation.skuTotals.dauXanh, aggregation.skuTotals.mienDong];
             const tVal = rData.reduce((a, b) => a + b, 0);
 
             donutChartInstance = new Chart(ctxDonut, {
                 type: 'doughnut', 
-                data: { labels: labelsSku, datasets: [{ data: rData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686', '#A8DBA8', '#FF9F1C', '#D32F2F', '#4A148C', '#009688'], borderWidth: 2 }] },
+                data: { labels: labelsSku, datasets: [{ data: rData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686', '#A8DBA8'], borderWidth: 2 }] },
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
@@ -1023,9 +1038,6 @@
                 return;
             }
 
-            let initialSkuTotals = {};
-            globalData.skuDict.forEach(m => initialSkuTotals[m.vi] = 0);
-
             const aggregation = filteredSec.reduce((acc, r) => {
                 let sVal = parseFloat(r.s) || 0;
                 let qtVal = parseFloat(r.qt) || 0;
@@ -1048,13 +1060,13 @@
                 acc.grandTotalQty.total += qtVal;
 
                 let skuName = (r.sku || '').toLowerCase();
-                let foundMap = globalData.skuDict.find(m => skuName.includes(m.lowerVi));
-                if (foundMap) {
-                    acc.skuTotals[foundMap.vi] += sVal;
-                }
+                if(skuName.includes("song lân")) acc.skuTotals.songLan += sVal; 
+                else if(skuName.includes("miến đậu xanh")) acc.skuTotals.dauXanh += sVal; 
+                else if(skuName.includes("miến tươi")) acc.skuTotals.mienTuoi += sVal;
+                else if(skuName.includes("miến dong")) acc.skuTotals.mienDong += sVal;
 
                 return acc;
-            }, { areaValueGroups: {}, chartDataObj: {}, grandTotalValues: { total: 0, months: {} }, areaQtyGroups: {}, grandTotalQty: { total: 0, months: {} }, skuTotals: initialSkuTotals });
+            }, { areaValueGroups: {}, chartDataObj: {}, grandTotalValues: { total: 0, months: {} }, areaQtyGroups: {}, grandTotalQty: { total: 0, months: {} }, skuTotals: { songLan: 0, mienTuoi: 0, dauXanh: 0, mienDong: 0 } });
 
             let valHead = `<th>HQ</th><th>Area</th>`;
             availableMonths.forEach(m => {
@@ -1101,11 +1113,7 @@
             Object.keys(aggregation.areaQtyGroups).sort().forEach(ar => {
                 let grp = aggregation.areaQtyGroups[ar];
                 Object.values(grp.rows).forEach(row => {
-                    let displaySku = row.sku;
-                    let foundMap = globalData.skuDict.find(m => row.sku.toLowerCase().includes(m.lowerVi));
-                    if (foundMap && lang === 'en') {
-                        displaySku = foundMap.en;
-                    }
+                    let displaySku = getDictTranslation(row.sku);
                     
                     qtyBody += `<tr><td>${row.hq}</td><td>${ar}</td><td style="font-weight:500;">${displaySku}</td>`;
                     availableMonths.forEach(m => qtyBody += `<td class="text-right">${formatQty(row.months[m] || 0)}</td>`);
@@ -1125,20 +1133,25 @@
             const ctxSecDonut = document.getElementById('sec-donutChart').getContext('2d');
             if(secDonutChartInstance) secDonutChartInstance.destroy();
             
-            const labelsSku = globalData.skuDict.map(m => lang === 'en' ? m.en : m.vi);
-            const rData = globalData.skuDict.map(m => aggregation.skuTotals[m.vi] || 0);
-            const tVal = rData.reduce((a, b) => a + b, 0);
+            const labelsSku = [
+                getDictTranslation("Song Lân"), 
+                getDictTranslation("Miến Tươi"), 
+                getDictTranslation("Miến Đậu Xanh"), 
+                getDictTranslation("Miến Dong")
+            ];
+            const rData = [aggregation.skuTotals.songLan, aggregation.skuTotals.mienTuoi, aggregation.skuTotals.dauXanh, aggregation.skuTotals.mienDong];
+            const totalDonutVal = rData.reduce((a, b) => a + b, 0);
 
             secDonutChartInstance = new Chart(ctxSecDonut, {
                 type: 'doughnut', 
-                data: { labels: labelsSku, datasets: [{ data: rData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686', '#A8DBA8', '#FF9F1C', '#D32F2F', '#4A148C', '#009688'], borderWidth: 2 }] },
+                data: { labels: labelsSku, datasets: [{ data: rData, backgroundColor: ['#0B486B', '#79BD9A', '#3B8686', '#A8DBA8'], borderWidth: 2 }] },
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
                     cutout: '55%', 
                     plugins: { 
                         legend: { position: 'bottom' }, 
-                        tooltip: { callbacks: { label: c => `${c.label}: ${formatCurrency(rData[c.dataIndex])} VND (${tVal > 0 ? ((rData[c.dataIndex] / totalDonutVal) * 100).toFixed(2) : 0}%)` } } 
+                        tooltip: { callbacks: { label: c => `${c.label}: ${formatCurrency(rData[c.dataIndex])} VND (${totalDonutVal > 0 ? ((rData[c.dataIndex] / totalDonutVal) * 100).toFixed(2) : 0}%)` } } 
                     } 
                 }
             });
