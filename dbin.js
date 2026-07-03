@@ -1,5 +1,4 @@
 // File: dbin.js
-// Đã chuyển đổi Qty và s sang kiểu Số (Number) để tính toán trực tiếp 
 
 const dbinSales = [
   {hq: "2.North",ar: "1. Ha Noi",Pv: "Hà Nội" ,sku: "Miến tươi Song Long 1kg",mo: "May",Qty: 1562,s:379277080 },
