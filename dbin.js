@@ -16,7 +16,7 @@ const dbinSales = [
 {hq: "1.South",ar: "4. Eastern",Pv: "Đồng Nai" ,sku: "Miến tươi Song Long 1kg",mo: "May",Qty: 230,s:58269120 },
 {hq: "1.South",ar: "4. Eastern",Pv: "Đồng Nai" ,sku: "Miến tươi Song Long 3kg",mo: "May",Qty: 56,s:28619136 },
 
-{hq: "2.North",ar: "1. Ha Noi",Pv: "Hà Nội" ,sku: "Miến đậu xanh Song Long 200g",mo: "Jun",Qty: 6,s:6779136 },
+  {hq: "2.North",ar: "1. Ha Noi",Pv: "Hà Nội" ,sku: "Miến đậu xanh Song Long 200g",mo: "Jun",Qty: 6,s:6779136 },
 {hq: "2.North",ar: "1. Ha Noi",Pv: "Hà Nội" ,sku: "Miến đậu xanh Song Long 500g",mo: "Jun",Qty: 4,s:4367599.6 },
 {hq: "2.North",ar: "1. Ha Noi",Pv: "Hà Nội" ,sku: "Miến tươi Song Long 1kg",mo: "Jun",Qty: 1350,s:322617750 },
 {hq: "2.North",ar: "1. Ha Noi",Pv: "Hà Nội" ,sku: "Miến tươi Song Long 3kg",mo: "Jun",Qty: 443,s:216964566 },
@@ -44,7 +44,7 @@ const dbinSales = [
 {hq: "1.South",ar: "1. HCMC",Pv: "TP.Hồ Chí Minh" ,sku: "Miến tươi Song Lân 500g",mo: "Jun",Qty: 16,s:8325086.952 },
 {hq: "1.South",ar: "2. North Mekong",Pv: "Tiền Giang" ,sku: "Miến đậu xanh Song Long 200g",mo: "Jun",Qty: 7,s:7908992 },
 
-{hq: "2.North",ar: "1. Ha Noi",Pv: "Hà Nội" ,sku: "Miến tươi Song Long 3kg",mo: "Jul",Qty: 43,s:20601945 },
+  {hq: "2.North",ar: "1. Ha Noi",Pv: "Hà Nội" ,sku: "Miến tươi Song Long 3kg",mo: "Jul",Qty: 43,s:20601945 },
 {hq: "1.South",ar: "6. Central",Pv: "Đà Nẵng" ,sku: "Miến tươi Song Long 1kg",mo: "Jul",Qty: 15,s:3800160 },
 {hq: "1.South",ar: "6. Central",Pv: "Đà Nẵng" ,sku: "Miến tươi Song Long 3kg",mo: "Jul",Qty: 40,s:20442240 },
 {hq: "1.South",ar: "4. Eastern",Pv: "Đồng Nai" ,sku: "Miến tươi Song Long 1kg",mo: "Jul",Qty: 18,s:4560192 },
@@ -54,6 +54,5 @@ const dbinSales = [
 {hq: "1.South",ar: "1. HCMC",Pv: "TP.Hồ Chí Minh" ,sku: "Miến tươi Song Long 3kg",mo: "Jul",Qty: 20,s:10221120 },
 {hq: "1.South",ar: "1. HCMC",Pv: "TP.Hồ Chí Minh" ,sku: "Miến tươi Song Long 450g",mo: "Jul",Qty: 3,s:1255800 },
 {hq: "1.South",ar: "1. HCMC",Pv: "TP.Hồ Chí Minh" ,sku: "Miến tươi Song Lân 500g",mo: "Jul",Qty: 2,s:1040635.869 },
-
-  
+ 
 ];
