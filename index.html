@@ -1141,22 +1141,25 @@
 
         function renderCoverageTables() {
             const selectedArea = document.getElementById('filter-area').value;
-            const selectedMonth = document.getElementById('filter-month').value;
+            
+            // 1. Ép cứng selectedMonth là 'All' để không bị ảnh hưởng bởi bộ lọc Tháng
+            const selectedMonth = 'All'; 
+            
             const masterData = getAggregatedMasterData();
             const salesData = getAggregatedSecondarySales();
             const lang = getLang();
 
-            let activeMonths = [];
-            if (selectedMonth === 'All') {
-                const monthSet = new Set();
-                globalData.dhc.forEach(item => { if (item._raw?.[6]) monthSet.add(item._raw[6].trim()); });
-                if (monthSet.size === 0) {
-                    salesData.forEach(item => { if (item.mo) monthSet.add(item.mo.trim()); });
-                }
-                activeMonths = Array.from(monthSet).sort((a, b) => parseInt(getVietnameseMonth(a)) - parseInt(getVietnameseMonth(b)));
-            } else {
-                activeMonths = [selectedMonth];
-            }
+            // 2. Gom tất cả các tháng từ MỌI NGUỒN (D HC, Sales, Master) để đảm bảo không sót tháng 7
+            const monthSet = new Set();
+            globalData.dhc.forEach(item => { if (item._raw?.[6]) monthSet.add(item._raw[6].trim()); });
+            salesData.forEach(item => { if (item.mo) monthSet.add(item.mo.trim()); });
+            masterData.forEach(item => { if (item.mo) monthSet.add(item.mo.trim()); });
+            
+            // Sắp xếp lại thứ tự tháng
+            let activeMonths = Array.from(monthSet).sort((a, b) => parseInt(getVietnameseMonth(a)) - parseInt(getVietnameseMonth(b)));
+
+            const uniqueDhcMap = new Map();
+            // ... (Các đoạn code bên dưới của hàm giữ nguyên không thay đổi)
 
             const uniqueDhcMap = new Map();
             globalData.dhc.forEach(row => {
