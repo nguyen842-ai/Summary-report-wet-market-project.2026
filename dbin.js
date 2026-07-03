@@ -54,5 +54,6 @@ const dbinSales = [
 {hq: "1.South",ar: "1. HCMC",Pv: "TP.Hồ Chí Minh" ,sku: "Miến tươi Song Long 3kg",mo: "Jul",Qty: 20,s:10221120 },
 {hq: "1.South",ar: "1. HCMC",Pv: "TP.Hồ Chí Minh" ,sku: "Miến tươi Song Long 450g",mo: "Jul",Qty: 3,s:1255800 },
 {hq: "1.South",ar: "1. HCMC",Pv: "TP.Hồ Chí Minh" ,sku: "Miến tươi Song Lân 500g",mo: "Jul",Qty: 2,s:1040635.869 },
+
   
 ];
