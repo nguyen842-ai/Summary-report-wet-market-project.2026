@@ -437,8 +437,9 @@
 
         // HÀM LẤY DATA TỪ API PROXY VERCEL
         async function fetchSheetTab(tabName) {
-            // Dùng đường dẫn tương đối để triệt tiêu hoàn toàn CORS
-            const VERCEL_PROXY_URL = `/api/sheets?sheet=${encodeURIComponent(tabName)}`;
+            // Khai báo rõ địa chỉ đầy đủ của máy chủ Vercel (Dùng link Production chính)
+            const VERCEL_DOMAIN = "https://summary-report-wet-market-project-2.vercel.app"; 
+            const VERCEL_PROXY_URL = `${VERCEL_DOMAIN}/api/sheets?sheet=${encodeURIComponent(tabName)}`;
             
             const response = await fetch(VERCEL_PROXY_URL);
             if (!response.ok) throw new Error(`Lỗi tải tab ${tabName}`);
