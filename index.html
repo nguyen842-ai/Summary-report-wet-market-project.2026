@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>© 2020 Copyright by Thai Corp. All rights reserved.</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="./dbin.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <link rel="icon" type="image/png" href="faviconTCI.png">
     <style>
         /* ==========================================================================
@@ -298,8 +300,10 @@
     </div>
 
     <script>
-        const SPREADSHEET_ID = '1Xtwk_Y7UGKNw2YC9c4kblae71mHahzr7GqV-sfiie6E';
-        const API_KEY = 'AIzaSyC8oIfsPGtSedj73Qky4aasg98xqkrWT5s'; 
+        // CẤU HÌNH SUPABASE CHO VIỆC TẢI SCRIPT BẢO MẬT
+        const SUPABASE_URL = "https://mrqldgycwovpbmzdeuyz.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_itZfZBVw7bxE184tGh7x8A_0_r-QB5p";
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let globalData = { gantt: [], swot: [], hcPlan: [], hcActual: [], dhc: [], skuDict: [] };
         let barChartInstance = null, donutChartInstance = null, secBarChartInstance = null, secDonutChartInstance = null;
@@ -397,7 +401,6 @@
             return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
         }
 
-        // HÀM TỰ ĐỘNG GỌT BỎ KHỐI LƯỢNG (g, kg, gr, l, ml) Ở BIỂU ĐỒ DONUT
         function removeWeight(str) {
             if (!str) return str;
             return str.replace(/\s*\d+(?:\.\d+)?\s*(g|kg|gr|ml|l)\b/gi, '').trim();
@@ -432,23 +435,40 @@
             });
         }
 
+        // HÀM LẤY DATA TỪ API PROXY VERCEL MỚI
         async function fetchSheetTab(tabName) {
-            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(tabName)}?key=${API_KEY}`;
-            const response = await fetch(url);
+            const VERCEL_PROXY_URL = `https://summary-report-wet-market-project-2026.vercel.app/api/sheets?sheet=${encodeURIComponent(tabName)}`;
+            const response = await fetch(VERCEL_PROXY_URL);
             if (!response.ok) throw new Error(`Lỗi tải tab ${tabName}`);
             const data = await response.json();
-            return data.values;
+            return data.values || [];
         }
 
-        function loadDataScripts() {
+        // HÀM TẢI FILE JS TỪ BUCKET SUPABASE THAY VÌ GỌI LOCAL
+        async function loadScriptFromSupabase(fileName) {
+            try {
+                const { data, error } = await supabase.storage.from('chotruyenthong').download(fileName);
+                if (error) throw error;
+                const text = await data.text();
+                const script = document.createElement('script');
+                script.textContent = text;
+                document.head.appendChild(script);
+                return true;
+            } catch (err) {
+                console.warn(`Bỏ qua file (không tồn tại hoặc lỗi): ${fileName}`);
+                return false;
+            }
+        }
+
+        async function loadDataScripts() {
+            document.getElementById('loading-status').innerText = "Đang tải dữ liệu bảo mật từ Supabase...";
+            
+            // 1. Tải file dbin.js đầu tiên
+            await loadScriptFromSupabase('dbin.js');
+            
+            // 2. Loop từ 1 đến 12 để quét file dataM (Chỉ những file có trên bucket mới được tải xuống)
             const promises = Array.from({ length: 12 }, (_, i) => {
-                return new Promise((resolve) => {
-                    let script = document.createElement('script');
-                    script.src = `./dataM${i + 1}.js`;
-                    script.onload = () => resolve(true);
-                    script.onerror = () => resolve(false);
-                    document.head.appendChild(script);
-                });
+                return loadScriptFromSupabase(`dataM${i + 1}.js`);
             });
             return Promise.all(promises);
         }
@@ -465,6 +485,8 @@
             const statusText = document.getElementById('loading-status');
 
             try {
+                statusText.innerText = "Đang đồng bộ Google Sheets...";
+                
                 try {
                     let dSheet = await fetchSheetTab('D');
                     if (dSheet?.length > 0 && dSheet[0].length > 0) {
@@ -838,7 +860,6 @@
             const ctxDonut = document.getElementById('donutChart').getContext('2d');
             if(donutChartInstance) donutChartInstance.destroy();
             
-            // LẤY LABEL CHO DONUT (ĐÃ TỰ ĐỘNG GỌT BỎ KHỐI LƯỢNG)
             const labelsSku = [
                 removeWeight(getDictTranslation("Song Lân")), 
                 removeWeight(getDictTranslation("Miến Tươi")), 
@@ -972,7 +993,6 @@
             const ctxSecDonut = document.getElementById('sec-donutChart').getContext('2d');
             if(secDonutChartInstance) secDonutChartInstance.destroy();
             
-            // LẤY LABEL CHO DONUT (ĐÃ TỰ ĐỘNG GỌT BỎ KHỐI LƯỢNG)
             const labelsSku = [
                 removeWeight(getDictTranslation("Song Lân")), 
                 removeWeight(getDictTranslation("Miến Tươi")), 
@@ -1141,25 +1161,18 @@
 
         function renderCoverageTables() {
             const selectedArea = document.getElementById('filter-area').value;
-            
-            // 1. Ép cứng selectedMonth là 'All' để không bị ảnh hưởng bởi bộ lọc Tháng
             const selectedMonth = 'All'; 
             
             const masterData = getAggregatedMasterData();
             const salesData = getAggregatedSecondarySales();
             const lang = getLang();
 
-            // 2. Gom tất cả các tháng từ MỌI NGUỒN (D HC, Sales, Master) để đảm bảo không sót tháng 7
             const monthSet = new Set();
             globalData.dhc.forEach(item => { if (item._raw?.[6]) monthSet.add(item._raw[6].trim()); });
             salesData.forEach(item => { if (item.mo) monthSet.add(item.mo.trim()); });
             masterData.forEach(item => { if (item.mo) monthSet.add(item.mo.trim()); });
             
-            // Sắp xếp lại thứ tự tháng
             let activeMonths = Array.from(monthSet).sort((a, b) => parseInt(getVietnameseMonth(a)) - parseInt(getVietnameseMonth(b)));
-
-            const uniqueDhcMap = new Map();
-            // ... (Các đoạn code bên dưới của hàm giữ nguyên không thay đổi)
 
             const uniqueDhcMap = new Map();
             globalData.dhc.forEach(row => {
