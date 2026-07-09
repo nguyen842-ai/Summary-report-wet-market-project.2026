@@ -1,7 +1,14 @@
 // File: api/sheets.js
 export default async function handler(req, res) {
+    // 1. Cấu hình CORS để cho phép Frontend gọi API
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    // Phản hồi ngay với request OPTIONS (Preflight) của trình duyệt
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
 
     if (req.method !== 'GET') {
         return res.status(405).json({ message: 'Method Not Allowed' });
@@ -14,7 +21,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Chưa cấu hình biến môi trường GOOGLE_SHEETS_API_KEY trên Vercel.' });
     }
 
-    // Đọc tên Tab từ URL (ví dụ: ?sheet=Gantt)
+    // Đọc tham số sheet từ URL (VD: ?sheet=Gantt)
     const sheetName = req.query.sheet;
 
     if (!sheetName) {
@@ -31,7 +38,6 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: data.error.message });
         }
         
-        // Trả về toàn bộ ma trận dữ liệu của Tab đó cho Frontend
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error: 'Lỗi kết nối đến hệ thống Google Sheets.' });
