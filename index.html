@@ -447,33 +447,37 @@
             return data.values || [];
         }
 
-        // HÀM TẢI FILE JS TỪ BUCKET SUPABASE THAY VÌ GỌI LOCAL
+        // HÀM TẢI FILE JS TỪ BUCKET SUPABASE (Dùng biến supabaseApp)
         async function loadScriptFromSupabase(fileName) {
             try {
-                // Đổi thành supabaseApp.storage...
                 const { data, error } = await supabaseApp.storage.from('chotruyenthong').download(fileName);
-                if (error) throw error;
+                if (error) throw error; // Nếu file không có, ném lỗi để nhảy vào catch
+                
                 const text = await data.text();
                 const script = document.createElement('script');
                 script.textContent = text;
                 document.head.appendChild(script);
                 return true;
             } catch (err) {
-                console.warn(`Bỏ qua file (không tồn tại hoặc lỗi): ${fileName}`);
+                // In ra cảnh báo màu vàng, web vẫn chạy tiếp các hàm khác bình thường
+                console.warn(`Đã bỏ qua file (không có trên hệ thống): ${fileName}`);
                 return false;
             }
         }
 
+        // HÀM QUẢN LÝ VÒNG LẶP
         async function loadDataScripts() {
             document.getElementById('loading-status').innerText = "Đang tải dữ liệu bảo mật từ Supabase...";
             
-            // 1. Tải file dbin.js đầu tiên
+            // 1. Tải file dbin.js trước (Vì nó quan trọng)
             await loadScriptFromSupabase('dbin.js');
             
-            // 2. Loop từ 1 đến 12 để quét file dataM (Chỉ những file có trên bucket mới được tải xuống)
+            // 2. Chạy vòng lặp quét tự động từ dataM1.js đến dataM12.js
             const promises = Array.from({ length: 12 }, (_, i) => {
                 return loadScriptFromSupabase(`dataM${i + 1}.js`);
             });
+            
+            // Đợi quét xong tất cả 12 file (cái nào có thì lấy, không có thì bỏ qua)
             return Promise.all(promises);
         }
 
