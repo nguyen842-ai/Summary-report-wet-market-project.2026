@@ -466,7 +466,7 @@
 
         // HÀM QUẢN LÝ VÒNG LẶP
         async function loadDataScripts() {
-            document.getElementById('loading-status').innerText = "Đang tải dữ liệu bảo mật từ Supabase...";
+            document.getElementById('loading-status').innerText = "Đang tải dữ liệu...";
             
             // 1. Tải file dbin.js trước (Vì nó quan trọng)
             await loadScriptFromSupabase('dbin.js');
@@ -492,7 +492,7 @@
             const statusText = document.getElementById('loading-status');
 
             try {
-                statusText.innerText = "Đang đồng bộ Google Sheets...";
+                statusText.innerText = "Đang hoàn tất đồng bộ...";
                 
                 try {
                     let dSheet = await fetchSheetTab('D');
