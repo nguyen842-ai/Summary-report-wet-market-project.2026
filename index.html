@@ -303,7 +303,7 @@
         // CẤU HÌNH SUPABASE CHO VIỆC TẢI SCRIPT BẢO MẬT
         const SUPABASE_URL = "https://mrqldgycwovpbmzdeuyz.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_itZfZBVw7bxE184tGh7x8A_0_r-QB5p";
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseApp = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let globalData = { gantt: [], swot: [], hcPlan: [], hcActual: [], dhc: [], skuDict: [] };
         let barChartInstance = null, donutChartInstance = null, secBarChartInstance = null, secDonutChartInstance = null;
@@ -447,7 +447,8 @@
         // HÀM TẢI FILE JS TỪ BUCKET SUPABASE THAY VÌ GỌI LOCAL
         async function loadScriptFromSupabase(fileName) {
             try {
-                const { data, error } = await supabase.storage.from('chotruyenthong').download(fileName);
+                // Đổi thành supabaseApp.storage...
+                const { data, error } = await supabaseApp.storage.from('chotruyenthong').download(fileName);
                 if (error) throw error;
                 const text = await data.text();
                 const script = document.createElement('script');
