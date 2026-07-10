@@ -481,7 +481,24 @@
             return Promise.all(promises);
         }
 
-        window.addEventListener('DOMContentLoaded', async () => {
+       window.addEventListener('DOMContentLoaded', async () => {
+            // 1. ÔNG BẢO VỆ: KIỂM TRA ĐĂNG NHẬP TRƯỚC KHI LÀM BẤT CỨ VIỆC GÌ
+            const { data: { session } } = await supabaseApp.auth.getSession();
+            
+            if (!session) {
+                // Xóa màn hình chờ (để không bị kẹt loading)
+                document.getElementById('loading-screen').style.display = 'none';
+                
+                // Cảnh báo và tự động đá văng về trang chủ Portal
+                alert("Truy cập bị từ chối! Vui lòng đăng nhập hệ thống.");
+                
+                // 👇 BẠN NHỚ SỬA LINK NÀY THÀNH LINK TRANG CHỦ GITHUB CỦA BẠN NHÉ
+                window.location.href = "https://nguyen842-ai.github.io/Tong-hop-bao-cao/"; 
+                
+                return; // Lệnh return này cực kỳ quan trọng: Nó chặn đứng việc tải dữ liệu bên dưới!
+            }
+
+            // 2. NẾU ĐÃ ĐĂNG NHẬP HỢP LỆ, MỚI CHO PHÉP TẢI DỮ LIỆU BÁO CÁO
             await loadDataScripts();
             initDashboard();
         });
