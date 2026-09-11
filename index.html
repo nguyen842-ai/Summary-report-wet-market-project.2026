@@ -647,7 +647,7 @@
                 sheet.data.forEach(r => { if(r._raw?.[sheet.idx]) months.add(r._raw[sheet.idx]); });
             });
             monthFilter.innerHTML = `<option value="All">${i18n[getLang()].allMonth}</option>`;
-            Array.from(months).sort().forEach(m => {
+            Array.from(months).sort((a, b) => parseInt(getVietnameseMonth(a)) - parseInt(getVietnameseMonth(b))).forEach(m => {
                 let num = getVietnameseMonth(m);
                 let label = (getLang() === 'en') ? (shortMonthsEn[num] || num) : (`Tháng ${num}`);
                 monthFilter.innerHTML += `<option value="${m}">${label}</option>`;
@@ -770,7 +770,7 @@
         function renderPrimarySale() {
             const filteredDbin = filterDataGanttSales(typeof dbinSales !== 'undefined' ? dbinSales : [], true);
             const monthsSet = new Set(filteredDbin.map(r => r.mo));
-            const availableMonths = Array.from(monthsSet).sort();
+            const availableMonths = Array.from(monthsSet).sort((a, b) => parseInt(getVietnameseMonth(a)) - parseInt(getVietnameseMonth(b)));
             const lang = getLang();
 
             if(filteredDbin.length === 0) {
@@ -913,7 +913,7 @@
             const allSecSales = getAggregatedSecondarySales();
             let filteredSec = filterDataGanttSales(allSecSales, true).filter(r => !r.sku?.toLowerCase().includes("cá"));
             const monthsSet = new Set(filteredSec.map(r => r.mo));
-            const availableMonths = Array.from(monthsSet).sort();
+            const availableMonths = Array.from(monthsSet).sort((a, b) => parseInt(getVietnameseMonth(a)) - parseInt(getVietnameseMonth(b)));
             const lang = getLang();
 
             if(filteredSec.length === 0) {
